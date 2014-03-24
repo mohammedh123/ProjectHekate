@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BulletSystem.cs" />
     <Compile Include="Helpers\Math.cs" />
     <Compile Include="MathExtras\Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

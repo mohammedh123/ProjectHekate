@@ -17,6 +17,7 @@ namespace ProjectHekate.GUI.Screens
     }
     class TestScreen : GameScreen
     {
+        private IBulletSystem _bulletSystem;
         private Player _player = new Player();
         private Sprite _playerSprite;
 
@@ -59,6 +60,10 @@ namespace ProjectHekate.GUI.Screens
             
             dx *= (float)gameTime.TotalSeconds;
             dy *= (float)gameTime.TotalSeconds;
+
+            if (input.Keyboard.IsKeyDown(Keyboard.Key.Z)) {
+                _bulletSystem.FireBullet(_player.X, _player.Y, 0);
+            }
 
             _player.X += dx;
             _player.Y += dy;
