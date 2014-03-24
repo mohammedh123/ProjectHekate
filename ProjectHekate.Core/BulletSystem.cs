@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace ProjectHekate.Core
     public interface IBulletSystem
     {
         IBullet FireBullet(float x, float y, int spriteIndex);
+
+        IReadOnlyCollection<IBullet> Bullets { get; } 
     }
 
     public class BulletSystem : IBulletSystem
@@ -40,11 +43,15 @@ namespace ProjectHekate.Core
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
         private int _availableBulletIndex;
 
+        public IReadOnlyCollection<IBullet> Bullets { get; private set; } 
+
         public BulletSystem()
         {
             for (var i = 0; i < MaxBullets; i++) {
                 _bullets[i] = new Bullet();
             }
+
+            Bullets = Array.AsReadOnly(_bullets);
         }
 
         public IBullet FireBullet(float x, float y, int spriteIndex)
@@ -57,7 +64,7 @@ namespace ProjectHekate.Core
 
             return bullet;
         }
-
+        
         private Bullet FindNextAvailableBullet()
         {
             int i;
