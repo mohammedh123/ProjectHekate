@@ -32,7 +32,7 @@ namespace ProjectHekate.GUI
         {
             IsActive = true;
             
-            Window = new RenderWindow(new VideoMode(800,600), "ProjectHekate", Styles.Default);
+            Window = new RenderWindow(new VideoMode(1024,768), "ProjectHekate", Styles.Default);
             Window.SetFramerateLimit(60);
 
             Window.GainedFocus += OnGainedFocus;
@@ -54,6 +54,7 @@ namespace ProjectHekate.GUI
             ScreenManager = new ScreenManager(InputManager, this);
             ScreenManager.Initialize();
             // add screens
+            ScreenManager.AddScreen(new TestScreen());
             ScreenManager.LoadContent();
 
             var clock = new Stopwatch();
