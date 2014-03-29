@@ -67,7 +67,7 @@ namespace ProjectHekate.GUI.Screens
             dy *= (float)gameTime.TotalSeconds;
 
             if (input.Keyboard.IsKeyDown(Keyboard.Key.Z)) {
-                _bulletSystem.FireBullet(_player.X, _player.Y, 0);
+                _bulletSystem.FireBullet(_player.X, _player.Y, 0, 120, 0, b => b.Angle += 0.01f);
             }
 
             _player.X += dx;
@@ -79,6 +79,7 @@ namespace ProjectHekate.GUI.Screens
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             _playerSprite.Position = new Vector2f(_player.X, _player.Y);
+            _bulletSystem.Update((float)gameTime.TotalSeconds);
         }
 
         public override void Draw(TimeSpan gameTime)

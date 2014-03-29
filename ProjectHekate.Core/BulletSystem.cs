@@ -14,6 +14,8 @@ namespace ProjectHekate.Core
     {
         float X { get; }
         float Y { get; }
+        float Angle { get; }
+        float Speed { get; }
         int SpriteIndex { get; }
 
         bool IsActive { get; }
@@ -25,6 +27,8 @@ namespace ProjectHekate.Core
     {
         public float X { get; set; }
         public float Y { get; set; }
+        public float Angle { get; set; }
+        public float Speed { get; set; }
         public int SpriteIndex { get; set; }
 
         public Bullet()
@@ -44,20 +48,23 @@ namespace ProjectHekate.Core
 
     public interface IBulletSystem
     {
-        IBullet FireBullet(float x, float y, int spriteIndex);
-        IBullet FireBullet(float x, float y, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex);
+        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc);
 
-        IReadOnlyCollection<IBullet> Bullets { get; } 
+        IReadOnlyCollection<IBullet> Bullets { get; }
+
+        void Update(float dt);
     }
 
     public class BulletSystem : IBulletSystem
     {
         public const int MaxBullets = 2048;
 
+        // TODO: break bullets into arrays of components
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
         private int _availableBulletIndex;
 
-        public IReadOnlyCollection<IBullet> Bullets { get; private set; } 
+        public IReadOnlyCollection<IBullet> Bullets { get; private set; }
 
         public BulletSystem()
         {
@@ -68,26 +75,26 @@ namespace ProjectHekate.Core
             Bullets = Array.AsReadOnly(_bullets);
         }
 
-        public IBullet FireBullet(float x, float y, int spriteIndex)
+        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex)
         {
-            return InternalFireBullet(x, y, spriteIndex);
+            return InternalFireBullet(x, y, angle, speed, spriteIndex);
         }
 
-        public IBullet FireBullet(float x, float y, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc)
         {
-            var bullet = InternalFireBullet(x, y, spriteIndex);
-            bullet.UpdateFunc = bulletFunc;
-
-            return bullet;
+            return InternalFireBullet(x, y, angle, speed, spriteIndex, bulletFunc);
         }
 
-        private Bullet InternalFireBullet(float x, float y, int spriteIndex)
+        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc = null)
         {
             var bullet = FindNextAvailableBullet();
 
             bullet.X = x;
             bullet.Y = y;
+            bullet.Angle = angle;
+            bullet.Speed = speed;
             bullet.SpriteIndex = spriteIndex;
+            bullet.UpdateFunc = bulletFunc;
 
             return bullet;
         }
@@ -109,6 +116,23 @@ namespace ProjectHekate.Core
             if (i == MaxBullets) _availableBulletIndex = (_availableBulletIndex + 1) % MaxBullets;
 
             return _bullets[_availableBulletIndex];
+        }
+
+
+        public void Update(float dt)
+        {
+            Bullet b;
+            for (var i = 0; i < MaxBullets; i++) {
+                b = _bullets[i];
+
+                if (b.IsActive)
+                {
+                    b.X += (float)Math.Cos(b.Angle) * b.Speed * dt;
+                    b.Y += (float)Math.Sin(b.Angle) * b.Speed * dt;
+
+                    b.Update();
+                }
+            }
         }
     }
 }
