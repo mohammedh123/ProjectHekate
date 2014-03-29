@@ -8,14 +8,20 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Core
 {
+    public delegate void UpdateDelegate(Bullet bullet);
+
     public interface IBullet
     {
         float X { get; }
         float Y { get; }
         int SpriteIndex { get; }
+
+        bool IsActive { get; }
+
+        void Update();
     }
 
-    class Bullet : IBullet
+    public class Bullet : IBullet
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -27,11 +33,19 @@ namespace ProjectHekate.Core
         }
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
+
+        public void Update()
+        {
+            if(UpdateFunc != null) UpdateFunc(this);
+        }
+
+        public UpdateDelegate UpdateFunc { get; set; }
     }
 
     public interface IBulletSystem
     {
         IBullet FireBullet(float x, float y, int spriteIndex);
+        IBullet FireBullet(float x, float y, int spriteIndex, UpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; } 
     }
@@ -55,6 +69,19 @@ namespace ProjectHekate.Core
         }
 
         public IBullet FireBullet(float x, float y, int spriteIndex)
+        {
+            return InternalFireBullet(x, y, spriteIndex);
+        }
+
+        public IBullet FireBullet(float x, float y, int spriteIndex, UpdateDelegate bulletFunc)
+        {
+            var bullet = InternalFireBullet(x, y, spriteIndex);
+            bullet.UpdateFunc = bulletFunc;
+
+            return bullet;
+        }
+
+        private Bullet InternalFireBullet(float x, float y, int spriteIndex)
         {
             var bullet = FindNextAvailableBullet();
 

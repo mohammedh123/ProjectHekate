@@ -21,8 +21,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|x64.ActiveCfg = Debug|x64
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Debug|x64.Build.0 = Debug|x64
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,8 +33,8 @@ Global
 		{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}.Release|x64.Build.0 = Release|x64
 		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|x64.ActiveCfg = Debug|x64
 		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Debug|x64.Build.0 = Debug|x64
 		{420B4D23-453A-4BAF-A999-A898B075F5C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
