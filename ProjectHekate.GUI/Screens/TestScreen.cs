@@ -15,11 +15,13 @@ namespace ProjectHekate.GUI.Screens
         public float X { get; set; }
         public float Y { get; set; }
     }
+
     class TestScreen : GameScreen
     {
         private IBulletSystem _bulletSystem;
         private Player _player = new Player();
         private Sprite _playerSprite;
+        private List<Sprite> _bulletSprites = new List<Sprite>(); 
 
         public TestScreen()
         {
@@ -31,6 +33,9 @@ namespace ProjectHekate.GUI.Screens
             Game.TextureManager.LoadTexture("tilemap", @"Resources/Textures/tilemap.png");
 
             _playerSprite = new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0,0,32,32));
+
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 16, 16)));
         }
 
         public override void HandleInput(IInputManager<Mouse.Button, Vector2i, Window, Keyboard.Key> input, TimeSpan gameTime)
@@ -81,6 +86,24 @@ namespace ProjectHekate.GUI.Screens
             Game.Window.Clear();
 
             Game.Window.Draw(_playerSprite);
+
+            DrawBullets();
+        }
+
+        private void DrawBullets()
+        {
+            IBullet b;
+            Sprite sprite;
+            for (int i = 0; i < _bulletSystem.Bullets.Count; i++) {
+                b = _bulletSystem.Bullets.ElementAt(i);
+                
+                if (b.IsActive) {
+                    sprite = _bulletSprites[b.SpriteIndex];
+                    sprite.Position = new Vector2f(b.X, b.Y);
+
+                    Game.Window.Draw(sprite);
+                }
+            }
         }
     }
 }
