@@ -1,0 +1,28 @@
+emitter NameHere
+{
+    int x;
+    int y;
+    float z;
+    
+	state InitialState
+	{
+        function Run()
+        {
+            for(int i = 0; i < 50; i++) {
+                FireBullet(X, Y, Angle, 500, ...);
+                Wait(0.03);
+            }
+            
+            SetState(NextState);
+        }
+	}
+	
+	state NextState
+	{
+	}
+    
+	Initialize()
+    {
+        SetState(InitialState);
+	}	
+}
