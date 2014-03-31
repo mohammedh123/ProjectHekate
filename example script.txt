@@ -4,25 +4,25 @@ emitter NameHere
     int y;
     float z;
     
-	state InitialState
-	{
-        function Run()
+    state InitialState
+    {
+        function void Run()
         {
-            for(int i = 0; i < 50; i++) {
-                FireBullet(X, Y, Angle, 500, ...);
+            for(int variableName = 0; variableName < 50; variableName++) {
+                FireBullet(X, Y, Angle, 500, 500);
                 Wait(0.03);
             }
             
             SetState(NextState);
         }
-	}
-	
-	state NextState
-	{
-	}
+    }
     
-	Initialize()
+    state NextState
+    {
+    }
+    
+    Initialize
     {
         SetState(InitialState);
-	}	
+    }    
 }
