@@ -266,7 +266,7 @@ namespace ProjectHekate.Scripting
             constantDeclaration.Rule = "const" + typeRef + constantDeclarators + semi;
             constantDeclarator.Rule = identifier + "=" + expression;
             constantDeclarators.Rule = MakePlusRule(constantDeclarators, comma, constantDeclarator);
-            fieldDeclaration.Rule = typeRef + variableDeclarators + semi;
+            fieldDeclaration.Rule = builtinType + variableDeclarators + semi;
             variableDeclarator.Rule = identifier | identifier + "=" + elemInitializer;
             variableDeclarators.Rule = MakePlusRule(variableDeclarators, comma, variableDeclarator);
 
