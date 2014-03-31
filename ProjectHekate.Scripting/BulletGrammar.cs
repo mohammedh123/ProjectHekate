@@ -252,15 +252,15 @@ namespace ProjectHekate.Scripting
             emitterDeclarationList.Rule = MakePlusRule(emitterDeclarationList, null, emitterDeclaration);
             emitterDeclaration.Rule = "emitter" + qualifiedIdentifier + emitterBody + semiOpt;
             qualifiedIdentifier.Rule = MakePlusRule(qualifiedIdentifier, dot, identifier);
-            emitterBody.Rule = "{" + emitterMemberDeclarations + "}";
+            emitterBody.Rule = "{" + emitterMemberDeclarations + initializeDeclaration + emitterMemberDeclarations + "}";
             emitterMemberDeclaration.Rule = memberDeclaration | stateDeclaration;
-            emitterMemberDeclarations.Rule = MakePlusRule(emitterMemberDeclarations, null, emitterMemberDeclaration);
+            emitterMemberDeclarations.Rule = MakeStarRule(emitterMemberDeclarations, null, emitterMemberDeclaration);
             initializeDeclaration.Rule = "Initialize" + block;
             stateDeclarations.Rule = MakePlusRule(stateDeclarations, null, stateDeclaration);
             stateDeclaration.Rule = "state" + identifier + stateBody;
             stateBody.Rule = lbr + memberDeclarationsOpt + rbr;
 
-            memberDeclaration.Rule = constantDeclaration | fieldDeclaration | functionDeclaration | initializeDeclaration;
+            memberDeclaration.Rule = constantDeclaration | fieldDeclaration | functionDeclaration;
             memberDeclaration.ErrorRule = SyntaxError + ";" | SyntaxError + "}";
             memberDeclarationsOpt.Rule = MakeStarRule(memberDeclarationsOpt, null, memberDeclaration);
             constantDeclaration.Rule = "const" + typeRef + constantDeclarators + semi;
