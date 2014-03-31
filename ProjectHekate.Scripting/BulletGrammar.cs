@@ -155,7 +155,7 @@ namespace ProjectHekate.Scripting
             AddTermsReportGroup("type declaration", "emitter", "state");
             AddTermsReportGroup("constant", number, stringLiteral, charLiteral);
             AddTermsReportGroup("constant", "true", "false", "null");
-
+            AddTermsReportGroup("initialize", "Initialize");
             AddTermsReportGroup("unary operator", "+", "-", "!", "~");
 
             AddToNoReportGroup(comma, semi);
