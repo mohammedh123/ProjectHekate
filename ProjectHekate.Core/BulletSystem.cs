@@ -140,42 +140,43 @@ namespace ProjectHekate.Core
 
         public void Update(float dt)
         {
-            Bullet b;
             for (var i = 0; i < MaxBullets; i++) {
-                b = _bullets[i];
+                var b = _bullets[i];
 
-                if (b.IsActive)
-                {
-                    b.X += (float)Math.Cos(b.Angle) * b.Speed * dt;
-                    b.Y += (float)Math.Sin(b.Angle) * b.Speed * dt;
+                if (!b.IsActive) {
+                    continue;
+                }
 
-                    // if the func is not waiting, call Update()
-                    // if attempting to MoveNext on the Update() returns false, call Update() again
-                    if (_bulletWaitTimers[i] <= 0) {
-                        var loopAgain = true;
+                b.X += (float)Math.Cos(b.Angle) * b.Speed;
+                b.Y += (float)Math.Sin(b.Angle) * b.Speed;
+                    
+                // if the bullet's "update state" is ready
+                if (_bulletWaitTimers[i] <= 0) {
+                    var loopAgain = true;
 
-                        while (loopAgain) {
-                            _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
-                            if (_bulletEnumerators[i].MoveNext()) {
-                                if (_bulletEnumerators[i].Current is WaitForSeconds) {
-                                    _bulletWaitTimers[i] = (_bulletEnumerators[i].Current as WaitForSeconds).Delay;
+                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                    // this means that if there isn't a yield return, the function will loop infinitely
+                    // TODO: somehow prevent that
+                    while (loopAgain) {
+                        _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
 
-                                    loopAgain = false;
-                                }
-                                else {
-                                    throw new InvalidOperationException("A bullet script has an invalid iterator return type.");
-                                }
-                            }
-                            else {
-                                _bulletEnumerators[i] = b.Update();
+                        // this steps through the bullet's update function until it hits a yield return
+                        if (_bulletEnumerators[i].MoveNext()) {
+                            // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
+                            // starting next frame, this bullet is 'waiting'
+                            _bulletWaitTimers[i] = _bulletEnumerators[i].Current.Delay;
 
-                                loopAgain = true;
-                            }
+                            loopAgain = false;
+                        }
+                        else { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                            _bulletEnumerators[i] = b.Update();
+
+                            loopAgain = true;
                         }
                     }
-                    else {
-                        _bulletWaitTimers[i] -= dt;
-                    }
+                }
+                else { // the bullet is "waiting"
+                    _bulletWaitTimers[i]--;
                 }
             }
         }
