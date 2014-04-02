@@ -8,24 +8,31 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Core
 {
-    public class WaitForSeconds
+    public class WaitInFrames
     {
-        public float Delay { get; set; }
+        public int Delay { get; set; }
 
-        public WaitForSeconds(float delay)
+        public WaitInFrames(int delay)
         {
             Delay = delay;
         }
     }
 
-    public delegate IEnumerator UpdateDelegate(Bullet bullet);
+    public delegate IEnumerator<WaitInFrames> UpdateDelegate(Bullet bullet);
 
     public interface IBullet
     {
         float X { get; }
+
         float Y { get; }
+
         float Angle { get; }
+
+        /// <summary>
+        /// The speed of the bullet (measured in pixels per frame).
+        /// </summary>
         float Speed { get; }
+
         int SpriteIndex { get; }
 
         bool IsActive { get; }
@@ -46,10 +53,9 @@ namespace ProjectHekate.Core
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
 
-        public IEnumerator Update()
+        public IEnumerator<WaitInFrames> Update()
         {
-            if(UpdateFunc != null) return UpdateFunc(this);
-            return null;
+            return UpdateFunc != null ? UpdateFunc(this) : null;
         }
 
         public UpdateDelegate UpdateFunc { get; set; }
@@ -57,8 +63,8 @@ namespace ProjectHekate.Core
 
     public interface IBulletSystem
     {
-        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex);
-        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
+        IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
 
@@ -72,7 +78,7 @@ namespace ProjectHekate.Core
         // TODO: break bullets into arrays of components
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
         private readonly float[] _bulletWaitTimers = new float[MaxBullets];
-        private readonly IEnumerator[] _bulletEnumerators = new IEnumerator[MaxBullets];
+        private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
         private int _availableBulletIndex;
 
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
@@ -88,14 +94,14 @@ namespace ProjectHekate.Core
             Bullets = Array.AsReadOnly(_bullets);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex)
+        public IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
         {
-            return InternalFireBullet(x, y, angle, speed, spriteIndex);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
         {
-            return InternalFireBullet(x, y, angle, speed, spriteIndex, bulletFunc);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
         private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc = null)

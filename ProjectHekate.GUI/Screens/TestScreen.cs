@@ -68,17 +68,19 @@ namespace ProjectHekate.GUI.Screens
             dy *= (float)gameTime.TotalSeconds;
 
             if (input.Keyboard.IsKeyDown(Keyboard.Key.Z)) {
-                _bulletSystem.FireBullet(_player.X, _player.Y, 0, 120, 0, TestFunc);
+                _bulletSystem.FireBullet(_player.X, _player.Y, 0, 2, 0, TestFunc);
             }
 
             _player.X += dx;
             _player.Y += dy;
         }
 
-        public IEnumerator TestFunc(Bullet b)
+        public IEnumerator<WaitInFrames> TestFunc(Bullet b)
         {
             b.Angle += 1f;
-            yield return new WaitForSeconds(2.0f);
+            yield return new WaitInFrames(30);
+            b.Angle -= 0.5f;
+            yield return new WaitInFrames(10);
         }
 
         public override void Update(TimeSpan gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
