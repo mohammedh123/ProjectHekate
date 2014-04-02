@@ -135,6 +135,10 @@
       <Project>{5cf4018e-2fdf-4e2d-b74b-4356aae8de7e}</Project>
       <Name>ProjectHekate.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProjectHekate.Scripting\ProjectHekate.Scripting.csproj">
+      <Project>{f6dda2fc-f78b-404f-870f-83a7594257a6}</Project>
+      <Name>ProjectHekate.Scripting</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
