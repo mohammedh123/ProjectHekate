@@ -66,24 +66,6 @@ namespace ProjectHekate.Core.Tests
                 // Verify: last fired != first fired
                 lastBullet.X.Should().NotBe(firstBullet.X);
             }
-            
-            [TestMethod]
-            public void ShouldProperlyAddUpdateFuncToBullet()
-            {
-                // Setup: none
-
-                // Act: call method with updatefunc
-                var bullet = System.FireBullet(0, 0, 0, 0, 0, b => b.Angle += 1);
-                
-                // Verify: bullet has updatefunc and it gets updated after calling update
-                bullet.Angle.Should().Be(0);
-                
-                bullet.Update();
-
-                bullet.Angle.Should().Be(1);
-            }
-
-            
         }
     }
 }

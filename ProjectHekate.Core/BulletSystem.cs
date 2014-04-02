@@ -8,7 +8,17 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Core
 {
-    public delegate void UpdateDelegate(Bullet bullet);
+    public class WaitForSeconds
+    {
+        public float Delay { get; set; }
+
+        public WaitForSeconds(float delay)
+        {
+            Delay = delay;
+        }
+    }
+
+    public delegate IEnumerator UpdateDelegate(Bullet bullet);
 
     public interface IBullet
     {
@@ -19,8 +29,6 @@ namespace ProjectHekate.Core
         int SpriteIndex { get; }
 
         bool IsActive { get; }
-
-        void Update();
     }
 
     public class Bullet : IBullet
@@ -38,9 +46,10 @@ namespace ProjectHekate.Core
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
 
-        public void Update()
+        public IEnumerator Update()
         {
-            if(UpdateFunc != null) UpdateFunc(this);
+            if(UpdateFunc != null) return UpdateFunc(this);
+            return null;
         }
 
         public UpdateDelegate UpdateFunc { get; set; }
@@ -62,6 +71,8 @@ namespace ProjectHekate.Core
 
         // TODO: break bullets into arrays of components
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
+        private readonly float[] _bulletWaitTimers = new float[MaxBullets];
+        private readonly IEnumerator[] _bulletEnumerators = new IEnumerator[MaxBullets];
         private int _availableBulletIndex;
 
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
@@ -70,6 +81,8 @@ namespace ProjectHekate.Core
         {
             for (var i = 0; i < MaxBullets; i++) {
                 _bullets[i] = new Bullet();
+                _bulletWaitTimers[i] = -1.0f;
+                _bulletEnumerators[i] = null;
             }
 
             Bullets = Array.AsReadOnly(_bullets);
@@ -130,7 +143,33 @@ namespace ProjectHekate.Core
                     b.X += (float)Math.Cos(b.Angle) * b.Speed * dt;
                     b.Y += (float)Math.Sin(b.Angle) * b.Speed * dt;
 
-                    b.Update();
+                    // if the func is not waiting, call Update()
+                    // if attempting to MoveNext on the Update() returns false, call Update() again
+                    if (_bulletWaitTimers[i] <= 0) {
+                        var loopAgain = true;
+
+                        while (loopAgain) {
+                            _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
+                            if (_bulletEnumerators[i].MoveNext()) {
+                                if (_bulletEnumerators[i].Current is WaitForSeconds) {
+                                    _bulletWaitTimers[i] = (_bulletEnumerators[i].Current as WaitForSeconds).Delay;
+
+                                    loopAgain = false;
+                                }
+                                else {
+                                    throw new InvalidOperationException("A bullet script has an invalid iterator return type.");
+                                }
+                            }
+                            else {
+                                _bulletEnumerators[i] = b.Update();
+
+                                loopAgain = true;
+                            }
+                        }
+                    }
+                    else {
+                        _bulletWaitTimers[i] -= dt;
+                    }
                 }
             }
         }
