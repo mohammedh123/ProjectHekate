@@ -8,48 +8,10 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Core
 {
-    public delegate void UpdateDelegate(Bullet bullet);
-
-    public interface IBullet
-    {
-        float X { get; }
-        float Y { get; }
-        float Angle { get; }
-        float Speed { get; }
-        int SpriteIndex { get; }
-
-        bool IsActive { get; }
-
-        void Update();
-    }
-
-    public class Bullet : IBullet
-    {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Angle { get; set; }
-        public float Speed { get; set; }
-        public int SpriteIndex { get; set; }
-
-        public Bullet()
-        {
-            SpriteIndex = -1;
-        }
-
-        public bool IsActive { get { return SpriteIndex >= 0; } }
-
-        public void Update()
-        {
-            if(UpdateFunc != null) UpdateFunc(this);
-        }
-
-        public UpdateDelegate UpdateFunc { get; set; }
-    }
-
     public interface IBulletSystem
     {
-        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex);
-        IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
 
@@ -62,6 +24,8 @@ namespace ProjectHekate.Core
 
         // TODO: break bullets into arrays of components
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
+        private readonly float[] _bulletWaitTimers = new float[MaxBullets];
+        private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
         private int _availableBulletIndex;
 
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
@@ -70,19 +34,21 @@ namespace ProjectHekate.Core
         {
             for (var i = 0; i < MaxBullets; i++) {
                 _bullets[i] = new Bullet();
+                _bulletWaitTimers[i] = -1.0f;
+                _bulletEnumerators[i] = null;
             }
 
             Bullets = Array.AsReadOnly(_bullets);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex)
+        public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
         {
-            return InternalFireBullet(x, y, angle, speed, spriteIndex);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
         {
-            return InternalFireBullet(x, y, angle, speed, spriteIndex, bulletFunc);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
         private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc = null)
@@ -121,16 +87,43 @@ namespace ProjectHekate.Core
 
         public void Update(float dt)
         {
-            Bullet b;
             for (var i = 0; i < MaxBullets; i++) {
-                b = _bullets[i];
+                var b = _bullets[i];
 
-                if (b.IsActive)
-                {
-                    b.X += (float)Math.Cos(b.Angle) * b.Speed * dt;
-                    b.Y += (float)Math.Sin(b.Angle) * b.Speed * dt;
+                if (!b.IsActive) {
+                    continue;
+                }
 
-                    b.Update();
+                b.X += (float)Math.Cos(b.Angle) * b.Speed;
+                b.Y += (float)Math.Sin(b.Angle) * b.Speed;
+                    
+                // if the bullet's "update state" is ready
+                if (_bulletWaitTimers[i] <= 0) {
+                    var loopAgain = true;
+
+                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                    // this means that if there isn't a yield return, the function will loop infinitely
+                    // TODO: somehow prevent that
+                    while (loopAgain) {
+                        _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
+
+                        // this steps through the bullet's update function until it hits a yield return
+                        if (_bulletEnumerators[i].MoveNext()) {
+                            // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
+                            // starting next frame, this bullet is 'waiting'
+                            _bulletWaitTimers[i] = _bulletEnumerators[i].Current.Delay;
+
+                            loopAgain = false;
+                        }
+                        else { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                            _bulletEnumerators[i] = b.Update();
+
+                            loopAgain = true;
+                        }
+                    }
+                }
+                else { // the bullet is "waiting"
+                    _bulletWaitTimers[i]--;
                 }
             }
         }
