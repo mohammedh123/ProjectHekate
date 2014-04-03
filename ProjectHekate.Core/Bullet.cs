@@ -2,16 +2,6 @@
 
 namespace ProjectHekate.Core
 {
-    public class WaitInFrames
-    {
-        public int Delay { get; set; }
-
-        public WaitInFrames(int delay)
-        {
-            Delay = delay;
-        }
-    }
-
     public delegate IEnumerator<WaitInFrames> UpdateDelegate(Bullet bullet);
 
     public interface IBullet
