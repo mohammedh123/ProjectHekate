@@ -8,6 +8,9 @@ namespace ProjectHekate.Core
 {
     public delegate IEnumerator<WaitInFrames> EmitterUpdateDelegate(Emitter emitter);
 
+    /// <summary>
+    /// Emitters are objects that fire off bullets. They are attached to a controller (you should not have a dangling emitter) and their positions are offset from the controller's position.
+    /// </summary>
     public interface IEmitter
     {
         float X { get; set; }
