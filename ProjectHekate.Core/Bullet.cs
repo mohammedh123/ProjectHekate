@@ -2,7 +2,7 @@
 
 namespace ProjectHekate.Core
 {
-    public delegate IEnumerator<WaitInFrames> UpdateDelegate(Bullet bullet);
+    public delegate IEnumerator<WaitInFrames> BulletUpdateDelegate(Bullet bullet);
 
     public interface IBullet
     {
@@ -42,6 +42,6 @@ namespace ProjectHekate.Core
             return UpdateFunc != null ? UpdateFunc(this) : null;
         }
 
-        internal UpdateDelegate UpdateFunc { get; set; }
+        internal BulletUpdateDelegate UpdateFunc { get; set; }
     }
 }

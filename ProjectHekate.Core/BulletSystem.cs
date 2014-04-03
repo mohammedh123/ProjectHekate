@@ -11,7 +11,7 @@ namespace ProjectHekate.Core
     public interface IBulletSystem
     {
         IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
-        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
 
@@ -43,15 +43,15 @@ namespace ProjectHekate.Core
 
         public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
         {
-            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
         }
 
-        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
-        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc = null)
+        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, BulletUpdateDelegate bulletFunc)
         {
             var bullet = FindNextAvailableBullet();
 
