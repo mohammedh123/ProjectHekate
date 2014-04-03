@@ -14,8 +14,6 @@ namespace ProjectHekate.Core
         float Y { get; set; }
         float Angle { get; set; }
         bool Enabled { get; set; }
-
-        void Update(float dt);
     }
 
     public class Emitter : IEmitter
@@ -25,9 +23,14 @@ namespace ProjectHekate.Core
         public float Angle { get; set; }
         public bool Enabled { get; set; }
 
-        public void Update(float dt)
+        internal Emitter()
+        {}
+
+        internal IEnumerator<WaitInFrames> Update()
         {
-            throw new NotImplementedException();
+            return UpdateFunc != null ? UpdateFunc(this) : null;
         }
+
+        internal EmitterUpdateDelegate UpdateFunc { get; set; }
     }
 }
