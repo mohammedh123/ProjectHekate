@@ -59,8 +59,10 @@
   <ItemGroup>
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletSystem.cs" />
+    <Compile Include="Controller.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="EmitterSystem.cs" />
+    <Compile Include="Engine.cs" />
     <Compile Include="Helpers\Math.cs" />
     <Compile Include="MathExtras\Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
