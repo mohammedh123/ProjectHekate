@@ -68,7 +68,7 @@ namespace ProjectHekate.GUI.Screens
             dy *= (float)gameTime.TotalSeconds;
 
             if (input.Keyboard.IsKeyDown(Keyboard.Key.Z)) {
-                _bulletSystem.FireBullet(_player.X, _player.Y, 0, 2, 0, TestFunc);
+                _bulletSystem.FireScriptedBullet(_player.X, _player.Y, 0, 2, 0, TestFunc);
             }
 
             _player.X += dx;

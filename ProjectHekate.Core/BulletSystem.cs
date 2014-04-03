@@ -63,8 +63,8 @@ namespace ProjectHekate.Core
 
     public interface IBulletSystem
     {
-        IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
-        IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
 
@@ -94,12 +94,12 @@ namespace ProjectHekate.Core
             Bullets = Array.AsReadOnly(_bullets);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
+        public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex);
         }
 
-        public IBullet FireBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
