@@ -96,7 +96,12 @@ namespace ProjectHekate.Core
 
                 b.X += (float)Math.Cos(b.Angle) * b.Speed;
                 b.Y += (float)Math.Sin(b.Angle) * b.Speed;
-                    
+
+                // if the bullet does not have a special update function, skip the wait logic
+                if (b.UpdateFunc == null) {
+                    continue;
+                }
+
                 // if the bullet's "update state" is ready
                 if (_bulletWaitTimers[i] <= 0) {
                     var loopAgain = true;
