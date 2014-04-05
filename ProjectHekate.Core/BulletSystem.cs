@@ -14,8 +14,6 @@ namespace ProjectHekate.Core
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
-
-        void Update(float dt);
     }
 
     public class BulletSystem : IBulletSystem
@@ -85,7 +83,7 @@ namespace ProjectHekate.Core
         }
 
 
-        public void Update(float dt)
+        internal void Update(float dt)
         {
             for (var i = 0; i < MaxBullets; i++) {
                 var b = _bullets[i];

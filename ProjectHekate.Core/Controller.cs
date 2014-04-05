@@ -15,8 +15,6 @@ namespace ProjectHekate.Core
         float Y { get; set; }
         float Angle { get; set; }
         bool Enabled { get; set; }
-
-        void AddEmitter(IEmitter e);
     }
 
     class Controller : IController
@@ -26,15 +24,10 @@ namespace ProjectHekate.Core
         public float Angle { get; set; }
         public bool Enabled { get; set; }
 
-        private readonly List<IEmitter> _emitters = new List<IEmitter>();
+        internal readonly List<Emitter> Emitters = new List<Emitter>();
 
 
         internal Controller()
         {}
-
-        public void AddEmitter(IEmitter e)
-        {
-            _emitters.Add(e);
-        }
     }
 }
