@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using ProjectHekate.Core;
 using ProjectHekate.GUI.Interfaces;
 using ProjectHekate.GUI.Managers;
@@ -25,6 +26,12 @@ namespace ProjectHekate.GUI
         public bool IsActive { get; private set; }
 
         public TimeSpan LastFrameTime { get; private set; }
+
+        public double LastRenderTime { get; private set; }
+
+        public double AverageRenderTimeForLastSecond { get; private set; }
+        private List<double> _lastRenderTimes = new List<double>();
+        private double _averageRenderTimeTimer = 0;
 
         public RenderWindow Window { get; private set; }
 
@@ -114,15 +121,34 @@ namespace ProjectHekate.GUI
             InputManager.Update();
 
             ScreenManager.Update(LastFrameTime);
+            _averageRenderTimeTimer += LastFrameTime.TotalSeconds;
 
             InputManager.PostUpdate();
         }
 
         private void RenderFrame(RenderWindow window)
         {
+            var renderClock = new Stopwatch();
+            renderClock.Start();
             ScreenManager.Draw(LastFrameTime);
+            LastRenderTime = renderClock.Elapsed.TotalMilliseconds;
+            renderClock.Reset();
+
+            UpdateAverageFrameTime();
 
             window.Display();
+        }
+
+        private void UpdateAverageFrameTime()
+        {
+            _lastRenderTimes.Add(LastRenderTime);
+
+            if (_averageRenderTimeTimer >= 1.0f) {
+                AverageRenderTimeForLastSecond = _lastRenderTimes.Average();
+                _lastRenderTimes.Clear();
+
+                _averageRenderTimeTimer = 0.0f;
+            }
         }
 
         public void Dispose()

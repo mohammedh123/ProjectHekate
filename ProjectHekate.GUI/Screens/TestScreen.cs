@@ -37,7 +37,8 @@ namespace ProjectHekate.GUI.Screens
         private IEngine _engine;
         private Player _player = new Player();
         private Sprite _playerSprite;
-        private List<Sprite> _bulletSprites = new List<Sprite>(); 
+        private List<Sprite> _bulletSprites = new List<Sprite>();
+        private Font _textFont = new Font(@"Resources/Fonts/arial.ttf");
 
         public TestScreen()
         {
@@ -123,6 +124,17 @@ namespace ProjectHekate.GUI.Screens
             Game.Window.Draw(_playerSprite);
 
             DrawBullets();
+
+            DrawRenderFrameTime();
+        }
+
+        private void DrawRenderFrameTime()
+        {
+            var textStr = String.Format("Avg render time: {0}\nRender time: {1}", Game.AverageRenderTimeForLastSecond.ToString("##.##"), Game.LastRenderTime.ToString("##.##"));
+            var text = new Text(textStr, _textFont);
+            text.CharacterSize = 16;
+
+            Game.Window.Draw(text);
         }
 
         private void DrawBullets()
