@@ -48,12 +48,31 @@ namespace ProjectHekate.GUI.Screens
                 .CreateController(_player.X, _player.Y, 0, true)
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
+
+            //_engine.CreateController(512, 300, 0, true)
+            //    .WithEmitter(0, 0, 0, true, SomeCrap1)
+            //    .Build();
         }
 
         public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IBulletSystem bs)
         {
-            bs.FireBasicBullet(e.X-5, e.Y, Math.ToRadians(-90), 5, 0);
+            bs.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
             bs.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+            yield return new WaitInFrames(5);
+        }
+
+        public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs)
+        {
+            e.Angle += Math.TwoPi/90;
+            var angles = 5;
+            var angleDiff = Math.TwoPi/angles;
+            for (int i = 0; i < angles; i++)
+            {
+                bs.FireScriptedBullet(e.X, e.Y, (e.Angle + angleDiff * i), 2, 0, TestFunc);
+                bs.FireScriptedBullet(e.X, e.Y, (-e.Angle + angleDiff * i), 2, 0, TestFunc);
+                bs.FireScriptedBullet(e.X, e.Y, (e.Angle + angleDiff * i), 3, 0, TestFunc);
+                bs.FireScriptedBullet(e.X, e.Y, (-e.Angle + angleDiff * i), 3, 0, TestFunc);
+            }
             yield return new WaitInFrames(5);
         }
 
@@ -103,10 +122,8 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> TestFunc(Bullet b)
         {
-            b.Angle += 1f;
-            yield return new WaitInFrames(30);
-            b.Angle -= 0.5f;
-            yield return new WaitInFrames(10);
+            b.Angle += Math.Pi/180;
+            yield return new WaitInFrames(1);
         }
 
         public override void Update(TimeSpan gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
