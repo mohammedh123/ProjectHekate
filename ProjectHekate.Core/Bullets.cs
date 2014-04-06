@@ -21,7 +21,7 @@ namespace ProjectHekate.Core
 
         bool IsActive { get; }
     }
-
+    
     public class Bullet : IBullet
     {
         public float X { get; set; }
