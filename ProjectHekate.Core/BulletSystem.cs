@@ -11,7 +11,7 @@ namespace ProjectHekate.Core
     public interface IBulletSystem
     {
         IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
-        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
     }
@@ -22,9 +22,9 @@ namespace ProjectHekate.Core
 
         // TODO: break bullets into arrays of components
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
+        private int _availableBulletIndex;
         private readonly float[] _bulletWaitTimers = new float[MaxBullets];
         private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
-        private int _availableBulletIndex;
 
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
 
@@ -44,12 +44,12 @@ namespace ProjectHekate.Core
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
         }
 
-        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
-        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, BulletUpdateDelegate bulletFunc)
+        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc)
         {
             var bullet = FindNextAvailableBullet();
 
@@ -66,21 +66,26 @@ namespace ProjectHekate.Core
         
         private Bullet FindNextAvailableBullet()
         {
-            int i;
-            for (i = 0; i < MaxBullets; i++)
-            {
-                var trueIndex = (_availableBulletIndex + i) % MaxBullets;
+            return FindNextAvailableProjectile(MaxBullets, ref _availableBulletIndex, _bullets);
+        }
 
-                if (!_bullets[trueIndex].IsActive)
+        private TProjectileType FindNextAvailableProjectile<TProjectileType>(int maxProjectiles, ref int availableProjectileIndex, TProjectileType[] projectileArray) where TProjectileType : AbstractProjectile
+        {
+            int i;
+            for (i = 0; i < maxProjectiles; i++)
+            {
+                var trueIndex = (availableProjectileIndex + i) % maxProjectiles;
+
+                if (!projectileArray[trueIndex].IsActive)
                 {
-                    _availableBulletIndex = trueIndex;
+                    availableProjectileIndex = trueIndex;
                     break;
                 }
             }
 
-            if (i == MaxBullets) _availableBulletIndex = (_availableBulletIndex + 1) % MaxBullets;
+            if (i == maxProjectiles) availableProjectileIndex = (availableProjectileIndex + 1) % maxProjectiles;
 
-            return _bullets[_availableBulletIndex];
+            return projectileArray[availableProjectileIndex];
         }
 
 
