@@ -20,6 +20,10 @@ namespace ProjectHekate.Core
         int SpriteIndex { get; }
 
         bool IsActive { get; }
+
+        uint FramesAlive { get; }
+
+        float Radius { get; }
     }
     
     public class Bullet : IBullet
@@ -29,6 +33,8 @@ namespace ProjectHekate.Core
         public float Angle { get; set; }
         public float Speed { get; set; }
         public int SpriteIndex { get; set; }
+        public uint FramesAlive { get; set; }
+        public float Radius { get; set; }
 
         internal Bullet()
         {

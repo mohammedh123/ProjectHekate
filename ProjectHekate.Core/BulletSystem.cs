@@ -59,6 +59,7 @@ namespace ProjectHekate.Core
             bullet.Speed = speed;
             bullet.SpriteIndex = spriteIndex;
             bullet.UpdateFunc = bulletFunc;
+            bullet.FramesAlive = 0;
 
             return bullet;
         }
@@ -88,46 +89,59 @@ namespace ProjectHekate.Core
             for (var i = 0; i < MaxBullets; i++) {
                 var b = _bullets[i];
 
-                if (!b.IsActive) {
+                if (!b.IsActive)
+                {
                     continue;
                 }
 
                 b.X += (float)Math.Cos(b.Angle) * b.Speed;
                 b.Y += (float)Math.Sin(b.Angle) * b.Speed;
 
+
                 // if the bullet does not have a special update function, skip the wait logic
-                if (b.UpdateFunc == null) {
+                if (b.UpdateFunc == null)
+                {
+                    b.FramesAlive++;
                     continue;
                 }
 
                 // if the bullet's "update state" is ready
-                if (_bulletWaitTimers[i] <= 0) {
+                if (_bulletWaitTimers[i] <= 0)
+                {
                     var loopAgain = true;
 
                     // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
                     // this means that if there isn't a yield return, the function will loop infinitely
                     // TODO: somehow prevent that
-                    while (loopAgain) {
+                    while (loopAgain)
+                    {
                         _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
 
                         // this steps through the bullet's update function until it hits a yield return
-                        if (_bulletEnumerators[i].MoveNext()) {
+                        if (_bulletEnumerators[i].MoveNext())
+                        {
                             // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
                             // starting next frame, this bullet is 'waiting'
                             _bulletWaitTimers[i] = _bulletEnumerators[i].Current.Delay;
 
                             loopAgain = false;
                         }
-                        else { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                        else
+                        {
+                            // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
                             _bulletEnumerators[i] = b.Update();
 
                             loopAgain = true;
                         }
                     }
                 }
-                else { // the bullet is "waiting"
+                else
+                {
+                    // the bullet is "waiting"
                     _bulletWaitTimers[i]--;
                 }
+
+                b.FramesAlive++;
             }
         }
     }
