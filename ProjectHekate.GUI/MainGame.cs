@@ -40,7 +40,6 @@ namespace ProjectHekate.GUI
             IsActive = true;
             
             Window = new RenderWindow(new VideoMode(1024,768), "ProjectHekate", Styles.Default);
-            Window.SetFramerateLimit(60);
 
             Window.GainedFocus += OnGainedFocus;
             Window.LostFocus += OnLostFocus;
