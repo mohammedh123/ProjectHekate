@@ -1,4 +1,6 @@
-﻿namespace ProjectHekate.Core.MathExtras
+﻿using System;
+
+namespace ProjectHekate.Core.MathExtras
 {
     public struct Vector<TNumericType>
     {
@@ -9,6 +11,11 @@
         {
             X = x;
             Y = y;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("({0}, {1})", X, Y);
         }
     }
 }
