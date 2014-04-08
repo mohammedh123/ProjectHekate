@@ -57,11 +57,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bullet.cs" />
+    <Compile Include="Bullets.cs" />
     <Compile Include="BulletSystem.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="Emitter.cs" />
+    <Compile Include="Engine.cs" />
     <Compile Include="Helpers\Math.cs" />
     <Compile Include="MathExtras\Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WaitInFrames.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,17 +2,7 @@
 
 namespace ProjectHekate.Core
 {
-    public class WaitInFrames
-    {
-        public int Delay { get; set; }
-
-        public WaitInFrames(int delay)
-        {
-            Delay = delay;
-        }
-    }
-
-    public delegate IEnumerator<WaitInFrames> UpdateDelegate(Bullet bullet);
+    public delegate IEnumerator<WaitInFrames> BulletUpdateDelegate(Bullet bullet);
 
     public interface IBullet
     {
@@ -31,7 +21,7 @@ namespace ProjectHekate.Core
 
         bool IsActive { get; }
     }
-
+    
     public class Bullet : IBullet
     {
         public float X { get; set; }
@@ -52,6 +42,6 @@ namespace ProjectHekate.Core
             return UpdateFunc != null ? UpdateFunc(this) : null;
         }
 
-        internal UpdateDelegate UpdateFunc { get; set; }
+        internal BulletUpdateDelegate UpdateFunc { get; set; }
     }
 }

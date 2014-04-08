@@ -11,11 +11,9 @@ namespace ProjectHekate.Core
     public interface IBulletSystem
     {
         IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
-        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
-
-        void Update(float dt);
     }
 
     public class BulletSystem : IBulletSystem
@@ -43,15 +41,15 @@ namespace ProjectHekate.Core
 
         public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
         {
-            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex);
+            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
         }
 
-        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, UpdateDelegate bulletFunc)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, BulletUpdateDelegate bulletFunc)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
-        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, UpdateDelegate bulletFunc = null)
+        private Bullet InternalFireBullet(float x, float y, float angle, float speed, int spriteIndex, BulletUpdateDelegate bulletFunc)
         {
             var bullet = FindNextAvailableBullet();
 
@@ -85,7 +83,7 @@ namespace ProjectHekate.Core
         }
 
 
-        public void Update(float dt)
+        internal void Update(float dt)
         {
             for (var i = 0; i < MaxBullets; i++) {
                 var b = _bullets[i];
@@ -96,7 +94,12 @@ namespace ProjectHekate.Core
 
                 b.X += (float)Math.Cos(b.Angle) * b.Speed;
                 b.Y += (float)Math.Sin(b.Angle) * b.Speed;
-                    
+
+                // if the bullet does not have a special update function, skip the wait logic
+                if (b.UpdateFunc == null) {
+                    continue;
+                }
+
                 // if the bullet's "update state" is ready
                 if (_bulletWaitTimers[i] <= 0) {
                     var loopAgain = true;
