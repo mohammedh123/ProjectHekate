@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using ProjectHekate.Core.MathExtras;
 
 namespace ProjectHekate.Core
 {
-    public delegate IEnumerator<WaitInFrames> BulletUpdateDelegate(Bullet bullet);
+    public delegate IEnumerator<WaitInFrames> ProjectileUpdateDelegate<in TProjectileType>(TProjectileType ap) where TProjectileType : AbstractProjectile;
 
     public interface IBullet
     {
@@ -25,8 +27,8 @@ namespace ProjectHekate.Core
 
         float Radius { get; }
     }
-    
-    public class Bullet : IBullet
+
+    public abstract class AbstractProjectile
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -36,10 +38,25 @@ namespace ProjectHekate.Core
         public uint FramesAlive { get; set; }
         public float Radius { get; set; }
 
-        internal Bullet()
+
+        public bool IsActive { get { return SpriteIndex >= 0; } }
+
+        internal AbstractProjectile()
         {
+
             SpriteIndex = -1;
         }
+    }
+    
+    public class Bullet : AbstractProjectile, IBullet
+    {
+        internal IEnumerator<WaitInFrames> Update()
+        {
+            return UpdateFunc != null ? UpdateFunc(this) : null;
+        }
+
+        virtual internal ProjectileUpdateDelegate<Bullet> UpdateFunc { get; set; }
+    }
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
 
