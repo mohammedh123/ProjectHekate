@@ -39,6 +39,7 @@ namespace ProjectHekate.GUI.Screens
         private Sprite _playerSprite;
         private List<Sprite> _bulletSprites = new List<Sprite>();
         private Font _textFont = new Font(@"Resources/Fonts/arial.ttf");
+        private VertexArray _vertexArray = new VertexArray(PrimitiveType.TrianglesStrip);
 
         public TestScreen()
         {
@@ -83,7 +84,9 @@ namespace ProjectHekate.GUI.Screens
             _playerSprite = new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0,0,32,32));
 
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)));
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 16, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 32, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 32, 32, 16)));
         }
 
         public override void HandleInput(IInputManager<Mouse.Button, Vector2i, Window, Keyboard.Key> input, TimeSpan gameTime)
@@ -141,6 +144,7 @@ namespace ProjectHekate.GUI.Screens
             Game.Window.Draw(_playerSprite);
 
             DrawBullets();
+            DrawCurvedLasers();
 
             DrawRenderFrameTime();
         }
@@ -158,10 +162,125 @@ namespace ProjectHekate.GUI.Screens
         {
             IBullet b;
             Sprite sprite;
-            for (int i = 0; i < _engine.BulletSystem.Bullets.Count; i++) {
+            for (int i = 0; i < _engine.BulletSystem.Bullets.Count; i++)
+            {
                 b = _engine.BulletSystem.Bullets.ElementAt(i);
-                
-                if (b.IsActive) {
+
+                if (b.IsActive)
+                {
+                    sprite = _bulletSprites[b.SpriteIndex];
+                    sprite.Position = new Vector2f(b.X, b.Y);
+
+                    Game.Window.Draw(sprite);
+                }
+            }
+        }
+
+        private void DrawCurvedLasers()
+        {
+            ICurvedLaser cv;
+            Sprite sprite;
+
+            int texLeft, texTop, texWidth, texHeight;
+            for (int i = 0; i < _engine.BulletSystem.CurvedLasers.Count; i++)
+            {
+                cv = _engine.BulletSystem.CurvedLasers.ElementAt(i);
+
+                // needs at least 2 points to draw [at least 2 coordinates]
+                if (cv.IsActive && cv.FramesAlive >= 2) {
+                    sprite = _bulletSprites[cv.SpriteIndex];
+                    texLeft = sprite.TextureRect.Left;
+                    texTop = sprite.TextureRect.Top;
+                    texWidth = sprite.TextureRect.Width;
+                    texHeight = sprite.TextureRect.Height;
+
+                    uint limit = System.Math.Min(cv.FramesAlive, cv.Lifetime);
+                    _vertexArray.Resize(limit * 2);
+
+                    // 1st coordinate is always aimed at the 2nd coordinate
+                    var firstToSecondAngle = System.Math.Atan2(
+                        cv.Coordinates.ElementAt(1).Y - cv.Coordinates.ElementAt(0).Y,
+                        cv.Coordinates.ElementAt(1).X - cv.Coordinates.ElementAt(0).X
+                    );
+
+                    _vertexArray[0] = new Vertex(
+                        new Vector2f(
+                            cv.Coordinates.ElementAt(0).X + (float)System.Math.Cos(firstToSecondAngle - Math.PiOver2) * cv.Radius,
+                            cv.Coordinates.ElementAt(0).Y + (float)System.Math.Sin(firstToSecondAngle - Math.PiOver2) * cv.Radius
+                        ), 
+                        Color.White,
+                        new Vector2f(texLeft,texTop)
+                    );
+                    _vertexArray[1] = new Vertex(
+                        new Vector2f(
+                            cv.Coordinates.ElementAt(0).X + (float)System.Math.Cos(firstToSecondAngle + Math.PiOver2) * cv.Radius,
+                            cv.Coordinates.ElementAt(0).Y + (float)System.Math.Sin(firstToSecondAngle + Math.PiOver2) * cv.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texLeft, texTop+texHeight)
+                    );
+
+                    // the 'middle' coordinates are aimed slightly differently
+                    // to calculate where the offsets are, use the previous point's "3rd-angle"
+                    // "3rd-angle" refers to a point's angle to the point after the next point
+                    // i.e. point 1 to point 3
+                    for (var x = 1; x <= limit - 2; x++)
+                    {
+                        var xCoord = (float)x / (limit - 1);
+                        var previousThirdAngle = System.Math.Atan2(
+                            cv.Coordinates.ElementAt(x + 1).Y - cv.Coordinates.ElementAt(x - 1).Y,
+                            cv.Coordinates.ElementAt(x + 1).X - cv.Coordinates.ElementAt(x - 1).X
+                        );
+                        
+                        _vertexArray[(uint)x*2] = new Vertex(
+                            new Vector2f(
+                                cv.Coordinates.ElementAt(x).X + (float)System.Math.Cos(previousThirdAngle - Math.PiOver2) * cv.Radius,
+                                cv.Coordinates.ElementAt(x).Y + (float)System.Math.Sin(previousThirdAngle - Math.PiOver2) * cv.Radius
+                            ),
+                            Color.White,
+                            new Vector2f(texLeft+xCoord*texWidth,texTop)
+                        );
+                        _vertexArray[(uint)x*2+1] = new Vertex(
+                            new Vector2f(
+                                cv.Coordinates.ElementAt(x).X + (float)System.Math.Cos(previousThirdAngle + Math.PiOver2) * cv.Radius,
+                                cv.Coordinates.ElementAt(x).Y + (float)System.Math.Sin(previousThirdAngle + Math.PiOver2) * cv.Radius
+                            ),
+                            Color.White,
+                            new Vector2f(texLeft + xCoord * texWidth, texTop+texHeight)
+                        );
+                    }
+
+                    // penultimate coordinate is always aimed at last coordinate
+                    var penultimateToLastAngle = System.Math.Atan2(
+                        cv.Coordinates.ElementAt((int)limit-1).Y - cv.Coordinates.ElementAt((int)limit-2).Y,
+                        cv.Coordinates.ElementAt((int)limit-1).X - cv.Coordinates.ElementAt((int)limit-2).X
+                    );
+
+                    _vertexArray[limit*2-2] = new Vertex(
+                        new Vector2f(
+                            cv.Coordinates.ElementAt((int)limit-1).X + (float)System.Math.Cos(penultimateToLastAngle - Math.PiOver2) * cv.Radius,
+                            cv.Coordinates.ElementAt((int)limit-1).Y + (float)System.Math.Sin(penultimateToLastAngle - Math.PiOver2) * cv.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texLeft + texWidth, texTop)
+                    );
+                    _vertexArray[limit*2-1] = new Vertex(
+                        new Vector2f(
+                            cv.Coordinates.ElementAt((int)limit-1).X + (float)System.Math.Cos(penultimateToLastAngle + Math.PiOver2) * cv.Radius,
+                            cv.Coordinates.ElementAt((int)limit-1).Y + (float)System.Math.Sin(penultimateToLastAngle + Math.PiOver2) * cv.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texLeft + texWidth, texTop + texHeight)
+                    );
+
+                    
+                    var renderStates = new RenderStates(sprite.Texture);
+
+                    Game.Window.Draw(_vertexArray, renderStates);
+                }
+            }
+        }
+
                     sprite = _bulletSprites[b.SpriteIndex];
                     sprite.Position = new Vector2f(b.X, b.Y);
 
