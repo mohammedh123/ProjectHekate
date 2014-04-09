@@ -115,12 +115,17 @@ namespace ProjectHekate.Core
         internal ProjectileUpdateDelegate<CurvedLaser> UpdateFunc { get; set; }
     }
 
+    public class Beam : AbstractProjectile, IBeam
+    {
+        public uint DelayInFrames { get; set; }
+        public uint Lifetime { get; set; }
+
 
         internal IEnumerator<WaitInFrames> Update()
         {
             return UpdateFunc != null ? UpdateFunc(this) : null;
         }
 
-        internal BulletUpdateDelegate UpdateFunc { get; set; }
+        virtual internal ProjectileUpdateDelegate<Beam> UpdateFunc { get; set; }
     }
 }
