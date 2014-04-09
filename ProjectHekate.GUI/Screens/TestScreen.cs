@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectHekate.Core;
@@ -41,6 +42,8 @@ namespace ProjectHekate.GUI.Screens
         private Font _textFont = new Font(@"Resources/Fonts/arial.ttf");
         private VertexArray _vertexArray = new VertexArray(PrimitiveType.TrianglesStrip);
 
+        private const float BeamRenderLength = 1500;
+
         public TestScreen()
         {
             _engine = new Engine();
@@ -50,7 +53,7 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateController(512, 300, 0, true)
+            _engine.CreateController(512, 800, 0, true)
                 .WithEmitter(0, 0, 0, true, SomeCrap1)
                 .Build();
         }
@@ -64,27 +67,32 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs)
         {
-            e.Angle += Math.TwoPi/90;
-            var angles = 6;
-            var angleDiff = Math.TwoPi/angles;
-            for (int i = 0; i < angles; i++) {
-                bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 1, 1, TestLaserFunc);
-                bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 3, 2, TestLaserFunc);
-                bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 4, 3, TestLaserFunc);
-            }
-            yield return new WaitInFrames(120);
+            bs.FireBeam(e.X, e.Y, -Math.PiOver2, 24, 0, 60, 4);
+
+            yield return new WaitInFrames(600);
+            //e.Angle += Math.TwoPi/90;
+            //var angles = 6;
+            //var angleDiff = Math.TwoPi/angles;
+            //for (int i = 0; i < angles; i++) {
+            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 1, 1, TestLaserFunc);
+            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 3, 2, TestLaserFunc);
+            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 4, 3, TestLaserFunc);
+            //}
+            //yield return new WaitInFrames(120);
         }
 
         public override void LoadContent()
         {
             Game.TextureManager.LoadTexture("tilemap", @"Resources/Textures/tilemap.png");
+            Game.TextureManager.LoadSubTexture("laser", @"Resources/Textures/tilemap.png", 0, 32, 256, 32, true, true);
 
             _playerSprite = new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0,0,32,32));
 
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)));
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 32, 16)));
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)));
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 32, 32, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(80, 0, 32, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("laser")));
         }
 
         public override void HandleInput(IInputManager<Mouse.Button, Vector2i, Window, Keyboard.Key> input, TimeSpan gameTime)
@@ -157,6 +165,7 @@ namespace ProjectHekate.GUI.Screens
 
             DrawBullets();
             DrawCurvedLasers();
+            DrawBeams();
 
             DrawRenderFrameTime();
         }
@@ -293,10 +302,66 @@ namespace ProjectHekate.GUI.Screens
             }
         }
 
-                    sprite = _bulletSprites[b.SpriteIndex];
-                    sprite.Position = new Vector2f(b.X, b.Y);
+        private void DrawBeams()
+        {
+            IBullet b;
+            Sprite sprite;
+            _vertexArray.Resize(4);
+            int texLeft, texTop, texWidth, texHeight;
+ 
+            for (int i = 0; i < _engine.BulletSystem.Beams.Count; i++)
+            {
+                b = _engine.BulletSystem.Beams.ElementAt(i);
 
-                    Game.Window.Draw(sprite);
+                if (b.IsActive)
+                {
+                    sprite = _bulletSprites[b.SpriteIndex];
+                    texLeft = sprite.TextureRect.Left;
+                    texTop = sprite.TextureRect.Top;
+                    texWidth = sprite.TextureRect.Width;
+                    texHeight = sprite.TextureRect.Height;
+
+                    var texSkip = b.FramesAlive*16;
+                    _vertexArray[0] = new Vertex(
+                        new Vector2f(
+                            b.X + (float)System.Math.Cos(b.Angle - Math.PiOver2) * b.Radius,
+                            b.Y + (float)System.Math.Sin(b.Angle - Math.PiOver2) * b.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texSkip + texLeft, texTop)
+                    );
+
+                    _vertexArray[1] = new Vertex(
+                        new Vector2f(
+                            b.X + (float)System.Math.Cos(b.Angle + Math.PiOver2) * b.Radius,
+                            b.Y + (float)System.Math.Sin(b.Angle + Math.PiOver2) * b.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texSkip + texLeft, texTop + texHeight)
+                    );
+
+                    _vertexArray[2] = new Vertex(
+                        new Vector2f(
+                            b.X + (float)System.Math.Cos(b.Angle) * BeamRenderLength + (float)System.Math.Cos(b.Angle - Math.PiOver2) * b.Radius,
+                            b.Y + (float)System.Math.Sin(b.Angle) * BeamRenderLength + (float)System.Math.Sin(b.Angle - Math.PiOver2) * b.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texSkip + texLeft + texWidth * 1, texTop)
+                    );
+
+                    _vertexArray[3] = new Vertex(
+                        new Vector2f(
+                            b.X + (float)System.Math.Cos(b.Angle) * BeamRenderLength + (float)System.Math.Cos(b.Angle + Math.PiOver2) * b.Radius,
+                            b.Y + (float)System.Math.Sin(b.Angle) * BeamRenderLength + (float)System.Math.Sin(b.Angle + Math.PiOver2) * b.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texSkip + texLeft + texWidth * 1, texTop + texHeight)
+                    );
+
+                    var renderStates = new RenderStates(sprite.Texture);
+
+                    sprite.Texture.Repeated = true;
+                    Game.Window.Draw(_vertexArray, renderStates);
                 }
             }
         }

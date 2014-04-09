@@ -15,15 +15,19 @@ namespace ProjectHekate.Core
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
+        IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex,
+            ProjectileUpdateDelegate<Beam> beamFunc = null);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
         IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; }
+        IReadOnlyCollection<IBeam> Beams { get; }
     }
 
     public class BulletSystem : IBulletSystem
     {
         public const int MaxBullets = 2048;
         public const int MaxCurvedLasers = 64;
+        public const int MaxBeams = 256;
 
         // TODO: break projectiles into arrays of components
 
@@ -33,14 +37,21 @@ namespace ProjectHekate.Core
         private readonly CurvedLaser[] _curvedLasers = new CurvedLaser[MaxCurvedLasers];
         private int _availableCurvedLaserIndex;
 
+        private readonly Beam[] _beams = new Beam[MaxBeams];
+        private int _availableBeamIndex;
+
         private readonly float[] _bulletWaitTimers = new float[MaxBullets];
         private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
 
         private readonly float[] _curvedLaserWaitTimers = new float[MaxCurvedLasers];
         private readonly IEnumerator<WaitInFrames>[] _curvedLaserEnumerators = new IEnumerator<WaitInFrames>[MaxCurvedLasers];
 
+        private readonly float[] _beamWaitTimers = new float[MaxBeams];
+        private readonly IEnumerator<WaitInFrames>[] _beamEnumerators = new IEnumerator<WaitInFrames>[MaxBeams];
+
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
         public IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; private set; }
+        public IReadOnlyCollection<IBeam> Beams { get; private set; }
 
         public BulletSystem()
         {
@@ -58,8 +69,16 @@ namespace ProjectHekate.Core
                 _curvedLaserEnumerators[i] = null;
             }
 
+            for (var i = 0; i < MaxBeams; i++)
+            {
+                _beams[i] = new Beam();
+                _beamWaitTimers[i] = -1.0f;
+                _beamEnumerators[i] = null;
+            }
+
             Bullets = Array.AsReadOnly(_bullets);
             CurvedLasers = Array.AsReadOnly(_curvedLasers);
+            Beams = Array.AsReadOnly(_beams);
         }
 
         #region Firing functions
@@ -77,6 +96,11 @@ namespace ProjectHekate.Core
         public ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<CurvedLaser> laserFunc)
         {
             return InternalFireCurvedLaser(x, y, angle, radius, lifetime, speedPerFrame, spriteIndex, laserFunc);
+        }
+
+        public IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
+        {
+            return InternalFireBeam(x, y, angle, radius, delayInFrames, lifetime, spriteIndex, beamFunc);
         }
 
         #endregion
@@ -116,6 +140,23 @@ namespace ProjectHekate.Core
             return cv;
         }
 
+        private IBeam InternalFireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
+        {
+            var b = FindNextAvailableBeam();
+
+            b.X = x;
+            b.Y = y;
+            b.Angle = angle;
+            b.Radius = radius;
+            b.DelayInFrames = delayInFrames;
+            b.Lifetime = lifetime;
+            b.SpriteIndex = spriteIndex;
+            b.FramesAlive = 0;
+            b.UpdateFunc = beamFunc;
+
+            return b;
+        }
+
         private Bullet FindNextAvailableBullet()
         {
             return FindNextAvailableProjectile(MaxBullets, ref _availableBulletIndex, _bullets);
@@ -124,6 +165,11 @@ namespace ProjectHekate.Core
         private CurvedLaser FindNextAvailableCurvedLaser()
         {
             return FindNextAvailableProjectile(MaxCurvedLasers, ref _availableCurvedLaserIndex, _curvedLasers);
+        }
+
+        private Beam FindNextAvailableBeam()
+        {
+            return FindNextAvailableProjectile(MaxBeams, ref _availableBeamIndex, _beams);
         }
 
         private TProjectileType FindNextAvailableProjectile<TProjectileType>(int maxProjectiles, ref int availableProjectileIndex, TProjectileType[] projectileArray) where TProjectileType : AbstractProjectile
@@ -151,6 +197,7 @@ namespace ProjectHekate.Core
         {
             UpdateBullets();
             UpdateCurvedLasers();
+            UpdateBeams();
         }
 
         private void UpdateBullets()
@@ -290,5 +337,62 @@ namespace ProjectHekate.Core
             }
         }
 
+        private void UpdateBeams()
+        {
+            for (var i = 0; i < MaxBeams; i++)
+            {
+                var b = _beams[i];
+
+                if (!b.IsActive)
+                {
+                    continue;
+                }
+                
+                // if the beam does not have a special update function, skip the wait logic
+                if (b.UpdateFunc == null)
+                {
+                    b.FramesAlive++;
+                    continue;
+                }
+
+                // if the beam's "update state" is ready
+                if (_beamWaitTimers[i] <= 0)
+                {
+                    var loopAgain = true;
+
+                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                    // this means that if there isn't a yield return, the function will loop infinitely
+                    // TODO: somehow prevent that
+                    while (loopAgain)
+                    {
+                        _beamEnumerators[i] = _beamEnumerators[i] ?? b.Update();
+
+                        // this steps through the beam's update function until it hits a yield return
+                        if (_beamEnumerators[i].MoveNext())
+                        {
+                            // TODO: check the type of _beamEnumerators[i].Current to make sure it isn't null?
+                            // starting next frame, this beam is 'waiting'
+                            _beamWaitTimers[i] = _beamEnumerators[i].Current.Delay;
+
+                            loopAgain = false;
+                        }
+                        else
+                        {
+                            // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                            _beamEnumerators[i] = b.Update();
+
+                            loopAgain = true;
+                        }
+                    }
+                }
+                else
+                {
+                    // the beam is "waiting"
+                    _beamWaitTimers[i]--;
+                }
+
+                b.FramesAlive++;
+            }
+        }
     }
 }
