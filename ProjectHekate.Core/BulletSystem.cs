@@ -17,6 +17,7 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
         IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
+        ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
 
         IReadOnlyCollection<IBullet> Bullets { get; }
         IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; }
