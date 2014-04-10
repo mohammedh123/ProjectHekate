@@ -57,6 +57,8 @@ namespace ProjectHekate.Core
         /// Max length of the laser.
         /// </summary>
         float Length { get; }
+
+        float CurrentLength { get; }
     }
 
     public abstract class AbstractProjectile
@@ -139,8 +141,8 @@ namespace ProjectHekate.Core
 
     public class Laser : AbstractProjectile, ILaser
     {
-        public float Length { get; set; }
+        public float Length { get; internal set; }
 
-        internal float CurrentLength { get; set; }
+        public float CurrentLength { get; internal set; }
     }
 }
