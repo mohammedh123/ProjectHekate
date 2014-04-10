@@ -390,6 +390,11 @@ namespace ProjectHekate.Core
                 {
                     continue;
                 }
+
+                if (b.FramesAlive > b.Lifetime) {
+                    // kill this beam
+                    // TODO: above
+                }
                 
                 // if the beam does not have a special update function, skip the wait logic
                 if (b.UpdateFunc == null)
