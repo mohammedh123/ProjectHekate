@@ -304,7 +304,7 @@ namespace ProjectHekate.GUI.Screens
 
         private void DrawBeams()
         {
-            IBullet b;
+            IBeam b;
             Sprite sprite;
             _vertexArray.Resize(4);
             int texLeft, texTop, texWidth, texHeight;
@@ -360,7 +360,10 @@ namespace ProjectHekate.GUI.Screens
 
                     var renderStates = new RenderStates(sprite.Texture);
 
-                    sprite.Texture.Repeated = true;
+                    Game.Window.Draw(_vertexArray, renderStates);
+                }
+            }
+        }
                     Game.Window.Draw(_vertexArray, renderStates);
                 }
             }
