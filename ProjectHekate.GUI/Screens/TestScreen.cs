@@ -53,7 +53,7 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateController(512, 800, 0, true)
+            _engine.CreateController(512, 384, 0, true)
                 .WithEmitter(0, 0, 0, true, SomeCrap1)
                 .Build();
         }
@@ -67,18 +67,32 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs)
         {
-            bs.FireBeam(e.X, e.Y, -Math.PiOver2, 24, 0, 60, 4);
+            e.Angle += Math.TwoPi / 90;
+            var angles = 5;
+            var angleDiff = Math.TwoPi / angles;
+            for (int i = 0; i < angles; i++)
+            {
+                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 180.0f) * 150f;
+                bs.FireLaser(
+                    e.X + (float)System.Math.Cos(angleDiff * i + e.Angle) * distance,
+                    e.Y + (float)System.Math.Sin(angleDiff * i + e.Angle) * distance, 
+                    (e.Angle + angleDiff * i) + Math.TwoPi/angles,
+                    6, 100, 5, 1);
+            }
 
-            yield return new WaitInFrames(600);
-            //e.Angle += Math.TwoPi/90;
-            //var angles = 6;
-            //var angleDiff = Math.TwoPi/angles;
-            //for (int i = 0; i < angles; i++) {
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 1, 1, TestLaserFunc);
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 3, 2, TestLaserFunc);
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 4, 3, TestLaserFunc);
-            //}
-            //yield return new WaitInFrames(120);
+            for (int i = 0; i < angles; i++)
+            {
+                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 60.0f) * 50f;
+                bs.FireLaser(
+                    e.X + (float)System.Math.Cos(angleDiff * i - e.Angle) * distance,
+                    e.Y + (float)System.Math.Sin(angleDiff * i - e.Angle) * distance,
+                    Math.Pi + (-e.Angle + angleDiff * i) + Math.PiOver2,
+                    6, (e.FramesAlive % 3 == 0) ? 100 : 50, 5, (e.FramesAlive % 3 == 0) ? 2 : 3);
+            }
+
+            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 3, 2);
+            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 4, 3);
+            yield return new WaitInFrames(3);
         }
 
         public override void LoadContent()
