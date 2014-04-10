@@ -19,6 +19,7 @@ namespace ProjectHekate.Core
         float OffsetY { get; set; }
         float Angle { get; set; }
         bool Enabled { get; set; }
+        int FramesAlive { get; }
     }
 
     public class Emitter : IEmitter
@@ -27,6 +28,7 @@ namespace ProjectHekate.Core
         public float OffsetY { get; set; }
         public float Angle { get; set; }
         public bool Enabled { get; set; }
+        public int FramesAlive { get; internal set; }
 
         public float X { get; internal set; }
         public float Y { get; internal set; }

@@ -53,7 +53,7 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateController(512, 800, 0, true)
+            _engine.CreateController(512, 384, 0, true)
                 .WithEmitter(0, 0, 0, true, SomeCrap1)
                 .Build();
         }
@@ -67,18 +67,32 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs)
         {
-            bs.FireBeam(e.X, e.Y, -Math.PiOver2, 24, 0, 60, 4);
+            e.Angle += Math.TwoPi / 90;
+            var angles = 5;
+            var angleDiff = Math.TwoPi / angles;
+            for (int i = 0; i < angles; i++)
+            {
+                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 180.0f) * 150f;
+                bs.FireLaser(
+                    e.X + (float)System.Math.Cos(angleDiff * i + e.Angle) * distance,
+                    e.Y + (float)System.Math.Sin(angleDiff * i + e.Angle) * distance, 
+                    (e.Angle + angleDiff * i) + Math.TwoPi/angles,
+                    6, 100, 5, 1);
+            }
 
-            yield return new WaitInFrames(600);
-            //e.Angle += Math.TwoPi/90;
-            //var angles = 6;
-            //var angleDiff = Math.TwoPi/angles;
-            //for (int i = 0; i < angles; i++) {
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 1, 1, TestLaserFunc);
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 3, 2, TestLaserFunc);
-            //    bs.FireCurvedLaser(e.X, e.Y, (e.Angle + angleDiff*i), 8, 64, 4, 3, TestLaserFunc);
-            //}
-            //yield return new WaitInFrames(120);
+            for (int i = 0; i < angles; i++)
+            {
+                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 60.0f) * 50f;
+                bs.FireLaser(
+                    e.X + (float)System.Math.Cos(angleDiff * i - e.Angle) * distance,
+                    e.Y + (float)System.Math.Sin(angleDiff * i - e.Angle) * distance,
+                    Math.Pi + (-e.Angle + angleDiff * i) + Math.PiOver2,
+                    6, (e.FramesAlive % 3 == 0) ? 100 : 50, 5, (e.FramesAlive % 3 == 0) ? 2 : 3);
+            }
+
+            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 3, 2);
+            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 4, 3);
+            yield return new WaitInFrames(3);
         }
 
         public override void LoadContent()
@@ -166,6 +180,7 @@ namespace ProjectHekate.GUI.Screens
             DrawBullets();
             DrawCurvedLasers();
             DrawBeams();
+            DrawLasers();
 
             DrawRenderFrameTime();
         }
@@ -304,7 +319,7 @@ namespace ProjectHekate.GUI.Screens
 
         private void DrawBeams()
         {
-            IBullet b;
+            IBeam b;
             Sprite sprite;
             _vertexArray.Resize(4);
             int texLeft, texTop, texWidth, texHeight;
@@ -360,7 +375,77 @@ namespace ProjectHekate.GUI.Screens
 
                     var renderStates = new RenderStates(sprite.Texture);
 
-                    sprite.Texture.Repeated = true;
+                    Game.Window.Draw(_vertexArray, renderStates);
+                }
+            }
+        }
+
+        private void DrawLasers()
+        {
+            ILaser l;
+            Sprite sprite;
+            _vertexArray.Resize(4);
+            int texLeft, texTop, texWidth, texRight, texHeight;
+
+            for (int i = 0; i < _engine.BulletSystem.Lasers.Count; i++)
+            {
+                l = _engine.BulletSystem.Lasers.ElementAt(i);
+
+                if (l.IsActive)
+                {
+                    sprite = _bulletSprites[l.SpriteIndex];
+                    texLeft = sprite.TextureRect.Left;
+                    texTop = sprite.TextureRect.Top;
+                    texWidth = sprite.TextureRect.Width;
+                    texRight = texLeft + texWidth;
+                    texHeight = sprite.TextureRect.Height;
+
+                    // texLeft needs to be calculated
+                    // for example, if the lasers CurrentLength is half of its Length, it should look like:
+                    // ====>
+                    // while if the lasers CurrentLength is 100% of its Length, it should look like:
+                    // <========>
+                    // texLeft = texRight - (int)((l.CurrentLength/l.Length)*texWidth);
+                    // on second thought...maybe lets not do that
+
+                    _vertexArray[0] = new Vertex(
+                        new Vector2f(
+                            l.X + (float)System.Math.Cos(l.Angle - Math.PiOver2) * l.Radius,
+                            l.Y + (float)System.Math.Sin(l.Angle - Math.PiOver2) * l.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texLeft, texTop)
+                    );
+
+                    _vertexArray[1] = new Vertex(
+                        new Vector2f(
+                            l.X + (float)System.Math.Cos(l.Angle + Math.PiOver2) * l.Radius,
+                            l.Y + (float)System.Math.Sin(l.Angle + Math.PiOver2) * l.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texLeft, texTop + texHeight)
+                    );
+
+                    _vertexArray[2] = new Vertex(
+                        new Vector2f(
+                            l.X - (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle - Math.PiOver2) * l.Radius,
+                            l.Y - (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle - Math.PiOver2) * l.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texRight, texTop)
+                    );
+
+                    _vertexArray[3] = new Vertex(
+                        new Vector2f(
+                            l.X - (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle + Math.PiOver2) * l.Radius,
+                            l.Y - (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle + Math.PiOver2) * l.Radius
+                        ),
+                        Color.White,
+                        new Vector2f(texRight, texTop + texHeight)
+                    );
+
+                    var renderStates = new RenderStates(sprite.Texture);
+
                     Game.Window.Draw(_vertexArray, renderStates);
                 }
             }

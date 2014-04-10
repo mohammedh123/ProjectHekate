@@ -115,6 +115,7 @@ namespace ProjectHekate.Core
 
                 // if the emitter does not have a special update function, skip the wait logic
                 if (emitter.UpdateFunc == null) {
+                    emitter.FramesAlive++;
                     continue;
                 }
 
@@ -151,6 +152,8 @@ namespace ProjectHekate.Core
                 { // the emitter is "waiting"
                     emitter.WaitTimer--;
                 }
+
+                emitter.FramesAlive++;
             }
         }
     }
