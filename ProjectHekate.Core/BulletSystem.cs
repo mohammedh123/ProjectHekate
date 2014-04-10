@@ -21,6 +21,7 @@ namespace ProjectHekate.Core
         IReadOnlyCollection<IBullet> Bullets { get; }
         IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; }
         IReadOnlyCollection<IBeam> Beams { get; }
+        IReadOnlyCollection<ILaser> Lasers { get; }
     }
 
     public class BulletSystem : IBulletSystem
