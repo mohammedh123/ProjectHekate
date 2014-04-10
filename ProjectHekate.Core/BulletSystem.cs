@@ -192,6 +192,7 @@ namespace ProjectHekate.Core
             l.Speed = speedPerFrame;
             l.SpriteIndex = spriteIndex;
             l.FramesAlive = 0;
+            l.CurrentLength = 0;
 
             return l;
         }

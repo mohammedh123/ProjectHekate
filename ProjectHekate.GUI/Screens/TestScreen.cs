@@ -373,7 +373,7 @@ namespace ProjectHekate.GUI.Screens
             _vertexArray.Resize(4);
             int texLeft, texTop, texWidth, texRight, texHeight;
 
-            for (int i = 0; i < _engine.BulletSystem.Beams.Count; i++)
+            for (int i = 0; i < _engine.BulletSystem.Lasers.Count; i++)
             {
                 l = _engine.BulletSystem.Lasers.ElementAt(i);
 
@@ -391,7 +391,8 @@ namespace ProjectHekate.GUI.Screens
                     // ====>
                     // while if the lasers CurrentLength is 100% of its Length, it should look like:
                     // <========>
-                    texLeft = texRight - (int)((l.CurrentLength/l.Length)*texWidth);
+                    // texLeft = texRight - (int)((l.CurrentLength/l.Length)*texWidth);
+                    // on second thought...maybe lets not do that
 
                     _vertexArray[0] = new Vertex(
                         new Vector2f(
@@ -413,8 +414,8 @@ namespace ProjectHekate.GUI.Screens
 
                     _vertexArray[2] = new Vertex(
                         new Vector2f(
-                            l.X + (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle - Math.PiOver2) * l.Radius,
-                            l.Y + (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle - Math.PiOver2) * l.Radius
+                            l.X - (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle - Math.PiOver2) * l.Radius,
+                            l.Y - (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle - Math.PiOver2) * l.Radius
                         ),
                         Color.White,
                         new Vector2f(texRight, texTop)
@@ -422,8 +423,8 @@ namespace ProjectHekate.GUI.Screens
 
                     _vertexArray[3] = new Vertex(
                         new Vector2f(
-                            l.X + (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle + Math.PiOver2) * l.Radius,
-                            l.Y + (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle + Math.PiOver2) * l.Radius
+                            l.X - (float)System.Math.Cos(l.Angle) * l.CurrentLength + (float)System.Math.Cos(l.Angle + Math.PiOver2) * l.Radius,
+                            l.Y - (float)System.Math.Sin(l.Angle) * l.CurrentLength + (float)System.Math.Sin(l.Angle + Math.PiOver2) * l.Radius
                         ),
                         Color.White,
                         new Vector2f(texRight, texTop + texHeight)
