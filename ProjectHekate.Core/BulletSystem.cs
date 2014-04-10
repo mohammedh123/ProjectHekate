@@ -28,9 +28,10 @@ namespace ProjectHekate.Core
         public const int MaxBullets = 2048;
         public const int MaxCurvedLasers = 64;
         public const int MaxBeams = 256;
+        public const int MaxLasers = 1024;
 
         // TODO: break projectiles into arrays of components
-
+        // TODO: organize the fuck outta this
         private readonly Bullet[] _bullets = new Bullet[MaxBullets];
         private int _availableBulletIndex;
 
@@ -39,6 +40,9 @@ namespace ProjectHekate.Core
 
         private readonly Beam[] _beams = new Beam[MaxBeams];
         private int _availableBeamIndex;
+
+        private readonly Laser[] _lasers = new Laser[MaxLasers];
+        private int _availableLaserIndex;
 
         private readonly float[] _bulletWaitTimers = new float[MaxBullets];
         private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
@@ -49,9 +53,13 @@ namespace ProjectHekate.Core
         private readonly float[] _beamWaitTimers = new float[MaxBeams];
         private readonly IEnumerator<WaitInFrames>[] _beamEnumerators = new IEnumerator<WaitInFrames>[MaxBeams];
 
+        private readonly float[] _laserWaitTimers = new float[MaxLasers];
+        private readonly IEnumerator<WaitInFrames>[] _laserEnumerators = new IEnumerator<WaitInFrames>[MaxLasers];
+
         public IReadOnlyCollection<IBullet> Bullets { get; private set; }
         public IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; private set; }
         public IReadOnlyCollection<IBeam> Beams { get; private set; }
+        public IReadOnlyCollection<ILaser> Lasers { get; private set; }
 
         public BulletSystem()
         {
@@ -76,9 +84,17 @@ namespace ProjectHekate.Core
                 _beamEnumerators[i] = null;
             }
 
+            for (var i = 0; i < MaxLasers; i++)
+            {
+                _lasers[i] = new Laser();
+                _laserWaitTimers[i] = -1.0f;
+                _laserEnumerators[i] = null;
+            }
+
             Bullets = Array.AsReadOnly(_bullets);
             CurvedLasers = Array.AsReadOnly(_curvedLasers);
             Beams = Array.AsReadOnly(_beams);
+            Lasers = Array.AsReadOnly(_lasers);
         }
 
         #region Firing functions
@@ -101,6 +117,11 @@ namespace ProjectHekate.Core
         public IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
         {
             return InternalFireBeam(x, y, angle, radius, delayInFrames, lifetime, spriteIndex, beamFunc);
+        }
+
+        public ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
+        {
+            return InternalFireLaser(x, y, angle, radius, length, speedPerFrame, spriteIndex);
         }
 
         #endregion
@@ -157,6 +178,22 @@ namespace ProjectHekate.Core
             return b;
         }
 
+        private ILaser InternalFireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
+        {
+            var l = FindNextAvailableLaser();
+
+            l.X = x;
+            l.Y = y;
+            l.Angle = angle;
+            l.Radius = radius;
+            l.Length = length;
+            l.Speed = speedPerFrame;
+            l.SpriteIndex = spriteIndex;
+            l.FramesAlive = 0;
+
+            return l;
+        }
+
         private Bullet FindNextAvailableBullet()
         {
             return FindNextAvailableProjectile(MaxBullets, ref _availableBulletIndex, _bullets);
@@ -170,6 +207,11 @@ namespace ProjectHekate.Core
         private Beam FindNextAvailableBeam()
         {
             return FindNextAvailableProjectile(MaxBeams, ref _availableBeamIndex, _beams);
+        }
+
+        private Laser FindNextAvailableLaser()
+        {
+            return FindNextAvailableProjectile(MaxLasers, ref _availableLaserIndex, _lasers);
         }
 
         private TProjectileType FindNextAvailableProjectile<TProjectileType>(int maxProjectiles, ref int availableProjectileIndex, TProjectileType[] projectileArray) where TProjectileType : AbstractProjectile
@@ -198,6 +240,7 @@ namespace ProjectHekate.Core
             UpdateBullets();
             UpdateCurvedLasers();
             UpdateBeams();
+            UpdateLasers();
         }
 
         private void UpdateBullets()
@@ -392,6 +435,27 @@ namespace ProjectHekate.Core
                 }
 
                 b.FramesAlive++;
+            }
+        }
+
+        private void UpdateLasers()
+        {
+            for (var i = 0; i < MaxLasers; i++)
+            {
+                var l = _lasers[i];
+
+                if (!l.IsActive)
+                {
+                    continue;
+                }
+
+                l.X += (float)Math.Cos(l.Angle) * l.Speed;
+                l.Y += (float)Math.Sin(l.Angle) * l.Speed;
+
+                // update current length and cap it at max length
+                l.CurrentLength = Math.Min(l.CurrentLength + l.Speed, l.Length);
+
+                l.FramesAlive++;
             }
         }
     }
