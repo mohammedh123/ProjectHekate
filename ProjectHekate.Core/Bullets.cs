@@ -51,6 +51,14 @@ namespace ProjectHekate.Core
         uint Lifetime { get; }
     }
 
+    public interface ILaser : IBullet
+    {
+        /// <summary>
+        /// Max length of the laser.
+        /// </summary>
+        float Length { get; }
+    }
+
     public abstract class AbstractProjectile
     {
         public float X { get; set; }
@@ -127,5 +135,12 @@ namespace ProjectHekate.Core
         }
 
         virtual internal ProjectileUpdateDelegate<Beam> UpdateFunc { get; set; }
+    }
+
+    public class Laser : AbstractProjectile, ILaser
+    {
+        public float Length { get; set; }
+
+        internal float CurrentLength { get; set; }
     }
 }
