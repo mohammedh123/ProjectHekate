@@ -200,12 +200,13 @@ namespace ProjectHekate.GUI.Screens
             Sprite sprite;
             for (int i = 0; i < _engine.BulletSystem.Bullets.Count; i++)
             {
-                b = _engine.BulletSystem.Bullets.ElementAt(i);
+                b = _engine.BulletSystem.Bullets[i];
 
                 if (b.IsActive)
                 {
                     sprite = _bulletSprites[b.SpriteIndex];
                     sprite.Position = new Vector2f(b.X, b.Y);
+                    sprite.Rotation = Math.ToDegrees(b.Angle);
 
                     Game.Window.Draw(sprite);
                 }
@@ -220,7 +221,7 @@ namespace ProjectHekate.GUI.Screens
             int texLeft, texTop, texWidth, texHeight;
             for (int i = 0; i < _engine.BulletSystem.CurvedLasers.Count; i++)
             {
-                cv = _engine.BulletSystem.CurvedLasers.ElementAt(i);
+                cv = _engine.BulletSystem.CurvedLasers[i];
 
                 // needs at least 2 points to draw [at least 2 coordinates]
                 if (cv.IsActive && cv.FramesAlive >= 2) {
@@ -326,7 +327,7 @@ namespace ProjectHekate.GUI.Screens
  
             for (int i = 0; i < _engine.BulletSystem.Beams.Count; i++)
             {
-                b = _engine.BulletSystem.Beams.ElementAt(i);
+                b = _engine.BulletSystem.Beams[i];
 
                 if (b.IsActive)
                 {
@@ -389,7 +390,7 @@ namespace ProjectHekate.GUI.Screens
 
             for (int i = 0; i < _engine.BulletSystem.Lasers.Count; i++)
             {
-                l = _engine.BulletSystem.Lasers.ElementAt(i);
+                l = _engine.BulletSystem.Lasers[i];
 
                 if (l.IsActive)
                 {

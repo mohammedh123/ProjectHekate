@@ -19,10 +19,10 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
 
-        IReadOnlyCollection<IBullet> Bullets { get; }
-        IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; }
-        IReadOnlyCollection<IBeam> Beams { get; }
-        IReadOnlyCollection<ILaser> Lasers { get; }
+        IReadOnlyList<IBullet> Bullets { get; }
+        IReadOnlyList<ICurvedLaser> CurvedLasers { get; }
+        IReadOnlyList<IBeam> Beams { get; }
+        IReadOnlyList<ILaser> Lasers { get; }
     }
 
     public class BulletSystem : IBulletSystem
@@ -58,10 +58,10 @@ namespace ProjectHekate.Core
         private readonly float[] _laserWaitTimers = new float[MaxLasers];
         private readonly IEnumerator<WaitInFrames>[] _laserEnumerators = new IEnumerator<WaitInFrames>[MaxLasers];
 
-        public IReadOnlyCollection<IBullet> Bullets { get; private set; }
-        public IReadOnlyCollection<ICurvedLaser> CurvedLasers { get; private set; }
-        public IReadOnlyCollection<IBeam> Beams { get; private set; }
-        public IReadOnlyCollection<ILaser> Lasers { get; private set; }
+        public IReadOnlyList<IBullet> Bullets { get; private set; }
+        public IReadOnlyList<ICurvedLaser> CurvedLasers { get; private set; }
+        public IReadOnlyList<IBeam> Beams { get; private set; }
+        public IReadOnlyList<ILaser> Lasers { get; private set; }
 
         public BulletSystem()
         {
