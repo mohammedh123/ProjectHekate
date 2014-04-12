@@ -58,12 +58,8 @@ namespace ProjectHekate.Core
 
         // TODO: break projectiles into arrays of components
         // TODO: organize the fuck outta this
-        private ProjectileData<Bullet> _bulletData; 
-        
-        private readonly CurvedLaser[] _curvedLasers = new CurvedLaser[MaxCurvedLasers];
-        private int _availableCurvedLaserIndex;
-        private readonly float[] _curvedLaserWaitTimers = new float[MaxCurvedLasers];
-        private readonly IEnumerator<WaitInFrames>[] _curvedLaserEnumerators = new IEnumerator<WaitInFrames>[MaxCurvedLasers];
+        private ProjectileData<Bullet> _bulletData;
+        private ProjectileData<CurvedLaser> _curvedLaserData; 
         
         private readonly Beam[] _beams = new Beam[MaxBeams];
         private int _availableBeamIndex;
@@ -83,13 +79,7 @@ namespace ProjectHekate.Core
         public BulletSystem()
         {
             _bulletData = new ProjectileData<Bullet>(MaxBullets);
-
-            for (var i = 0; i < MaxCurvedLasers; i++)
-            {
-                _curvedLasers[i] = new CurvedLaser();
-                _curvedLaserWaitTimers[i] = -1.0f;
-                _curvedLaserEnumerators[i] = null;
-            }
+            _curvedLaserData = new ProjectileData<CurvedLaser>(MaxCurvedLasers);
 
             for (var i = 0; i < MaxBeams; i++)
             {
@@ -106,7 +96,7 @@ namespace ProjectHekate.Core
             }
 
             Bullets = Array.AsReadOnly(_bulletData.Projectiles);
-            CurvedLasers = Array.AsReadOnly(_curvedLasers);
+            CurvedLasers = Array.AsReadOnly(_curvedLaserData.Projectiles);
             Beams = Array.AsReadOnly(_beams);
             Lasers = Array.AsReadOnly(_lasers);
         }
@@ -216,7 +206,7 @@ namespace ProjectHekate.Core
 
         private CurvedLaser FindNextAvailableCurvedLaser()
         {
-            return FindNextAvailableProjectile(MaxCurvedLasers, ref _availableCurvedLaserIndex, _curvedLasers);
+            return FindNextAvailableProjectile(MaxCurvedLasers, ref _curvedLaserData.AvailableProjectileIndex, _curvedLaserData.Projectiles);
         }
 
         private Beam FindNextAvailableBeam()
@@ -260,7 +250,7 @@ namespace ProjectHekate.Core
 
         private void UpdateBullets()
         {
-            for (var i = 0; i < MaxBullets; i++)
+            for (var i = 0; i < _bulletData.Projectiles.Length; i++)
             {
                 var b = _bulletData.Projectiles[i];
 
@@ -322,9 +312,9 @@ namespace ProjectHekate.Core
 
         private void UpdateCurvedLasers()
         {
-            for (var i = 0; i < MaxCurvedLasers; i++)
+            for (var i = 0; i < _curvedLaserData.Projectiles.Length; i++)
             {
-                var cv = _curvedLasers[i];
+                var cv = _curvedLaserData.Projectiles[i];
 
                 if (!cv.IsActive) {
                     continue;
@@ -356,7 +346,7 @@ namespace ProjectHekate.Core
 
 
                 // if the curved laser's "update state" is ready
-                if (_curvedLaserWaitTimers[i] <= 0)
+                if (_curvedLaserData.ProjectileWaitTimers[i] <= 0)
                 {
                     var loopAgain = true;
 
@@ -365,21 +355,21 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _curvedLaserEnumerators[i] = _curvedLaserEnumerators[i] ?? cv.Update();
+                        _curvedLaserData.ProjectileEnumerators[i] = _curvedLaserData.ProjectileEnumerators[i] ?? cv.Update();
 
                         // this steps through the curved laser's update function until it hits a yield return
-                        if (_curvedLaserEnumerators[i].MoveNext())
+                        if (_curvedLaserData.ProjectileEnumerators[i].MoveNext())
                         {
                             // TODO: check the type of _curvedLaserEnumerators[i].Current to make sure it isn't null?
                             // starting next frame, this curved laser is 'waiting'
-                            _curvedLaserWaitTimers[i] = _curvedLaserEnumerators[i].Current.Delay;
+                            _curvedLaserData.ProjectileWaitTimers[i] = _curvedLaserData.ProjectileEnumerators[i].Current.Delay;
 
                             loopAgain = false;
                         }
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _curvedLaserEnumerators[i] = cv.Update();
+                            _curvedLaserData.ProjectileEnumerators[i] = cv.Update();
 
                             loopAgain = true;
                         }
@@ -388,7 +378,7 @@ namespace ProjectHekate.Core
                 else
                 {
                     // the curved laser is "waiting"
-                    _curvedLaserWaitTimers[i]--;
+                    _curvedLaserData.ProjectileWaitTimers[i]--;
                 }
 
                 cv.FramesAlive++;
