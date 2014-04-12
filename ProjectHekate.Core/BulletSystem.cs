@@ -58,27 +58,20 @@ namespace ProjectHekate.Core
 
         // TODO: break projectiles into arrays of components
         // TODO: organize the fuck outta this
-        private readonly Bullet[] _bullets = new Bullet[MaxBullets];
-        private int _availableBulletIndex;
-
+        private ProjectileData<Bullet> _bulletData; 
+        
         private readonly CurvedLaser[] _curvedLasers = new CurvedLaser[MaxCurvedLasers];
         private int _availableCurvedLaserIndex;
-
-        private readonly Beam[] _beams = new Beam[MaxBeams];
-        private int _availableBeamIndex;
-
-        private readonly Laser[] _lasers = new Laser[MaxLasers];
-        private int _availableLaserIndex;
-
-        private readonly float[] _bulletWaitTimers = new float[MaxBullets];
-        private readonly IEnumerator<WaitInFrames>[] _bulletEnumerators = new IEnumerator<WaitInFrames>[MaxBullets];
-
         private readonly float[] _curvedLaserWaitTimers = new float[MaxCurvedLasers];
         private readonly IEnumerator<WaitInFrames>[] _curvedLaserEnumerators = new IEnumerator<WaitInFrames>[MaxCurvedLasers];
-
+        
+        private readonly Beam[] _beams = new Beam[MaxBeams];
+        private int _availableBeamIndex;
         private readonly float[] _beamWaitTimers = new float[MaxBeams];
         private readonly IEnumerator<WaitInFrames>[] _beamEnumerators = new IEnumerator<WaitInFrames>[MaxBeams];
 
+        private readonly Laser[] _lasers = new Laser[MaxLasers];
+        private int _availableLaserIndex;
         private readonly float[] _laserWaitTimers = new float[MaxLasers];
         private readonly IEnumerator<WaitInFrames>[] _laserEnumerators = new IEnumerator<WaitInFrames>[MaxLasers];
 
@@ -89,12 +82,7 @@ namespace ProjectHekate.Core
 
         public BulletSystem()
         {
-            for (var i = 0; i < MaxBullets; i++)
-            {
-                _bullets[i] = new Bullet();
-                _bulletWaitTimers[i] = -1.0f;
-                _bulletEnumerators[i] = null;
-            }
+            _bulletData = new ProjectileData<Bullet>(MaxBullets);
 
             for (var i = 0; i < MaxCurvedLasers; i++)
             {
@@ -117,7 +105,7 @@ namespace ProjectHekate.Core
                 _laserEnumerators[i] = null;
             }
 
-            Bullets = Array.AsReadOnly(_bullets);
+            Bullets = Array.AsReadOnly(_bulletData.Projectiles);
             CurvedLasers = Array.AsReadOnly(_curvedLasers);
             Beams = Array.AsReadOnly(_beams);
             Lasers = Array.AsReadOnly(_lasers);
@@ -223,7 +211,7 @@ namespace ProjectHekate.Core
 
         private Bullet FindNextAvailableBullet()
         {
-            return FindNextAvailableProjectile(MaxBullets, ref _availableBulletIndex, _bullets);
+            return FindNextAvailableProjectile(MaxBullets, ref _bulletData.AvailableProjectileIndex, _bulletData.Projectiles);
         }
 
         private CurvedLaser FindNextAvailableCurvedLaser()
@@ -274,7 +262,7 @@ namespace ProjectHekate.Core
         {
             for (var i = 0; i < MaxBullets; i++)
             {
-                var b = _bullets[i];
+                var b = _bulletData.Projectiles[i];
 
                 if (!b.IsActive)
                 {
@@ -293,7 +281,7 @@ namespace ProjectHekate.Core
                 }
 
                 // if the bullet's "update state" is ready
-                if (_bulletWaitTimers[i] <= 0)
+                if (_bulletData.ProjectileWaitTimers[i] <= 0)
                 {
                     var loopAgain = true;
 
@@ -302,21 +290,21 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _bulletEnumerators[i] = _bulletEnumerators[i] ?? b.Update();
+                        _bulletData.ProjectileEnumerators[i] = _bulletData.ProjectileEnumerators[i] ?? b.Update();
 
                         // this steps through the bullet's update function until it hits a yield return
-                        if (_bulletEnumerators[i].MoveNext())
+                        if (_bulletData.ProjectileEnumerators[i].MoveNext())
                         {
                             // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
                             // starting next frame, this bullet is 'waiting'
-                            _bulletWaitTimers[i] = _bulletEnumerators[i].Current.Delay;
+                            _bulletData.ProjectileWaitTimers[i] = _bulletData.ProjectileEnumerators[i].Current.Delay;
 
                             loopAgain = false;
                         }
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _bulletEnumerators[i] = b.Update();
+                            _bulletData.ProjectileEnumerators[i] = b.Update();
 
                             loopAgain = true;
                         }
@@ -325,7 +313,7 @@ namespace ProjectHekate.Core
                 else
                 {
                     // the bullet is "waiting"
-                    _bulletWaitTimers[i]--;
+                    _bulletData.ProjectileWaitTimers[i]--;
                 }
 
                 b.FramesAlive++;
