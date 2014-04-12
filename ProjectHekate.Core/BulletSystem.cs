@@ -59,13 +59,9 @@ namespace ProjectHekate.Core
         // TODO: break projectiles into arrays of components
         // TODO: organize the fuck outta this
         private ProjectileData<Bullet> _bulletData;
-        private ProjectileData<CurvedLaser> _curvedLaserData; 
+        private ProjectileData<CurvedLaser> _curvedLaserData;
+        private ProjectileData<Beam> _beamData; 
         
-        private readonly Beam[] _beams = new Beam[MaxBeams];
-        private int _availableBeamIndex;
-        private readonly float[] _beamWaitTimers = new float[MaxBeams];
-        private readonly IEnumerator<WaitInFrames>[] _beamEnumerators = new IEnumerator<WaitInFrames>[MaxBeams];
-
         private readonly Laser[] _lasers = new Laser[MaxLasers];
         private int _availableLaserIndex;
         private readonly float[] _laserWaitTimers = new float[MaxLasers];
@@ -80,13 +76,7 @@ namespace ProjectHekate.Core
         {
             _bulletData = new ProjectileData<Bullet>(MaxBullets);
             _curvedLaserData = new ProjectileData<CurvedLaser>(MaxCurvedLasers);
-
-            for (var i = 0; i < MaxBeams; i++)
-            {
-                _beams[i] = new Beam();
-                _beamWaitTimers[i] = -1.0f;
-                _beamEnumerators[i] = null;
-            }
+            _beamData = new ProjectileData<Beam>(MaxBeams);
 
             for (var i = 0; i < MaxLasers; i++)
             {
@@ -97,7 +87,7 @@ namespace ProjectHekate.Core
 
             Bullets = Array.AsReadOnly(_bulletData.Projectiles);
             CurvedLasers = Array.AsReadOnly(_curvedLaserData.Projectiles);
-            Beams = Array.AsReadOnly(_beams);
+            Beams = Array.AsReadOnly(_beamData.Projectiles);
             Lasers = Array.AsReadOnly(_lasers);
         }
 
@@ -211,7 +201,7 @@ namespace ProjectHekate.Core
 
         private Beam FindNextAvailableBeam()
         {
-            return FindNextAvailableProjectile(MaxBeams, ref _availableBeamIndex, _beams);
+            return FindNextAvailableProjectile(MaxBeams, ref _beamData.AvailableProjectileIndex, _beamData.Projectiles);
         }
 
         private Laser FindNextAvailableLaser()
@@ -389,7 +379,7 @@ namespace ProjectHekate.Core
         {
             for (var i = 0; i < MaxBeams; i++)
             {
-                var b = _beams[i];
+                var b = _beamData.Projectiles[i];
 
                 if (!b.IsActive)
                 {
@@ -409,7 +399,7 @@ namespace ProjectHekate.Core
                 }
 
                 // if the beam's "update state" is ready
-                if (_beamWaitTimers[i] <= 0)
+                if (_beamData.ProjectileWaitTimers[i] <= 0)
                 {
                     var loopAgain = true;
 
@@ -418,21 +408,21 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _beamEnumerators[i] = _beamEnumerators[i] ?? b.Update();
+                        _beamData.ProjectileEnumerators[i] = _beamData.ProjectileEnumerators[i] ?? b.Update();
 
                         // this steps through the beam's update function until it hits a yield return
-                        if (_beamEnumerators[i].MoveNext())
+                        if (_beamData.ProjectileEnumerators[i].MoveNext())
                         {
                             // TODO: check the type of _beamEnumerators[i].Current to make sure it isn't null?
                             // starting next frame, this beam is 'waiting'
-                            _beamWaitTimers[i] = _beamEnumerators[i].Current.Delay;
+                            _beamData.ProjectileWaitTimers[i] = _beamData.ProjectileEnumerators[i].Current.Delay;
 
                             loopAgain = false;
                         }
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _beamEnumerators[i] = b.Update();
+                            _beamData.ProjectileEnumerators[i] = b.Update();
 
                             loopAgain = true;
                         }
@@ -441,7 +431,7 @@ namespace ProjectHekate.Core
                 else
                 {
                     // the beam is "waiting"
-                    _beamWaitTimers[i]--;
+                    _beamData.ProjectileWaitTimers[i]--;
                 }
 
                 b.FramesAlive++;
