@@ -24,9 +24,33 @@ namespace ProjectHekate.Core
         IReadOnlyList<IBeam> Beams { get; }
         IReadOnlyList<ILaser> Lasers { get; }
     }
-
+    
     public class BulletSystem : IBulletSystem
     {
+        private struct ProjectileData<TProjectileType> where TProjectileType : AbstractProjectile, new()
+        {
+            public readonly TProjectileType[] Projectiles;
+            public int AvailableProjectileIndex;
+            public readonly float[] ProjectileWaitTimers;
+            public readonly IEnumerator<WaitInFrames>[] ProjectileEnumerators;
+
+            public ProjectileData(int maxProjectiles)
+                : this()
+            {
+                Projectiles = new TProjectileType[maxProjectiles];
+                AvailableProjectileIndex = 0;
+                ProjectileWaitTimers = new float[maxProjectiles];
+                ProjectileEnumerators = new IEnumerator<WaitInFrames>[maxProjectiles];
+
+                for (var i = 0; i < maxProjectiles; i++)
+                {
+                    Projectiles[i] = new TProjectileType();
+                    ProjectileWaitTimers[i] = -1.0f;
+                    ProjectileEnumerators[i] = null;
+                }
+            }
+        }
+
         public const int MaxBullets = 2048;
         public const int MaxCurvedLasers = 64;
         public const int MaxBeams = 256;
