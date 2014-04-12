@@ -60,12 +60,8 @@ namespace ProjectHekate.Core
         // TODO: organize the fuck outta this
         private ProjectileData<Bullet> _bulletData;
         private ProjectileData<CurvedLaser> _curvedLaserData;
-        private ProjectileData<Beam> _beamData; 
-        
-        private readonly Laser[] _lasers = new Laser[MaxLasers];
-        private int _availableLaserIndex;
-        private readonly float[] _laserWaitTimers = new float[MaxLasers];
-        private readonly IEnumerator<WaitInFrames>[] _laserEnumerators = new IEnumerator<WaitInFrames>[MaxLasers];
+        private ProjectileData<Beam> _beamData;
+        private ProjectileData<Laser> _laserData; 
 
         public IReadOnlyList<IBullet> Bullets { get; private set; }
         public IReadOnlyList<ICurvedLaser> CurvedLasers { get; private set; }
@@ -77,18 +73,12 @@ namespace ProjectHekate.Core
             _bulletData = new ProjectileData<Bullet>(MaxBullets);
             _curvedLaserData = new ProjectileData<CurvedLaser>(MaxCurvedLasers);
             _beamData = new ProjectileData<Beam>(MaxBeams);
-
-            for (var i = 0; i < MaxLasers; i++)
-            {
-                _lasers[i] = new Laser();
-                _laserWaitTimers[i] = -1.0f;
-                _laserEnumerators[i] = null;
-            }
+            _laserData = new ProjectileData<Laser>(MaxLasers);
 
             Bullets = Array.AsReadOnly(_bulletData.Projectiles);
             CurvedLasers = Array.AsReadOnly(_curvedLaserData.Projectiles);
             Beams = Array.AsReadOnly(_beamData.Projectiles);
-            Lasers = Array.AsReadOnly(_lasers);
+            Lasers = Array.AsReadOnly(_laserData.Projectiles);
         }
 
         #region Firing functions
@@ -206,7 +196,7 @@ namespace ProjectHekate.Core
 
         private Laser FindNextAvailableLaser()
         {
-            return FindNextAvailableProjectile(MaxLasers, ref _availableLaserIndex, _lasers);
+            return FindNextAvailableProjectile(MaxLasers, ref _laserData.AvailableProjectileIndex, _laserData.Projectiles);
         }
 
         private TProjectileType FindNextAvailableProjectile<TProjectileType>(int maxProjectiles, ref int availableProjectileIndex, TProjectileType[] projectileArray) where TProjectileType : AbstractProjectile
@@ -442,7 +432,7 @@ namespace ProjectHekate.Core
         {
             for (var i = 0; i < MaxLasers; i++)
             {
-                var l = _lasers[i];
+                var l = _laserData.Projectiles[i];
 
                 if (!l.IsActive)
                 {
