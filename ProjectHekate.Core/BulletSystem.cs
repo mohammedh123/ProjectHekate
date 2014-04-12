@@ -57,7 +57,6 @@ namespace ProjectHekate.Core
         public const int MaxLasers = 1024;
 
         // TODO: break projectiles into arrays of components
-        // TODO: organize the fuck outta this
         private ProjectileData<Bullet> _bulletData;
         private ProjectileData<CurvedLaser> _curvedLaserData;
         private ProjectileData<Beam> _beamData;
@@ -367,7 +366,7 @@ namespace ProjectHekate.Core
 
         private void UpdateBeams()
         {
-            for (var i = 0; i < MaxBeams; i++)
+            for (var i = 0; i < _beamData.Projectiles.Length; i++)
             {
                 var b = _beamData.Projectiles[i];
 
@@ -430,7 +429,7 @@ namespace ProjectHekate.Core
 
         private void UpdateLasers()
         {
-            for (var i = 0; i < MaxLasers; i++)
+            for (var i = 0; i < _laserData.Projectiles.Length; i++)
             {
                 var l = _laserData.Projectiles[i];
 
