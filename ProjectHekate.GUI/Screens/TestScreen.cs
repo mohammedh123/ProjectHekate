@@ -65,34 +65,11 @@ namespace ProjectHekate.GUI.Screens
             yield return new WaitInFrames(5);
         }
 
-        public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs)
+        public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs, IInterpolationSystem iis)
         {
-            e.Angle += Math.TwoPi / 90;
-            var angles = 5;
-            var angleDiff = Math.TwoPi / angles;
-            for (int i = 0; i < angles; i++)
-            {
-                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 180.0f) * 150f;
-                bs.FireLaser(
-                    e.X + (float)System.Math.Cos(angleDiff * i + e.Angle) * distance,
-                    e.Y + (float)System.Math.Sin(angleDiff * i + e.Angle) * distance, 
-                    (e.Angle + angleDiff * i) + Math.TwoPi/angles,
-                    6, 100, 5, 1);
-            }
+            bs.FireScriptedBullet(e.X, e.Y, e.Angle, 5, 1, TestFunc);
 
-            for (int i = 0; i < angles; i++)
-            {
-                var distance = 50f + (float)System.Math.Sin(Math.Pi * e.FramesAlive / 60.0f) * 50f;
-                bs.FireLaser(
-                    e.X + (float)System.Math.Cos(angleDiff * i - e.Angle) * distance,
-                    e.Y + (float)System.Math.Sin(angleDiff * i - e.Angle) * distance,
-                    Math.Pi + (-e.Angle + angleDiff * i) + Math.PiOver2,
-                    6, (e.FramesAlive % 3 == 0) ? 100 : 50, 5, (e.FramesAlive % 3 == 0) ? 2 : 3);
-            }
-
-            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 3, 2);
-            //bs.FireLaser(e.X, e.Y, (e.Angle + angleDiff * i), 6, 100, 4, 3);
-            yield return new WaitInFrames(3);
+            yield return new WaitInFrames(0);
         }
 
         public override void LoadContent()
@@ -102,10 +79,10 @@ namespace ProjectHekate.GUI.Screens
 
             _playerSprite = new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0,0,32,32));
 
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)));
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 32, 16)));
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)));
-            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(80, 0, 32, 16)));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)){ Origin = new Vector2f(8,8) });
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 32, 16)){ Origin = new Vector2f(16,8) });
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)){ Origin = new Vector2f(16,8) });
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(80, 0, 32, 16)){ Origin = new Vector2f(16,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("laser")));
         }
 
@@ -143,10 +120,12 @@ namespace ProjectHekate.GUI.Screens
             _player.SetPosition(_player.X + dx, _player.Y + dy);
         }
 
-        public IEnumerator<WaitInFrames> TestFunc(Bullet b)
+        public IEnumerator<WaitInFrames> TestFunc(Bullet b, IInterpolationSystem ins)
         {
-            b.Angle += Math.Pi / 180;
-            yield return new WaitInFrames(1);
+            ins.InterpolateBulletAngle(b, b.Angle, b.Angle + Math.TwoPi, 60);
+            yield return new WaitInFrames(60);
+            //ins.InterpolateBulletAngle(b, b.Angle, b.Angle - Math.PiOver2, 20);
+            //yield return new WaitInFrames(40);
         }
 
         public IEnumerator<WaitInFrames> TestLaserFunc(CurvedLaser cv)
