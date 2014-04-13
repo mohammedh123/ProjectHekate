@@ -10,12 +10,12 @@ namespace ProjectHekate.Core
     public interface IInterpolationSystem
     {
         void InterpolateEmitterAngle(IEmitter e, float initialAngle, float finalAngle, int inHowManyFrames);
-        void InterpolateBulletAngle(Bullet bullet, float initialAngle, float finalAngle, int inHowManyFrames);
+        void InterpolateProjectileAngle(AbstractProjectile proj, float initialAngle, float finalAngle, int inHowManyFrames);
     }
 
     internal class InterpolationSystem : IInterpolationSystem
     {
-        private interface IBulletInterpolator
+        private interface IProjectileInterpolator
         {
             int CurrentFrame { get; set; }
             bool IsFinished { get; }
@@ -23,9 +23,9 @@ namespace ProjectHekate.Core
             void ApplyInterpolation();
         }
 
-        private class BulletAngleInterpolator : IBulletInterpolator
+        private class ProjectileAngleInterpolator : IProjectileInterpolator
         {
-            private readonly Bullet _bullet;
+            private readonly AbstractProjectile _projectile;
             private readonly float _initialAngle;
             private readonly float _finalAngle;
             private readonly int _frameCount;
@@ -36,9 +36,9 @@ namespace ProjectHekate.Core
                 get { return CurrentFrame == _frameCount+1; }
             }
 
-            public BulletAngleInterpolator(Bullet bullet, float initialAngle, float finalAngle, int frameCount)
+            public ProjectileAngleInterpolator(AbstractProjectile proj, float initialAngle, float finalAngle, int frameCount)
             {
-                _bullet = bullet;
+                _projectile = proj;
                 _initialAngle = initialAngle;
                 _finalAngle = finalAngle;
                 _frameCount = frameCount;
@@ -47,15 +47,15 @@ namespace ProjectHekate.Core
 
             public void ApplyInterpolation()
             {
-                _bullet.Angle = Math.Lerp(_initialAngle, _finalAngle, CurrentFrame/(float)_frameCount);
+                _projectile.Angle = Math.Lerp(_initialAngle, _finalAngle, CurrentFrame/(float)_frameCount);
             }
         }
 
-        private readonly List<IBulletInterpolator> _bulletInterpolators;
+        private readonly List<IProjectileInterpolator> _projectileInterpolators;
 
         public InterpolationSystem()
         {
-            _bulletInterpolators = new List<IBulletInterpolator>(10000);    
+            _projectileInterpolators = new List<IProjectileInterpolator>(10000);    
         }
 
         public void InterpolateEmitterAngle(IEmitter e, float initialAngle, float finalAngle, int inHowManyFrames)
@@ -63,21 +63,21 @@ namespace ProjectHekate.Core
             throw new NotImplementedException();
         }
 
-        public void InterpolateBulletAngle(Bullet bullet, float initialAngle, float finalAngle, int inHowManyFrames)
+        public void InterpolateProjectileAngle(AbstractProjectile proj, float initialAngle, float finalAngle, int inHowManyFrames)
         {
-            _bulletInterpolators.Add(new BulletAngleInterpolator(bullet, initialAngle, finalAngle, inHowManyFrames));
+            _projectileInterpolators.Add(new ProjectileAngleInterpolator(proj, initialAngle, finalAngle, inHowManyFrames));
         }
 
         internal void Update()
         {
-            for (int i = 0; i < _bulletInterpolators.Count; i++) {
-                var bulletInterpolator = _bulletInterpolators[i];
+            for (int i = 0; i < _projectileInterpolators.Count; i++) {
+                var bulletInterpolator = _projectileInterpolators[i];
 
                 bulletInterpolator.CurrentFrame++;
                 bulletInterpolator.ApplyInterpolation();
 
                 if (bulletInterpolator.IsFinished) {
-                    _bulletInterpolators.RemoveAt(i);
+                    _projectileInterpolators.RemoveAt(i);
                     i--;
                 }
             }
