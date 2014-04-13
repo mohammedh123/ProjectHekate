@@ -60,8 +60,8 @@ namespace ProjectHekate.Core
         private ProjectileData<Bullet> _bulletData;
         private ProjectileData<CurvedLaser> _curvedLaserData;
         private ProjectileData<Beam> _beamData;
-        private ProjectileData<Laser> _laserData; 
-
+        private ProjectileData<Laser> _laserData;
+        
         public IReadOnlyList<IBullet> Bullets { get; private set; }
         public IReadOnlyList<ICurvedLaser> CurvedLasers { get; private set; }
         public IReadOnlyList<IBeam> Beams { get; private set; }
@@ -218,16 +218,16 @@ namespace ProjectHekate.Core
         }
 
         #endregion
-
-        internal void Update(float dt)
+        
+        internal void Update(float dt, IInterpolationSystem ins)
         {
-            UpdateBullets();
-            UpdateCurvedLasers();
-            UpdateBeams();
-            UpdateLasers();
+            UpdateBullets(ins);
+            UpdateCurvedLasers(ins);
+            UpdateBeams(ins);
+            UpdateLasers(ins);
         }
 
-        private void UpdateBullets()
+        private void UpdateBullets(IInterpolationSystem ins)
         {
             for (var i = 0; i < _bulletData.Projectiles.Length; i++)
             {
@@ -259,7 +259,7 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _bulletData.ProjectileEnumerators[i] = _bulletData.ProjectileEnumerators[i] ?? b.Update();
+                        _bulletData.ProjectileEnumerators[i] = _bulletData.ProjectileEnumerators[i] ?? b.Update(ins);
 
                         // this steps through the bullet's update function until it hits a yield return
                         if (_bulletData.ProjectileEnumerators[i].MoveNext())
@@ -273,7 +273,7 @@ namespace ProjectHekate.Core
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _bulletData.ProjectileEnumerators[i] = b.Update();
+                            _bulletData.ProjectileEnumerators[i] = b.Update(ins);
 
                             loopAgain = true;
                         }
@@ -289,7 +289,7 @@ namespace ProjectHekate.Core
             }
         }
 
-        private void UpdateCurvedLasers()
+        private void UpdateCurvedLasers(IInterpolationSystem ins)
         {
             for (var i = 0; i < _curvedLaserData.Projectiles.Length; i++)
             {
@@ -334,7 +334,7 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _curvedLaserData.ProjectileEnumerators[i] = _curvedLaserData.ProjectileEnumerators[i] ?? cv.Update();
+                        _curvedLaserData.ProjectileEnumerators[i] = _curvedLaserData.ProjectileEnumerators[i] ?? cv.Update(ins);
 
                         // this steps through the curved laser's update function until it hits a yield return
                         if (_curvedLaserData.ProjectileEnumerators[i].MoveNext())
@@ -348,7 +348,7 @@ namespace ProjectHekate.Core
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _curvedLaserData.ProjectileEnumerators[i] = cv.Update();
+                            _curvedLaserData.ProjectileEnumerators[i] = cv.Update(ins);
 
                             loopAgain = true;
                         }
@@ -364,7 +364,7 @@ namespace ProjectHekate.Core
             }
         }
 
-        private void UpdateBeams()
+        private void UpdateBeams(IInterpolationSystem ins)
         {
             for (var i = 0; i < _beamData.Projectiles.Length; i++)
             {
@@ -397,7 +397,7 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        _beamData.ProjectileEnumerators[i] = _beamData.ProjectileEnumerators[i] ?? b.Update();
+                        _beamData.ProjectileEnumerators[i] = _beamData.ProjectileEnumerators[i] ?? b.Update(ins);
 
                         // this steps through the beam's update function until it hits a yield return
                         if (_beamData.ProjectileEnumerators[i].MoveNext())
@@ -411,7 +411,7 @@ namespace ProjectHekate.Core
                         else
                         {
                             // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _beamData.ProjectileEnumerators[i] = b.Update();
+                            _beamData.ProjectileEnumerators[i] = b.Update(ins);
 
                             loopAgain = true;
                         }
@@ -427,7 +427,7 @@ namespace ProjectHekate.Core
             }
         }
 
-        private void UpdateLasers()
+        private void UpdateLasers(IInterpolationSystem ins)
         {
             for (var i = 0; i < _laserData.Projectiles.Length; i++)
             {

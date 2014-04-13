@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ProjectHekate.Core
 {
     public delegate IEnumerator<WaitInFrames> EmitterUpdateDelegate(Emitter emitter, IBulletSystem bs);
+    public delegate IEnumerator<WaitInFrames> EmitterUpdateWithInterpolationDelegate(Emitter emitter, IBulletSystem bs, IInterpolationSystem ins);
 
     /// <summary>
     /// Emitters are objects that fire off bullets. They are attached to a controller (you should not have a dangling emitter) and their positions are offset from the controller's position.
@@ -38,11 +39,11 @@ namespace ProjectHekate.Core
         internal Emitter()
         {}
 
-        internal IEnumerator<WaitInFrames> Update(IBulletSystem bs)
+        internal IEnumerator<WaitInFrames> Update(IBulletSystem bs, IInterpolationSystem ins)
         {
-            return UpdateFunc != null ? UpdateFunc(this, bs) : null;
+            return UpdateFunc != null ? UpdateFunc(this, bs, ins) : null;
         }
 
-        internal EmitterUpdateDelegate UpdateFunc { get; set; }
+        internal EmitterUpdateWithInterpolationDelegate UpdateFunc { get; set; }
     }
 }
