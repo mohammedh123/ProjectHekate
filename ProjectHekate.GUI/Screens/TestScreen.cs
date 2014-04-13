@@ -53,7 +53,7 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateController(512, 384, 0, true)
+            _engine.CreateController(512+250, 384-250, 0, true)
                 .WithEmitter(0, 0, 0, true, SomeCrap1)
                 .Build();
         }
@@ -67,9 +67,12 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs, IInterpolationSystem iis)
         {
-            bs.FireScriptedBullet(e.X, e.Y, e.Angle, 5, 1, TestFunc);
+            const int numBullets = 5;
+            const float angleDiff = Math.TwoPi/numBullets;
+            const int delay = 60;
 
-            yield return new WaitInFrames(0);
+            bs.FireScriptedBullet(e.X, e.Y, 0, 9, 1, TestFunc);
+            yield return new WaitInFrames(delay);
         }
 
         public override void LoadContent()
@@ -120,12 +123,10 @@ namespace ProjectHekate.GUI.Screens
             _player.SetPosition(_player.X + dx, _player.Y + dy);
         }
 
-        public IEnumerator<WaitInFrames> TestFunc(Bullet b, IInterpolationSystem ins)
+        public IEnumerator<WaitInFrames> TestFunc(AbstractProjectile b, IInterpolationSystem ins)
         {
-            ins.InterpolateBulletAngle(b, b.Angle, b.Angle + Math.TwoPi, 60);
+            ins.InterpolateProjectileAngle(b, b.Angle, b.Angle + 2 * Math.Pi / 7, 1);
             yield return new WaitInFrames(60);
-            //ins.InterpolateBulletAngle(b, b.Angle, b.Angle - Math.PiOver2, 20);
-            //yield return new WaitInFrames(40);
         }
 
         public IEnumerator<WaitInFrames> TestLaserFunc(CurvedLaser cv)
