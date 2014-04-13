@@ -13,7 +13,7 @@ namespace ProjectHekate.Core
         void InterpolateBulletAngle(Bullet bullet, float initialAngle, float finalAngle, int inHowManyFrames);
     }
 
-    public class InterpolationSystem : IInterpolationSystem
+    internal class InterpolationSystem : IInterpolationSystem
     {
         private interface IBulletInterpolator
         {
@@ -68,7 +68,7 @@ namespace ProjectHekate.Core
             _bulletInterpolators.Add(new BulletAngleInterpolator(bullet, initialAngle, finalAngle, inHowManyFrames));
         }
 
-        public void Update()
+        internal void Update()
         {
             for (int i = 0; i < _bulletInterpolators.Count; i++) {
                 var bulletInterpolator = _bulletInterpolators[i];
