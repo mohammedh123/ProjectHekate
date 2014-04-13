@@ -63,6 +63,7 @@
     <Compile Include="Emitter.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Helpers\Math.cs" />
+    <Compile Include="InterpolationSystem.cs" />
     <Compile Include="MathExtras\Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WaitInFrames.cs" />
