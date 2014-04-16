@@ -4,7 +4,7 @@ using ProjectHekate.Core.MathExtras;
 
 namespace ProjectHekate.Core
 {
-    public delegate IEnumerator<WaitInFrames> ProjectileUpdateDelegate<in TProjectileType>(TProjectileType ap) where TProjectileType : AbstractProjectile;
+    public delegate IEnumerator<WaitInFrames> ProjectileUpdateDelegate<in TProjectileType>(TProjectileType ap, IInterpolationSystem ins) where TProjectileType : AbstractProjectile;
 
     public interface IBullet
     {
@@ -83,9 +83,9 @@ namespace ProjectHekate.Core
     
     public class Bullet : AbstractProjectile, IBullet
     {
-        internal IEnumerator<WaitInFrames> Update()
+        internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {
-            return UpdateFunc != null ? UpdateFunc(this) : null;
+            return UpdateFunc != null ? UpdateFunc(this, ins) : null;
         }
 
         virtual internal ProjectileUpdateDelegate<Bullet> UpdateFunc { get; set; }
@@ -117,9 +117,9 @@ namespace ProjectHekate.Core
             Coordinates = new ReadOnlyCollection<Vector<float>>(InternalCoordinates);
         }
 
-        internal IEnumerator<WaitInFrames> Update()
+        internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {
-            return UpdateFunc != null ? UpdateFunc(this) : null;
+            return UpdateFunc != null ? UpdateFunc(this, ins) : null;
         }
 
         internal ProjectileUpdateDelegate<CurvedLaser> UpdateFunc { get; set; }
@@ -131,9 +131,9 @@ namespace ProjectHekate.Core
         public uint Lifetime { get; set; }
 
 
-        internal IEnumerator<WaitInFrames> Update()
+        internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {
-            return UpdateFunc != null ? UpdateFunc(this) : null;
+            return UpdateFunc != null ? UpdateFunc(this, ins) : null;
         }
 
         virtual internal ProjectileUpdateDelegate<Beam> UpdateFunc { get; set; }

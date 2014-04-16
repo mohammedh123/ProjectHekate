@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +14,18 @@ namespace ProjectHekate.Core
         ControllerBuilder CreateController(float x, float y, float angle, bool enabled);
         void Update(float dt);
     }
+    
 
     public class ControllerBuilder
     {
         private Controller _controller;
         private List<Emitter> _emitters; 
         private Engine _engine;
+
+        internal static EmitterUpdateWithInterpolationDelegate ConvertUpdateDelegateToInterpolationDelegate(EmitterUpdateDelegate updater)
+        {
+            return (e, bs, ins) => updater(e, bs);
+        }
 
         internal ControllerBuilder(float x, float y, float angle, bool enabled, Engine e)
         {
@@ -35,7 +42,16 @@ namespace ProjectHekate.Core
 
         public ControllerBuilder WithEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updater)
         {
-            var emitter = new Emitter() {X = x, Y = y, Angle = angle, Enabled = enabled, UpdateFunc = updater};
+            var emitter = new Emitter() { X = x, Y = y, Angle = angle, Enabled = enabled, UpdateFunc = ConvertUpdateDelegateToInterpolationDelegate(updater) };
+            _controller.Emitters.Add(emitter);
+            _emitters.Add(emitter);
+
+            return this;
+        }
+
+        public ControllerBuilder WithEmitter(float x, float y, float angle, bool enabled, EmitterUpdateWithInterpolationDelegate updater)
+        {
+            var emitter = new Emitter() { X = x, Y = y, Angle = angle, Enabled = enabled, UpdateFunc = updater };
             _controller.Emitters.Add(emitter);
             _emitters.Add(emitter);
 
@@ -53,6 +69,7 @@ namespace ProjectHekate.Core
     public class Engine : IEngine
     {
         private readonly BulletSystem _bulletSystem;
+        private readonly InterpolationSystem _interpolationSystem;
         private readonly List<Controller> _controllers;
 
         private readonly List<Emitter> _emitters;
@@ -65,6 +82,7 @@ namespace ProjectHekate.Core
         public Engine()
         {
             _bulletSystem = new BulletSystem();
+            _interpolationSystem = new InterpolationSystem();
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();
         }
@@ -89,7 +107,8 @@ namespace ProjectHekate.Core
             // updates all systems
             UpdateControllers();
 
-            _bulletSystem.Update(dt);
+            _bulletSystem.Update(dt, _interpolationSystem);
+            _interpolationSystem.Update();
         }
 
         private void UpdateControllers()
@@ -129,7 +148,7 @@ namespace ProjectHekate.Core
                     // TODO: somehow prevent that
                     while (loopAgain)
                     {
-                        emitter.WaitEnumerator = emitter.WaitEnumerator ?? emitter.Update(_bulletSystem);
+                        emitter.WaitEnumerator = emitter.WaitEnumerator ?? emitter.Update(_bulletSystem, _interpolationSystem);
 
                         // this steps through the emitters update function until it hits a yield return
                         if (emitter.WaitEnumerator.MoveNext())
@@ -142,7 +161,7 @@ namespace ProjectHekate.Core
                         }
                         else
                         { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            emitter.WaitEnumerator = emitter.Update(_bulletSystem);
+                            emitter.WaitEnumerator = emitter.Update(_bulletSystem, _interpolationSystem);
 
                             loopAgain = true;
                         }
