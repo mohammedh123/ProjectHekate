@@ -27,8 +27,19 @@ namespace ProjectHekate.GUI
 
         public TimeSpan LastFrameTime { get; private set; }
 
+        /// <summary>
+        /// The last update call's execution time, in milliseconds.
+        /// </summary>
+        public double AverageUpdateTime { get; private set; }
+
+        /// <summary>
+        /// The last frame's render time, in milliseconds.
+        /// </summary>
         public double LastRenderTime { get; private set; }
 
+        /// <summary>
+        /// The average render time for the last second's worth of frames, in milliseconds.
+        /// </summary>
         public double AverageRenderTimeForLastSecond { get; private set; }
         private List<double> _lastRenderTimes = new List<double>();
         private double _averageRenderTimeTimer = 0;
@@ -64,7 +75,9 @@ namespace ProjectHekate.GUI
             ScreenManager.AddScreen(new TestScreen());
             ScreenManager.LoadContent();
 
-            var clock = new Stopwatch();
+            const double currentFrameTimeFactor = 0.80; // weighted average of frame time, with this percent being the current frame time
+            const double previousFrameTimeFactor = 1.0 - currentFrameTimeFactor;
+            Stopwatch clock = new Stopwatch(), updateClock = new Stopwatch();
             clock.Start();
             // run the program as long as the window is open
             while (Window.IsOpen()) {
@@ -73,7 +86,9 @@ namespace ProjectHekate.GUI
 
                 Window.DispatchEvents();
 
+                updateClock.Restart();
                 Update();
+                AverageUpdateTime = previousFrameTimeFactor*AverageUpdateTime + currentFrameTimeFactor*updateClock.Elapsed.TotalMilliseconds;
 
                 RenderFrame(Window);
             }

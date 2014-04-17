@@ -167,7 +167,7 @@ namespace ProjectHekate.GUI.Screens
 
         private void DrawRenderFrameTime()
         {
-            var textStr = String.Format("Avg render time: {0}\nRender time: {1}", Game.AverageRenderTimeForLastSecond.ToString("##.##"), Game.LastRenderTime.ToString("##.##"));
+            var textStr = String.Format("Avg render time: {0}\nRender time: {1}\nAvg update time: {2}", Game.AverageRenderTimeForLastSecond.ToString("##.##"), Game.LastRenderTime.ToString("##.##"), Game.AverageUpdateTime.ToString("##.##"));
             var text = new Text(textStr, _textFont);
             text.CharacterSize = 16;
 
