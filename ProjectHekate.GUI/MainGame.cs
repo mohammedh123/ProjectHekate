@@ -49,8 +49,10 @@ namespace ProjectHekate.GUI
         public void Run(int updatesPerSecond)
         {
             IsActive = true;
-            
-            Window = new RenderWindow(new VideoMode(1024,768), "ProjectHekate", Styles.Default);
+            var ctxSettings = new ContextSettings();
+            ctxSettings.AntialiasingLevel = 8;
+
+            Window = new RenderWindow(new VideoMode(1024,768), "ProjectHekate", Styles.Default, ctxSettings);
             Window.SetFramerateLimit(60);
 
             Window.GainedFocus += OnGainedFocus;

@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectHekate.Core;
+using ProjectHekate.GUI.DrawingHelpers;
 using ProjectHekate.GUI.Interfaces;
 using SFML.Graphics;
 using SFML.Window;
