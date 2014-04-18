@@ -66,13 +66,13 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs, IInterpolationSystem iis)
         {
-            const int numBullets = 15;
-            const float angleDiff = Math.TwoPi/numBullets;
-            const int delay = 10;
+            const int numBullets = 5;
+            const float angleDiff = Math.TwoPi / numBullets;
+            const int delay = 240;
 
-            for(var i = 0; i < numBullets; i++) {
-                bs.FireBasicBullet(e.X, e.Y, (e.Angle + angleDiff * i) * (float)System.Math.Cosh(e.Angle*0.25f), 3, 1 + i % 3);
-                bs.FireBasicBullet(e.X, e.Y, -(e.Angle + angleDiff * i) * (float)System.Math.Cos(e.Angle * 0.25f), 3, 1 + i % 3);
+            for (var i = 0; i < numBullets; i++)
+            {
+                bs.FireBeam(e.X, e.Y, (e.Angle + angleDiff * i), 32, 512, 60, 120, 4);
             }
             e.Angle += Math.TwoPi / 18.0f;
             yield return new WaitInFrames(delay);
