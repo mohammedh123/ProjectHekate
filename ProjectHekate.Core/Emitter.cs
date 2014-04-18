@@ -21,6 +21,10 @@ namespace ProjectHekate.Core
         float Angle { get; set; }
         bool Enabled { get; set; }
         int FramesAlive { get; }
+
+        // orbit-specific stuff
+        bool Orbiting { get; }
+        float OrbitDistance { get; set; }
     }
 
     public class Emitter : IEmitter
@@ -30,6 +34,10 @@ namespace ProjectHekate.Core
         public float Angle { get; set; }
         public bool Enabled { get; set; }
         public int FramesAlive { get; internal set; }
+
+        // orbit-specific stuff
+        public bool Orbiting { get; internal set; }
+        public float OrbitDistance { get; set; }
 
         public float X { get; internal set; }
         public float Y { get; internal set; }

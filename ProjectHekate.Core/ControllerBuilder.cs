@@ -40,6 +40,21 @@ namespace ProjectHekate.Core
             return this;
         }
 
+        public ControllerBuilder WithOrbittingEmitter(float distance, float angle, bool enabled, EmitterUpdateDelegate updater)
+        {
+            return WithOrbittingEmitter(distance, angle, enabled, ConvertUpdateDelegateToInterpolationDelegate(updater));
+        }
+
+        public ControllerBuilder WithOrbittingEmitter(float distance, float angle, bool enabled,
+            EmitterUpdateWithInterpolationDelegate updater)
+        {
+            var emitter = new Emitter {OrbitDistance = distance, Angle = angle, Enabled = enabled, UpdateFunc = updater, Orbiting = true};
+            _controller.Emitters.Add(emitter);
+            _emitters.Add(emitter);
+
+            return this;
+        }
+
         public IController Build()
         {
             _engine.AddController(_controller);
