@@ -322,45 +322,71 @@ namespace ProjectHekate.GUI.Screens
                     texWidth = sprite.TextureRect.Width;
                     texHeight = sprite.TextureRect.Height;
 
-                    var texSkip = b.FramesAlive*16;
+                    var texSkip = 0U;
+                    var renderStates = new RenderStates(sprite.Texture);
+
+                    // draw warning line
+                    if (b.FramesAlive < b.DelayInFrames) {
+                        var x2 = b.X + (float) System.Math.Cos(b.Angle)*b.Length;
+                        var y2 = b.Y + (float) System.Math.Sin(b.Angle)*b.Length;
+
+                        LineDrawer.Draw(b.X, b.Y, x2, y2, Game.Window);
+                    }
+
+                    // draw beam
+                    // once the 'warning period' is 85% done, start drawing the beam
+                    // at a lower alpha
+
+                    var ratio = (float)b.FramesAlive/b.DelayInFrames;
+                    var realRatio = 0.0f;
+                    const float lowerLimit = 0.85f;
+                    if (ratio < lowerLimit) {
+                        realRatio = 0.0f;
+                    }
+                    else {
+                        realRatio = (ratio - lowerLimit) / (1.0f-lowerLimit);
+                    }
+
+                    var radiusToUse = b.Radius;
+                    var alpha = Math.SmoothStep(0.0f, 1.0f, realRatio);
+                    var color = new Color(255, 255, 255, (byte) (alpha*255));
+
+                    texSkip = b.FramesAlive * 16;
                     _vertexArray[0] = new Vertex(
                         new Vector2f(
-                            b.X + (float)System.Math.Cos(b.Angle - Math.PiOver2) * b.Radius,
-                            b.Y + (float)System.Math.Sin(b.Angle - Math.PiOver2) * b.Radius
+                            b.X + (float)System.Math.Cos(b.Angle - Math.PiOver2) * radiusToUse,
+                            b.Y + (float)System.Math.Sin(b.Angle - Math.PiOver2) * radiusToUse
                         ),
-                        Color.White,
+                        color,
                         new Vector2f(texSkip + texLeft, texTop)
                     );
 
                     _vertexArray[1] = new Vertex(
                         new Vector2f(
-                            b.X + (float)System.Math.Cos(b.Angle + Math.PiOver2) * b.Radius,
-                            b.Y + (float)System.Math.Sin(b.Angle + Math.PiOver2) * b.Radius
+                            b.X + (float)System.Math.Cos(b.Angle + Math.PiOver2) * radiusToUse,
+                            b.Y + (float)System.Math.Sin(b.Angle + Math.PiOver2) * radiusToUse
                         ),
-                        Color.White,
+                        color,
                         new Vector2f(texSkip + texLeft, texTop + texHeight)
                     );
 
                     _vertexArray[2] = new Vertex(
                         new Vector2f(
-                            b.X + (float)System.Math.Cos(b.Angle) * BeamRenderLength + (float)System.Math.Cos(b.Angle - Math.PiOver2) * b.Radius,
-                            b.Y + (float)System.Math.Sin(b.Angle) * BeamRenderLength + (float)System.Math.Sin(b.Angle - Math.PiOver2) * b.Radius
+                            b.X + (float)System.Math.Cos(b.Angle) * b.Length + (float)System.Math.Cos(b.Angle - Math.PiOver2) * radiusToUse,
+                            b.Y + (float)System.Math.Sin(b.Angle) * b.Length + (float)System.Math.Sin(b.Angle - Math.PiOver2) * radiusToUse
                         ),
-                        Color.White,
+                        color,
                         new Vector2f(texSkip + texLeft + texWidth * 1, texTop)
                     );
 
                     _vertexArray[3] = new Vertex(
                         new Vector2f(
-                            b.X + (float)System.Math.Cos(b.Angle) * BeamRenderLength + (float)System.Math.Cos(b.Angle + Math.PiOver2) * b.Radius,
-                            b.Y + (float)System.Math.Sin(b.Angle) * BeamRenderLength + (float)System.Math.Sin(b.Angle + Math.PiOver2) * b.Radius
+                            b.X + (float)System.Math.Cos(b.Angle) * b.Length + (float)System.Math.Cos(b.Angle + Math.PiOver2) * radiusToUse,
+                            b.Y + (float)System.Math.Sin(b.Angle) * b.Length + (float)System.Math.Sin(b.Angle + Math.PiOver2) * radiusToUse
                         ),
-                        Color.White,
+                        color,
                         new Vector2f(texSkip + texLeft + texWidth * 1, texTop + texHeight)
                     );
-
-                    var renderStates = new RenderStates(sprite.Texture);
-
                     Game.Window.Draw(_vertexArray, renderStates);
                 }
             }
