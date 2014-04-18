@@ -230,6 +230,7 @@ namespace ProjectHekate.Core
 
         #endregion
 
+        #region Kill projectile functions
 
         public void KillBullet(uint id)
         {
@@ -249,6 +250,8 @@ namespace ProjectHekate.Core
         {
             _laserData.KillProjectile(id);
         }
+
+        #endregion
 
         internal void Update(float dt, IInterpolationSystem ins)
         {
