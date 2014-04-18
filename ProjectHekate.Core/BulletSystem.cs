@@ -15,7 +15,7 @@ namespace ProjectHekate.Core
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
-        IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex,
+        IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
 
@@ -109,9 +109,9 @@ namespace ProjectHekate.Core
             return InternalFireCurvedLaser(x, y, angle, radius, lifetime, speedPerFrame, spriteIndex, laserFunc);
         }
 
-        public IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
+        public IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
         {
-            return InternalFireBeam(x, y, angle, radius, delayInFrames, lifetime, spriteIndex, beamFunc);
+            return InternalFireBeam(x, y, angle, radius, length, delayInFrames, lifetime, spriteIndex, beamFunc);
         }
 
         public ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
@@ -156,7 +156,7 @@ namespace ProjectHekate.Core
             return cv;
         }
 
-        private IBeam InternalFireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
+        private IBeam InternalFireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
         {
             var b = FindNextAvailableBeam();
 
@@ -164,6 +164,7 @@ namespace ProjectHekate.Core
             b.Y = y;
             b.Angle = angle;
             b.Radius = radius;
+            b.Length = length;
             b.DelayInFrames = delayInFrames;
             b.Lifetime = lifetime;
             b.SpriteIndex = spriteIndex;

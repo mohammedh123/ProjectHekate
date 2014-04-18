@@ -47,6 +47,8 @@ namespace ProjectHekate.Core
         /// </summary>
         uint DelayInFrames { get; }
 
+        float Length { get; }
+
         /// <summary>
         /// The total lifetime of the beam INCLUDING the startup delay.
         /// </summary>
@@ -79,7 +81,6 @@ namespace ProjectHekate.Core
 
         internal AbstractProjectile()
         {
-
             SpriteIndex = -1;
         }
     }
@@ -131,8 +132,8 @@ namespace ProjectHekate.Core
     public class Beam : AbstractProjectile, IBeam
     {
         public uint DelayInFrames { get; set; }
+        public float Length { get; set; }
         public uint Lifetime { get; set; }
-
 
         internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {

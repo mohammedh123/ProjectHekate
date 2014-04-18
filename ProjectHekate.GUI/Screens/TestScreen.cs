@@ -42,8 +42,6 @@ namespace ProjectHekate.GUI.Screens
         private Font _textFont = new Font(@"Resources/Fonts/arial.ttf");
         private VertexArray _vertexArray = new VertexArray(PrimitiveType.TrianglesStrip);
 
-        private const float BeamRenderLength = 1500;
-
         public TestScreen()
         {
             _engine = new Engine();
