@@ -14,6 +14,9 @@ namespace ProjectHekate.Core
 
         float Y { get; }
 
+        /// <summary>
+        /// Used as a normal angle for non-orbiting projectiles; used to determine position on orbit for orbiting projectiles.
+        /// </summary>
         float Angle { get; }
 
         /// <summary>
@@ -75,7 +78,13 @@ namespace ProjectHekate.Core
         public int SpriteIndex { get; set; }
         public uint FramesAlive { get; set; }
         public float Radius { get; set; }
-
+        
+        // orbit-specific stuff
+        public bool Orbiting { get; set; } // by making this setter public, you can enable/disable it via script, which is pretty cool
+        public float OrbitDistance { get; internal set; }
+        public float OrbitAngle { get; internal set; }
+        // used specifically by the orbit stuff
+        internal IEmitter Emitter { get; set; }
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
 
@@ -135,6 +144,9 @@ namespace ProjectHekate.Core
         public float Length { get; set; }
         public uint Lifetime { get; set; }
 
+        // orbit-specific; an offset angle for the beam
+        public float OrbitOffsetAngle { get; set; }
+        
         internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {
             return UpdateFunc != null ? UpdateFunc(this, ins) : null;
@@ -146,6 +158,9 @@ namespace ProjectHekate.Core
     public class Laser : AbstractProjectile, ILaser
     {
         public float Length { get; internal set; }
+
+        // orbit-specific; an offset angle for the beam
+        public float OrbitOffsetAngle { get; set; }
 
         public float CurrentLength { get; internal set; }
     }
