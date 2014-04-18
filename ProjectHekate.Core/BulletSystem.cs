@@ -19,6 +19,11 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
 
+        void KillBullet(uint id);
+        void KillCurvedLaser(uint id);
+        void KillBeam(uint id);
+        void KillLaser(uint id);
+
         IReadOnlyList<IBullet> Bullets { get; }
         IReadOnlyList<ICurvedLaser> CurvedLasers { get; }
         IReadOnlyList<IBeam> Beams { get; }
@@ -48,6 +53,12 @@ namespace ProjectHekate.Core
                     ProjectileWaitTimers[i] = -1.0f;
                     ProjectileEnumerators[i] = null;
                 }
+            }
+
+            public void KillProjectile(uint id)
+            {
+                // id is really just the index into the array
+                Projectiles[id].SpriteIndex = -1;
             }
         }
 
@@ -218,7 +229,27 @@ namespace ProjectHekate.Core
         }
 
         #endregion
-        
+
+
+        public void KillBullet(uint id)
+        {
+            _bulletData.KillProjectile(id);
+        }
+
+        public void KillCurvedLaser(uint id)
+        {
+            _curvedLaserData.KillProjectile(id);
+        }
+
+        public void KillBeam(uint id)
+        {
+            _beamData.KillProjectile(id);
+        }
+        public void KillLaser(uint id)
+        {
+            _laserData.KillProjectile(id);
+        }
+
         internal void Update(float dt, IInterpolationSystem ins)
         {
             UpdateBullets(ins);
