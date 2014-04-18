@@ -420,6 +420,7 @@ namespace ProjectHekate.Core
                 if (b.FramesAlive > b.Lifetime) {
                     // kill this beam
                     KillBeam(b.Id);
+                    continue;
                 }
                 
                 // if the beam does not have a special update function, skip the wait logic
