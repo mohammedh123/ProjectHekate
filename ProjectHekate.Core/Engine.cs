@@ -15,57 +15,6 @@ namespace ProjectHekate.Core
         void Update(float dt);
     }
     
-
-    public class ControllerBuilder
-    {
-        private Controller _controller;
-        private List<Emitter> _emitters; 
-        private Engine _engine;
-
-        internal static EmitterUpdateWithInterpolationDelegate ConvertUpdateDelegateToInterpolationDelegate(EmitterUpdateDelegate updater)
-        {
-            return (e, bs, ins) => updater(e, bs);
-        }
-
-        internal ControllerBuilder(float x, float y, float angle, bool enabled, Engine e)
-        {
-            _controller = new Controller()
-                          {
-                              X = x,
-                              Y = y,
-                              Angle = angle,
-                              Enabled = enabled
-                          };
-            _emitters = new List<Emitter>();
-            _engine = e;
-        }
-
-        public ControllerBuilder WithEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updater)
-        {
-            var emitter = new Emitter() { X = x, Y = y, Angle = angle, Enabled = enabled, UpdateFunc = ConvertUpdateDelegateToInterpolationDelegate(updater) };
-            _controller.Emitters.Add(emitter);
-            _emitters.Add(emitter);
-
-            return this;
-        }
-
-        public ControllerBuilder WithEmitter(float x, float y, float angle, bool enabled, EmitterUpdateWithInterpolationDelegate updater)
-        {
-            var emitter = new Emitter() { X = x, Y = y, Angle = angle, Enabled = enabled, UpdateFunc = updater };
-            _controller.Emitters.Add(emitter);
-            _emitters.Add(emitter);
-
-            return this;
-        }
-
-        public IController Build()
-        {
-            _engine.AddController(_controller);
-            _engine.AddEmitters(_emitters);
-            return _controller;
-        }
-    }
-
     public class Engine : IEngine
     {
         private readonly BulletSystem _bulletSystem;
@@ -132,8 +81,15 @@ namespace ProjectHekate.Core
                 while (emitter.Angle > Helpers.Math.TwoPi) emitter.Angle -= Helpers.Math.TwoPi;
                 while (emitter.Angle < -Helpers.Math.TwoPi) emitter.Angle += Helpers.Math.TwoPi;
 
-                emitter.X = cont.X + emitter.OffsetX;
-                emitter.Y = cont.Y + emitter.OffsetY;
+                if (emitter.Orbiting) {
+                    // use angle + distance to determine position
+                    emitter.X = cont.X + (float) Math.Cos(emitter.Angle)*emitter.OrbitDistance;
+                    emitter.Y = cont.Y + (float) Math.Sin(emitter.Angle)*emitter.OrbitDistance;
+                }
+                else {
+                    emitter.X = cont.X + emitter.OffsetX;
+                    emitter.Y = cont.Y + emitter.OffsetY;
+                }
 
                 // if the emitter does not have a special update function, skip the wait logic
                 if (emitter.UpdateFunc == null) {
