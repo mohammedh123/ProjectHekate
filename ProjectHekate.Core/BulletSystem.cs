@@ -48,8 +48,7 @@ namespace ProjectHekate.Core
                 ProjectileEnumerators = new IEnumerator<WaitInFrames>[maxProjectiles];
 
                 for (uint i = 0; i < maxProjectiles; i++) {
-                    Projectiles[i] = new TProjectileType();
-                    Projectiles[i].Id = i;
+                    Projectiles[i] = new TProjectileType {Id = i};
                     ProjectileWaitTimers[i] = -1.0f;
                     ProjectileEnumerators[i] = null;
                 }
@@ -59,6 +58,8 @@ namespace ProjectHekate.Core
             {
                 // id is really just the index into the array
                 Projectiles[id].SpriteIndex = -1;
+                ProjectileWaitTimers[id] = -1.0f;
+                ProjectileEnumerators[id] = null;
             }
         }
 
