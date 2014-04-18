@@ -4,9 +4,9 @@ namespace ProjectHekate.Core
 {
     public class ControllerBuilder
     {
-        private Controller _controller;
-        private List<Emitter> _emitters; 
-        private Engine _engine;
+        private readonly Controller _controller;
+        private readonly List<Emitter> _emitters; 
+        private readonly Engine _engine;
 
         internal static EmitterUpdateWithInterpolationDelegate ConvertUpdateDelegateToInterpolationDelegate(EmitterUpdateDelegate updater)
         {

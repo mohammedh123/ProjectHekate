@@ -15,9 +15,14 @@ namespace ProjectHekate.Core
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
-        IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex,
+        IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
+
+        void KillBullet(uint id);
+        void KillCurvedLaser(uint id);
+        void KillBeam(uint id);
+        void KillLaser(uint id);
 
         IReadOnlyList<IBullet> Bullets { get; }
         IReadOnlyList<ICurvedLaser> CurvedLasers { get; }
@@ -34,7 +39,7 @@ namespace ProjectHekate.Core
             public readonly float[] ProjectileWaitTimers;
             public readonly IEnumerator<WaitInFrames>[] ProjectileEnumerators;
 
-            public ProjectileData(int maxProjectiles)
+            public ProjectileData(uint maxProjectiles)
                 : this()
             {
                 Projectiles = new TProjectileType[maxProjectiles];
@@ -42,12 +47,19 @@ namespace ProjectHekate.Core
                 ProjectileWaitTimers = new float[maxProjectiles];
                 ProjectileEnumerators = new IEnumerator<WaitInFrames>[maxProjectiles];
 
-                for (var i = 0; i < maxProjectiles; i++)
-                {
-                    Projectiles[i] = new TProjectileType();
+                for (uint i = 0; i < maxProjectiles; i++) {
+                    Projectiles[i] = new TProjectileType {Id = i};
                     ProjectileWaitTimers[i] = -1.0f;
                     ProjectileEnumerators[i] = null;
                 }
+            }
+
+            public void KillProjectile(uint id)
+            {
+                // id is really just the index into the array
+                Projectiles[id].SpriteIndex = -1;
+                ProjectileWaitTimers[id] = -1.0f;
+                ProjectileEnumerators[id] = null;
             }
         }
 
@@ -97,9 +109,9 @@ namespace ProjectHekate.Core
             return InternalFireCurvedLaser(x, y, angle, radius, lifetime, speedPerFrame, spriteIndex, laserFunc);
         }
 
-        public IBeam FireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
+        public IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
         {
-            return InternalFireBeam(x, y, angle, radius, delayInFrames, lifetime, spriteIndex, beamFunc);
+            return InternalFireBeam(x, y, angle, radius, length, delayInFrames, lifetime, spriteIndex, beamFunc);
         }
 
         public ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
@@ -144,7 +156,7 @@ namespace ProjectHekate.Core
             return cv;
         }
 
-        private IBeam InternalFireBeam(float x, float y, float angle, float radius, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
+        private IBeam InternalFireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
         {
             var b = FindNextAvailableBeam();
 
@@ -152,6 +164,7 @@ namespace ProjectHekate.Core
             b.Y = y;
             b.Angle = angle;
             b.Radius = radius;
+            b.Length = length;
             b.DelayInFrames = delayInFrames;
             b.Lifetime = lifetime;
             b.SpriteIndex = spriteIndex;
@@ -218,7 +231,30 @@ namespace ProjectHekate.Core
         }
 
         #endregion
-        
+
+        #region Kill projectile functions
+
+        public void KillBullet(uint id)
+        {
+            _bulletData.KillProjectile(id);
+        }
+
+        public void KillCurvedLaser(uint id)
+        {
+            _curvedLaserData.KillProjectile(id);
+        }
+
+        public void KillBeam(uint id)
+        {
+            _beamData.KillProjectile(id);
+        }
+        public void KillLaser(uint id)
+        {
+            _laserData.KillProjectile(id);
+        }
+
+        #endregion
+
         internal void Update(float dt, IInterpolationSystem ins)
         {
             UpdateBullets(ins);
@@ -383,7 +419,7 @@ namespace ProjectHekate.Core
 
                 if (b.FramesAlive > b.Lifetime) {
                     // kill this beam
-                    // TODO: above
+                    KillBeam(b.Id);
                 }
                 
                 // if the beam does not have a special update function, skip the wait logic

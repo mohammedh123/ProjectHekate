@@ -8,6 +8,8 @@ namespace ProjectHekate.Core
 
     public interface IBullet
     {
+        uint Id { get; }
+
         float X { get; }
 
         float Y { get; }
@@ -45,6 +47,8 @@ namespace ProjectHekate.Core
         /// </summary>
         uint DelayInFrames { get; }
 
+        float Length { get; }
+
         /// <summary>
         /// The total lifetime of the beam INCLUDING the startup delay.
         /// </summary>
@@ -63,6 +67,7 @@ namespace ProjectHekate.Core
 
     public abstract class AbstractProjectile
     {
+        public uint Id { get; internal set; }
         public float X { get; set; }
         public float Y { get; set; }
         public float Angle { get; set; }
@@ -76,7 +81,6 @@ namespace ProjectHekate.Core
 
         internal AbstractProjectile()
         {
-
             SpriteIndex = -1;
         }
     }
@@ -128,8 +132,8 @@ namespace ProjectHekate.Core
     public class Beam : AbstractProjectile, IBeam
     {
         public uint DelayInFrames { get; set; }
+        public float Length { get; set; }
         public uint Lifetime { get; set; }
-
 
         internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
         {

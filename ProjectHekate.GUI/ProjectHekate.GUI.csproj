@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DrawingHelpers\LineDrawer.cs" />
     <Compile Include="Interfaces\IInputManager.cs" />
     <Compile Include="Interfaces\IKeyStateManager.cs" />
     <Compile Include="Interfaces\IMouseManager.cs" />
