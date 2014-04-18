@@ -438,13 +438,6 @@ namespace ProjectHekate.Core
                     UpdatePositionLinearly(cv);
                 }
 
-                // if the curved laser does not have a special update function, skip the wait logic
-                if (cv.UpdateFunc == null)
-                {
-                    cv.FramesAlive++;
-                    continue;
-                }
-
                 var limit = Math.Min(cv.FramesAlive, cv.Lifetime-1);
                 // add the cv's new position to the internal list of points
                 // the "- 1" is so that a length of 1 means 1 point in the list of coordinates
@@ -459,6 +452,13 @@ namespace ProjectHekate.Core
                 //append
                 cv.InternalCoordinates[limit] = new Vector<float>(cv.X, cv.Y);
 
+
+                // if the curved laser does not have a special update function, skip the wait logic
+                if (cv.UpdateFunc == null)
+                {
+                    cv.FramesAlive++;
+                    continue;
+                }
 
                 // if the curved laser's "update state" is ready
                 if (_curvedLaserData.ProjectileWaitTimers[i] <= 0)
