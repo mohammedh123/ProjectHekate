@@ -34,7 +34,7 @@ namespace ProjectHekate.Core
             public readonly float[] ProjectileWaitTimers;
             public readonly IEnumerator<WaitInFrames>[] ProjectileEnumerators;
 
-            public ProjectileData(int maxProjectiles)
+            public ProjectileData(uint maxProjectiles)
                 : this()
             {
                 Projectiles = new TProjectileType[maxProjectiles];
@@ -42,9 +42,9 @@ namespace ProjectHekate.Core
                 ProjectileWaitTimers = new float[maxProjectiles];
                 ProjectileEnumerators = new IEnumerator<WaitInFrames>[maxProjectiles];
 
-                for (var i = 0; i < maxProjectiles; i++)
-                {
+                for (uint i = 0; i < maxProjectiles; i++) {
                     Projectiles[i] = new TProjectileType();
+                    Projectiles[i].Id = i;
                     ProjectileWaitTimers[i] = -1.0f;
                     ProjectileEnumerators[i] = null;
                 }

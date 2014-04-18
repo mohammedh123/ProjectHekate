@@ -8,6 +8,8 @@ namespace ProjectHekate.Core
 
     public interface IBullet
     {
+        uint Id { get; }
+
         float X { get; }
 
         float Y { get; }
@@ -63,6 +65,7 @@ namespace ProjectHekate.Core
 
     public abstract class AbstractProjectile
     {
+        public uint Id { get; internal set; }
         public float X { get; set; }
         public float Y { get; set; }
         public float Angle { get; set; }
