@@ -60,6 +60,7 @@
     <Compile Include="Bullets.cs" />
     <Compile Include="BulletSystem.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="ControllerBuilder.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Helpers\Math.cs" />
