@@ -81,8 +81,15 @@ namespace ProjectHekate.Core
                 while (emitter.Angle > Helpers.Math.TwoPi) emitter.Angle -= Helpers.Math.TwoPi;
                 while (emitter.Angle < -Helpers.Math.TwoPi) emitter.Angle += Helpers.Math.TwoPi;
 
-                emitter.X = cont.X + emitter.OffsetX;
-                emitter.Y = cont.Y + emitter.OffsetY;
+                if (emitter.Orbiting) {
+                    // use angle + distance to determine position
+                    emitter.X = cont.X + (float) Math.Cos(emitter.Angle)*emitter.OrbitDistance;
+                    emitter.Y = cont.Y + (float) Math.Sin(emitter.Angle)*emitter.OrbitDistance;
+                }
+                else {
+                    emitter.X = cont.X + emitter.OffsetX;
+                    emitter.Y = cont.Y + emitter.OffsetY;
+                }
 
                 // if the emitter does not have a special update function, skip the wait logic
                 if (emitter.UpdateFunc == null) {
