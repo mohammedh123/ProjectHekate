@@ -81,9 +81,9 @@ namespace ProjectHekate.Core
         
         // orbit-specific stuff
         public bool Orbiting { get; set; } // by making this setter public, you can enable/disable it via script, which is pretty cool
-        public float OrbitDistance { get; internal set; }
-        public float OrbitAngle { get; internal set; }
-        // used specifically by the orbit stuff
+        public float OrbitDistance { get; set; }
+        public float OrbitAngle { get; set; }
+        public float OrbitalAngularSpeed { get; set; }
         internal IEmitter Emitter { get; set; }
 
         public bool IsActive { get { return SpriteIndex >= 0; } }
@@ -159,7 +159,7 @@ namespace ProjectHekate.Core
     {
         public float Length { get; internal set; }
 
-        // orbit-specific; an offset angle for the beam
+        // orbit-specific; an offset angle for the laser
         public float OrbitOffsetAngle { get; set; }
 
         public float CurrentLength { get; internal set; }
