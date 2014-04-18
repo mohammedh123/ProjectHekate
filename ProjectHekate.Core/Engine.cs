@@ -129,6 +129,9 @@ namespace ProjectHekate.Core
                     continue;
                 }
 
+                while (emitter.Angle > Helpers.Math.TwoPi) emitter.Angle -= Helpers.Math.TwoPi;
+                while (emitter.Angle < -Helpers.Math.TwoPi) emitter.Angle += Helpers.Math.TwoPi;
+
                 emitter.X = cont.X + emitter.OffsetX;
                 emitter.Y = cont.Y + emitter.OffsetY;
 

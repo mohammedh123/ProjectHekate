@@ -238,6 +238,9 @@ namespace ProjectHekate.Core
                     continue;
                 }
 
+                while (b.Angle >  Helpers.Math.TwoPi) b.Angle -= Helpers.Math.TwoPi;
+                while (b.Angle < -Helpers.Math.TwoPi) b.Angle += Helpers.Math.TwoPi;
+
                 b.X += (float)Math.Cos(b.Angle) * b.Speed;
                 b.Y += (float)Math.Sin(b.Angle) * b.Speed;
 
@@ -298,6 +301,9 @@ namespace ProjectHekate.Core
                 if (!cv.IsActive) {
                     continue;
                 }
+                
+                while (cv.Angle > Helpers.Math.TwoPi) cv.Angle -= Helpers.Math.TwoPi;
+                while (cv.Angle < -Helpers.Math.TwoPi) cv.Angle += Helpers.Math.TwoPi;
 
                 cv.X += (float)Math.Cos(cv.Angle) * cv.Speed;
                 cv.Y += (float)Math.Sin(cv.Angle) * cv.Speed;
