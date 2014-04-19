@@ -163,5 +163,12 @@ namespace ProjectHekate.Core
         public float OrbitOffsetAngle { get; set; }
 
         public float CurrentLength { get; internal set; }
+
+        internal IEnumerator<WaitInFrames> Update(IInterpolationSystem ins)
+        {
+            return UpdateFunc != null ? UpdateFunc(this, ins) : null;
+        }
+
+        virtual internal ProjectileUpdateDelegate<Laser> UpdateFunc { get; set; }
     }
 }

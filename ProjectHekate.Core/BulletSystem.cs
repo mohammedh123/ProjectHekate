@@ -17,7 +17,7 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
         IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
-        ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
+        ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null);
 
         IBullet FireOrbitingBasicBullet(IEmitter emitter, float distance, float orbitAngle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
         IBullet FireOrbitingScriptedBullet(IEmitter emitter, float distance, float orbitAngle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex,
@@ -26,8 +26,8 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
         IBeam FireOrbitingBeam(IEmitter emitter, float startingDistanceAwayFromEmitter, float orbitAngle, float orbitOffsetAngle, float radius, float length, uint delayInFrames, uint lifetime, float angularSpeedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
-        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
-        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float orbitOffsetAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
+        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null);
+        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float orbitOffsetAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null);
 
         void KillBullet(uint id);
         void KillCurvedLaser(uint id);
@@ -124,9 +124,9 @@ namespace ProjectHekate.Core
             return InternalFireBeam(x, y, angle, radius, length, delayInFrames, lifetime, spriteIndex, beamFunc);
         }
 
-        public ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
+        public ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null)
         {
-            return InternalFireLaser(x, y, angle, radius, length, speedPerFrame, spriteIndex);
+            return InternalFireLaser(x, y, angle, radius, length, speedPerFrame, spriteIndex, null);
         }
 
 
@@ -184,12 +184,12 @@ namespace ProjectHekate.Core
             return b;
         }
 
-        public ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex)
+        public ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null)
         {
             var l = InternalFireLaser(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
                 emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
                 emitter.Angle + orbitAngle,
-                radius, length, speedPerFrame, spriteIndex);
+                radius, length, speedPerFrame, spriteIndex, laserFunc);
             l.Emitter = emitter;
             l.OrbitDistance = distance;
             l.OrbitAngle = orbitAngle;
@@ -201,12 +201,12 @@ namespace ProjectHekate.Core
         }
 
         public ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float orbitOffsetAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame,
-            int spriteIndex)
+            int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null)
         {
             var l = InternalFireLaser(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
                 emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
                 emitter.Angle + orbitAngle + orbitOffsetAngle,
-                radius, length, speedPerFrame, spriteIndex);
+                radius, length, speedPerFrame, spriteIndex, laserFunc);
             l.Emitter = emitter;
             l.OrbitDistance = distance;
             l.OrbitAngle = orbitAngle;
@@ -272,7 +272,7 @@ namespace ProjectHekate.Core
             return b;
         }
 
-        private Laser InternalFireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
+        private Laser InternalFireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null)
         {
             var l = FindNextAvailableLaser();
 
@@ -284,6 +284,7 @@ namespace ProjectHekate.Core
             l.Speed = speedPerFrame;
             l.SpriteIndex = spriteIndex;
             l.FramesAlive = 0;
+            l.UpdateFunc = laserFunc;
             l.CurrentLength = 0;
 
             return l;
@@ -593,6 +594,49 @@ namespace ProjectHekate.Core
 
                 // update current length and cap it at max length
                 l.CurrentLength = Math.Min(l.CurrentLength + l.Speed, l.Length);
+
+                // if the laser does not have a special update function, skip the wait logic
+                if (l.UpdateFunc == null)
+                {
+                    l.FramesAlive++;
+                    continue;
+                }
+
+                // if the laser's "update state" is ready
+                if (_laserData.ProjectileWaitTimers[i] <= 0)
+                {
+                    var loopAgain = true;
+
+                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                    // this means that if there isn't a yield return, the function will loop infinitely
+                    // TODO: somehow prevent that
+                    while (loopAgain)
+                    {
+                        _laserData.ProjectileEnumerators[i] = _laserData.ProjectileEnumerators[i] ?? l.Update(ins);
+
+                        // this steps through the laser's update function until it hits a yield return
+                        if (_laserData.ProjectileEnumerators[i].MoveNext())
+                        {
+                            // TODO: check the type of _laserEnumerators[i].Current to make sure it isn't null?
+                            // starting next frame, this laser is 'waiting'
+                            _laserData.ProjectileWaitTimers[i] = _laserData.ProjectileEnumerators[i].Current.Delay;
+
+                            loopAgain = false;
+                        }
+                        else
+                        {
+                            // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                            _laserData.ProjectileEnumerators[i] = l.Update(ins);
+
+                            loopAgain = true;
+                        }
+                    }
+                }
+                else
+                {
+                    // the laser is "waiting"
+                    _laserData.ProjectileWaitTimers[i]--;
+                }
 
                 l.FramesAlive++;
             }

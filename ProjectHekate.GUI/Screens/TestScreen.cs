@@ -52,34 +52,45 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateController(512, 384, 0, true)
-                .WithOrbittingEmitter(64, 0, true, SomeCrap1)
-                .WithOrbittingEmitter(64, Math.ToRadians(120), true, SomeCrap1)
-                .WithOrbittingEmitter(64, Math.ToRadians(240), true, SomeCrap1)
+            _engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
                 .Build();
         }
 
-        public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IBulletSystem bs)
+        private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
         {
-            bs.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
-            bs.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
-            yield return new WaitInFrames(5);
+            if (controller.FramesAlive%60 == 0) {
+                for (int i = 0; i < 3; i++) {
+                    engine.CreateScriptedEmitter(controller.X, controller.Y, Math.GetRandomAngle(0, Math.Pi), true, SomeCrap1);
+                }
+            }
+
+            yield return new WaitInFrames(0);
         }
 
-        public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs, IInterpolationSystem iis)
+        public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IEngine engine)
         {
-            const int numBullets = 16;
+            engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
+            engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+            yield return new WaitInFrames(5);
+        }
+        
+        public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IEngine engine)
+        {
+            const int numBullets = 4;
             const float angleDiff = Math.TwoPi / numBullets;
             const int delay = 30;
 
             if (e.FramesAlive == delay) {
                 for (var i = 0; i < numBullets; i++) {
                     //bs.FireOrbitingBeam(e, 100, (angleDiff*i), 0, 32, 512, 60, 240, 0, 4);
-                    bs.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
-                    bs.FireOrbitingLaser(e, 32, angleDiff*i, 16, 200, 5, 1f, 1 + e.FramesAlive % 3);
+                    engine.BulletSystem.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
+                    engine.BulletSystem.FireOrbitingLaser(e, 32, angleDiff*i, 16, 200, 5, 1f, 1 + e.FramesAlive % 3);
                 }
             }
-            e.Angle += Math.TwoPi / 360.0f;
+
+            e.X += (float)System.Math.Cos(e.Angle) * 2.0f;
+            e.Y += (float)System.Math.Sin(e.Angle) * 2.0f;
+
             yield return new WaitInFrames(0);
         }
 
@@ -126,7 +137,7 @@ namespace ProjectHekate.GUI.Screens
             dx *= (float)gameTime.TotalSeconds;
             dy *= (float)gameTime.TotalSeconds;
 
-            _player.Controller.Enabled = input.Keyboard.IsKeyDown(Keyboard.Key.Z);
+            _player.Controller.IsEnabled = input.Keyboard.IsKeyDown(Keyboard.Key.Z);
             //_engine.BulletSystem.FireScriptedBullet(_player.X, _player.Y, 0, 2, 0, TestFunc);
 
             _player.SetPosition(_player.X + dx, _player.Y + dy);

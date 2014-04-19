@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Core
 {
+    public delegate IEnumerator<WaitInFrames> ControllerUpdateDelegate(IController c, IEngine engine);
+
     /// <summary>
     /// Controllers are objects that have emitters. The controller is disabled by default.
     /// </summary>
@@ -14,15 +16,22 @@ namespace ProjectHekate.Core
         float X { get; set; }
         float Y { get; set; }
         float Angle { get; set; }
-        bool Enabled { get; set; }
+        int FramesAlive { get; }
+        bool IsEnabled { get; set; }
     }
 
-    class Controller : IController
+    class Controller : AbstractScriptedObject<ControllerUpdateDelegate>, IController
     {
         public float X { get; set; }
         public float Y { get; set; }
         public float Angle { get; set; }
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
+        public int FramesAlive { get; set; }
+
+        internal IEnumerator<WaitInFrames> Update(IEngine engine)
+        {
+            return UpdateFunc != null ? UpdateFunc(this, engine) : null;
+        }
 
         internal readonly List<Emitter> Emitters = new List<Emitter>();
 
