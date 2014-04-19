@@ -33,6 +33,12 @@ namespace ProjectHekate.Core
         /// properties.
         /// </summary>
         ControllerBuilder CreateScriptedController(float x, float y, float angle, bool enabled,  ControllerUpdateDelegate updateFunc);
+
+        /// <summary>
+        /// Creates an emitter that is controlled via a script function.
+        /// </summary>
+        IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc);
+
         void Update(float dt);
     }
     
@@ -72,6 +78,21 @@ namespace ProjectHekate.Core
             return new ControllerBuilder(x, y, angle, enabled, this, updateFunc);
         }
 
+        public IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc)
+        {
+            var emitter = new Emitter()
+                          {
+                              X = x,
+                              Y = y,
+                              Angle = angle,
+                              IsEnabled = true,
+                              UpdateFunc = updateFunc
+                          };
+            _emitters.Add(emitter);
+
+            return emitter;
+        }
+
         internal void AddController(Controller con)
         {
             _controllers.Add(con);
@@ -86,11 +107,12 @@ namespace ProjectHekate.Core
         {
             // updates all systems
             UpdateControllers();
+            UpdateStandaloneEmitters();
 
             _bulletSystem.Update(dt, _interpolationSystem);
             _interpolationSystem.Update();
         }
-
+        
         private void UpdateControllers()
         {
             foreach (var controller in _controllers) {
@@ -138,6 +160,8 @@ namespace ProjectHekate.Core
                 { // the controller is "waiting"
                     controller.WaitTimer--;
                 }
+
+                controller.FramesAlive++;
             }
         }
 
@@ -150,8 +174,7 @@ namespace ProjectHekate.Core
                     continue;
                 }
 
-                while (emitter.Angle > Helpers.Math.TwoPi) emitter.Angle -= Helpers.Math.TwoPi;
-                while (emitter.Angle < -Helpers.Math.TwoPi) emitter.Angle += Helpers.Math.TwoPi;
+                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
 
                 if (emitter.Orbiting) {
                     // use angle + distance to determine position
@@ -168,42 +191,71 @@ namespace ProjectHekate.Core
                     emitter.FramesAlive++;
                     continue;
                 }
-
-                // if the emitter's "update state" is ready
-                if (emitter.WaitTimer <= 0)
-                {
-                    var loopAgain = true;
-
-                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
-                    // this means that if there isn't a yield return, the function will loop infinitely
-                    // TODO: somehow prevent that
-                    while (loopAgain)
-                    {
-                        emitter.WaitEnumerator = emitter.WaitEnumerator ?? emitter.Update(this);
-
-                        // this steps through the emitters update function until it hits a yield return
-                        if (emitter.WaitEnumerator.MoveNext())
-                        {
-                            // TODO: check the type of emitter.WaitEnumerator.Current to make sure it isn't null?
-                            // starting next frame, this emitter is 'waiting'
-                            emitter.WaitTimer = emitter.WaitEnumerator.Current.Delay;
-
-                            loopAgain = false;
-                        }
-                        else
-                        { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            emitter.WaitEnumerator = emitter.Update(this);
-
-                            loopAgain = true;
-                        }
-                    }
-                }
-                else
-                { // the emitter is "waiting"
-                    emitter.WaitTimer--;
-                }
+                
+                AdvanceEmitterScript(emitter);
 
                 emitter.FramesAlive++;
+            }
+        }
+
+        private void UpdateStandaloneEmitters()
+        {
+            foreach (var emitter in _emitters)
+            {
+                if (!emitter.IsEnabled)
+                {
+                    continue;
+                }
+
+                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
+                
+                // if the emitter does not have a special update function, skip the wait logic
+                if (emitter.UpdateFunc == null)
+                {
+                    emitter.FramesAlive++;
+                    continue;
+                }
+
+                AdvanceEmitterScript(emitter);
+
+                emitter.FramesAlive++;
+            }
+        }
+
+        private void AdvanceEmitterScript(Emitter emitter)
+        {
+            // if the emitter's "update state" is ready
+            if (emitter.WaitTimer <= 0)
+            {
+                var loopAgain = true;
+
+                // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                // this means that if there isn't a yield return, the function will loop infinitely
+                // TODO: somehow prevent that
+                while (loopAgain)
+                {
+                    emitter.WaitEnumerator = emitter.WaitEnumerator ?? emitter.Update(this);
+
+                    // this steps through the emitters update function until it hits a yield return
+                    if (emitter.WaitEnumerator.MoveNext())
+                    {
+                        // TODO: check the type of emitter.WaitEnumerator.Current to make sure it isn't null?
+                        // starting next frame, this emitter is 'waiting'
+                        emitter.WaitTimer = emitter.WaitEnumerator.Current.Delay;
+
+                        loopAgain = false;
+                    }
+                    else
+                    { // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                        emitter.WaitEnumerator = emitter.Update(this);
+
+                        loopAgain = true;
+                    }
+                }
+            }
+            else
+            { // the emitter is "waiting"
+                emitter.WaitTimer--;
             }
         }
     }

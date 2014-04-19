@@ -1,4 +1,6 @@
-﻿namespace ProjectHekate.Core.Helpers
+﻿using System;
+
+namespace ProjectHekate.Core.Helpers
 {
     public static class Math
     {
@@ -9,6 +11,12 @@
         public const float PiOver2 = (float)(System.Math.PI / 2.0);
         public const float PiOver4 = (float)(System.Math.PI / 4.0);
         public const float TwoPi = (float)(System.Math.PI * 2.0);
+        private static Random _randomGen = new Random();
+
+        public static float GetRandomAngle(float minAngle, float maxAngle)
+        {
+            return minAngle + (maxAngle - minAngle)*(float)_randomGen.NextDouble();
+        }
 
         public static float Barycentric(float value1, float value2, float value3, float amount1, float amount2)
         {

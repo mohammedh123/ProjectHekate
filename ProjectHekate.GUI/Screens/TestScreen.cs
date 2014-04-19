@@ -52,15 +52,19 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateScriptedController(512, 120, 0, true, ScriptedController1)
-                .WithEmitter(0, 0, 0, true, SomeCrap1)
+            _engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
                 .Build();
         }
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
         {
-            controller.Y += 1.0f;
-            yield return new WaitInFrames(5);
+            if (controller.FramesAlive%60 == 0) {
+                for (int i = 0; i < 3; i++) {
+                    engine.CreateScriptedEmitter(controller.X, controller.Y, Math.GetRandomAngle(0, Math.Pi), true, SomeCrap1);
+                }
+            }
+
+            yield return new WaitInFrames(0);
         }
 
         public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IEngine engine)
@@ -83,7 +87,10 @@ namespace ProjectHekate.GUI.Screens
                     engine.BulletSystem.FireOrbitingLaser(e, 32, angleDiff*i, 16, 200, 5, 1f, 1 + e.FramesAlive % 3);
                 }
             }
-            e.Angle += Math.TwoPi / 360.0f;
+
+            e.X += (float)System.Math.Cos(e.Angle) * 2.0f;
+            e.Y += (float)System.Math.Sin(e.Angle) * 2.0f;
+
             yield return new WaitInFrames(0);
         }
 

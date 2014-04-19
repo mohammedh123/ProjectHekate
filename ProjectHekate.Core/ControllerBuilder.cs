@@ -44,7 +44,6 @@ namespace ProjectHekate.Core
         public IController Build()
         {
             _engine.AddController(_controller);
-            _engine.AddEmitters(_emitters);
             return _controller;
         }
     }
