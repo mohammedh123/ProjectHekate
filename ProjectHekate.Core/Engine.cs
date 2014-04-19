@@ -145,7 +145,7 @@ namespace ProjectHekate.Core
         {
             foreach(var emitter in cont.Emitters)
             {
-                if (!emitter.Enabled)
+                if (!emitter.IsEnabled)
                 {
                     continue;
                 }

@@ -24,7 +24,7 @@ namespace ProjectHekate.Core
 
         public ControllerBuilder WithEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updater)
         {
-            var emitter = new Emitter {OffsetX = x, OffsetY = y, Angle = angle, Enabled = enabled, UpdateFunc = updater};
+            var emitter = new Emitter {OffsetX = x, OffsetY = y, Angle = angle, IsEnabled = enabled, UpdateFunc = updater};
             _controller.Emitters.Add(emitter);
             _emitters.Add(emitter);
 
@@ -34,7 +34,7 @@ namespace ProjectHekate.Core
         public ControllerBuilder WithOrbittingEmitter(float distance, float angle, bool enabled,
             EmitterUpdateDelegate updater)
         {
-            var emitter = new Emitter {OrbitDistance = distance, Angle = angle, Enabled = enabled, UpdateFunc = updater, Orbiting = true};
+            var emitter = new Emitter {OrbitDistance = distance, Angle = angle, IsEnabled = enabled, UpdateFunc = updater, Orbiting = true};
             _controller.Emitters.Add(emitter);
             _emitters.Add(emitter);
 

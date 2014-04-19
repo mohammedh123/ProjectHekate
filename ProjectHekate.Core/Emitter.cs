@@ -13,12 +13,12 @@ namespace ProjectHekate.Core
     /// </summary>
     public interface IEmitter
     {
-        float X { get; }
-        float Y { get; }
+        float X { get; set; }
+        float Y { get; set; }
         float OffsetX { get; set; }
         float OffsetY { get; set; }
         float Angle { get; set; }
-        bool Enabled { get; set; }
+        bool IsEnabled { get; set; }
         int FramesAlive { get; }
 
         // orbit-specific stuff
@@ -28,18 +28,18 @@ namespace ProjectHekate.Core
 
     public class Emitter : AbstractScriptedObject<EmitterUpdateDelegate>, IEmitter
     {
+        public float X { get; set; }
+        public float Y { get; set; }
         public float OffsetX { get; set; }
         public float OffsetY { get; set; }
         public float Angle { get; set; }
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
         public int FramesAlive { get; internal set; }
 
         // orbit-specific stuff
         public bool Orbiting { get; internal set; }
         public float OrbitDistance { get; set; }
 
-        public float X { get; internal set; }
-        public float Y { get; internal set; }
 
         internal Emitter()
         {}
