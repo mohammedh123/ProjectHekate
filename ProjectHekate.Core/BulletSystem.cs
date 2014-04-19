@@ -19,6 +19,16 @@ namespace ProjectHekate.Core
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex);
 
+        IBullet FireOrbitingBasicBullet(IEmitter emitter, float distance, float orbitAngle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
+        IBullet FireOrbitingScriptedBullet(IEmitter emitter, float distance, float orbitAngle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex,
+            ProjectileUpdateDelegate<Bullet> bulletFunc);
+        ICurvedLaser FireOrbitingCurvedLaser(IEmitter emitter, float distance, float orbitAngle, float radius, uint lifetime, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex,
+            ProjectileUpdateDelegate<CurvedLaser> laserFunc);
+        IBeam FireOrbitingBeam(IEmitter emitter, float startingDistanceAwayFromEmitter, float orbitAngle, float orbitOffsetAngle, float radius, float length, uint delayInFrames, uint lifetime, float angularSpeedPerFrame, int spriteIndex,
+            ProjectileUpdateDelegate<Beam> beamFunc = null);
+        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
+        ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float orbitOffsetAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex);
+
         void KillBullet(uint id);
         void KillCurvedLaser(uint id);
         void KillBeam(uint id);
@@ -119,6 +129,94 @@ namespace ProjectHekate.Core
             return InternalFireLaser(x, y, angle, radius, length, speedPerFrame, spriteIndex);
         }
 
+
+        public IBullet FireOrbitingBasicBullet(IEmitter emitter, float distance, float angle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex)
+        {
+            return FireOrbitingScriptedBullet(emitter, distance, angle, speedPerFrame, angularSpeedPerFrame, spriteIndex, null);
+        }
+
+        public IBullet FireOrbitingScriptedBullet(IEmitter emitter, float distance, float orbitAngle, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex,
+            ProjectileUpdateDelegate<Bullet> bulletFunc)
+        {
+            var b = InternalFireBullet(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
+                emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
+                emitter.Angle + orbitAngle,
+                speedPerFrame, spriteIndex, bulletFunc);
+            b.Emitter = emitter;
+            b.OrbitDistance = distance;
+            b.OrbitAngle = orbitAngle;
+            b.OrbitalAngularSpeed = angularSpeedPerFrame;
+            b.Orbiting = true;
+
+            return b;
+        }
+
+        public ICurvedLaser FireOrbitingCurvedLaser(IEmitter emitter, float distance, float orbitAngle, float radius, uint lifetime, float speedPerFrame, float angularSpeedPerFrame,
+            int spriteIndex, ProjectileUpdateDelegate<CurvedLaser> laserFunc)
+        {
+            var cv = InternalFireCurvedLaser(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
+                emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
+                emitter.Angle + orbitAngle,
+                radius, lifetime, speedPerFrame, spriteIndex, laserFunc);
+            cv.Emitter = emitter;
+            cv.OrbitDistance = distance;
+            cv.OrbitAngle = orbitAngle;
+            cv.OrbitalAngularSpeed = angularSpeedPerFrame;
+            cv.Orbiting = true;
+
+            return cv;
+        }
+
+        public IBeam FireOrbitingBeam(IEmitter emitter, float startingDistanceAwayFromEmitter, float orbitAngle, float orbitOffsetAngle, float radius, float length,
+            uint delayInFrames, uint lifetime, float angularSpeedPerFrame, int spriteIndex,
+            ProjectileUpdateDelegate<Beam> beamFunc = null)
+        {
+            var b = InternalFireBeam(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * startingDistanceAwayFromEmitter,
+                emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * startingDistanceAwayFromEmitter,
+                emitter.Angle + orbitAngle + orbitOffsetAngle, radius, length, delayInFrames, lifetime, spriteIndex, beamFunc);
+            b.Emitter = emitter;
+            b.OrbitDistance = startingDistanceAwayFromEmitter;
+            b.OrbitAngle = orbitAngle;
+            b.OrbitOffsetAngle = orbitOffsetAngle;
+            b.OrbitalAngularSpeed = angularSpeedPerFrame;
+            b.Orbiting = true;
+
+            return b;
+        }
+
+        public ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame, int spriteIndex)
+        {
+            var l = InternalFireLaser(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
+                emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
+                emitter.Angle + orbitAngle,
+                radius, length, speedPerFrame, spriteIndex);
+            l.Emitter = emitter;
+            l.OrbitDistance = distance;
+            l.OrbitAngle = orbitAngle;
+            l.OrbitOffsetAngle = 0.0f;
+            l.OrbitalAngularSpeed = angularSpeedPerFrame;
+            l.Orbiting = true;
+
+            return l;
+        }
+
+        public ILaser FireOrbitingLaser(IEmitter emitter, float distance, float orbitAngle, float orbitOffsetAngle, float radius, float length, float speedPerFrame, float angularSpeedPerFrame,
+            int spriteIndex)
+        {
+            var l = InternalFireLaser(emitter.X + (float)Math.Cos(orbitAngle + emitter.Angle) * distance,
+                emitter.Y + (float)Math.Sin(orbitAngle + emitter.Angle) * distance,
+                emitter.Angle + orbitAngle + orbitOffsetAngle,
+                radius, length, speedPerFrame, spriteIndex);
+            l.Emitter = emitter;
+            l.OrbitDistance = distance;
+            l.OrbitAngle = orbitAngle;
+            l.OrbitOffsetAngle = orbitOffsetAngle;
+            l.OrbitalAngularSpeed = angularSpeedPerFrame;
+            l.Orbiting = true;
+
+            return l;
+        }
+
         #endregion
 
         #region Internal firing functions & utility functions
@@ -156,7 +254,7 @@ namespace ProjectHekate.Core
             return cv;
         }
 
-        private IBeam InternalFireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
+        private Beam InternalFireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc)
         {
             var b = FindNextAvailableBeam();
 
@@ -174,7 +272,7 @@ namespace ProjectHekate.Core
             return b;
         }
 
-        private ILaser InternalFireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
+        private Laser InternalFireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex)
         {
             var l = FindNextAvailableLaser();
 
@@ -274,12 +372,12 @@ namespace ProjectHekate.Core
                     continue;
                 }
 
-                while (b.Angle >  Helpers.Math.TwoPi) b.Angle -= Helpers.Math.TwoPi;
-                while (b.Angle < -Helpers.Math.TwoPi) b.Angle += Helpers.Math.TwoPi;
-
-                b.X += (float)Math.Cos(b.Angle) * b.Speed;
-                b.Y += (float)Math.Sin(b.Angle) * b.Speed;
-
+                if (b.Orbiting) {
+                    UpdatePositionOrbitally(b);
+                }
+                else {
+                    UpdatePositionLinearly(b);
+                }
 
                 // if the bullet does not have a special update function, skip the wait logic
                 if (b.UpdateFunc == null)
@@ -337,18 +435,12 @@ namespace ProjectHekate.Core
                 if (!cv.IsActive) {
                     continue;
                 }
-                
-                while (cv.Angle > Helpers.Math.TwoPi) cv.Angle -= Helpers.Math.TwoPi;
-                while (cv.Angle < -Helpers.Math.TwoPi) cv.Angle += Helpers.Math.TwoPi;
 
-                cv.X += (float)Math.Cos(cv.Angle) * cv.Speed;
-                cv.Y += (float)Math.Sin(cv.Angle) * cv.Speed;
-                
-                // if the curved laser does not have a special update function, skip the wait logic
-                if (cv.UpdateFunc == null)
-                {
-                    cv.FramesAlive++;
-                    continue;
+                if (cv.Orbiting) {
+                    UpdatePositionOrbitally(cv);
+                }
+                else {
+                    UpdatePositionLinearly(cv);
                 }
 
                 var limit = Math.Min(cv.FramesAlive, cv.Lifetime-1);
@@ -365,6 +457,13 @@ namespace ProjectHekate.Core
                 //append
                 cv.InternalCoordinates[limit] = new Vector<float>(cv.X, cv.Y);
 
+
+                // if the curved laser does not have a special update function, skip the wait logic
+                if (cv.UpdateFunc == null)
+                {
+                    cv.FramesAlive++;
+                    continue;
+                }
 
                 // if the curved laser's "update state" is ready
                 if (_curvedLaserData.ProjectileWaitTimers[i] <= 0)
@@ -420,8 +519,13 @@ namespace ProjectHekate.Core
                 if (b.FramesAlive > b.Lifetime) {
                     // kill this beam
                     KillBeam(b.Id);
+                    continue;
                 }
-                
+
+                if (b.Orbiting) {
+                    UpdatePositionOrbitally(b);
+                }
+
                 // if the beam does not have a special update function, skip the wait logic
                 if (b.UpdateFunc == null)
                 {
@@ -480,8 +584,12 @@ namespace ProjectHekate.Core
                     continue;
                 }
 
-                l.X += (float)Math.Cos(l.Angle) * l.Speed;
-                l.Y += (float)Math.Sin(l.Angle) * l.Speed;
+                if (l.Orbiting) {
+                    UpdatePositionOrbitally(l);
+                }
+                else {
+                    UpdatePositionLinearly(l);
+                }
 
                 // update current length and cap it at max length
                 l.CurrentLength = Math.Min(l.CurrentLength + l.Speed, l.Length);
@@ -489,5 +597,39 @@ namespace ProjectHekate.Core
                 l.FramesAlive++;
             }
         }
-    }
+
+        private void UpdatePositionLinearly(AbstractProjectile proj)
+        {
+            proj.Angle = Helpers.Math.WrapAngle(proj.Angle);
+
+            proj.X += (float)Math.Cos(proj.Angle) * proj.Speed;
+            proj.Y += (float)Math.Sin(proj.Angle) * proj.Speed;
+        }
+
+        private void UpdatePositionOrbitally(AbstractProjectile proj)
+        {
+            proj.OrbitAngle += Helpers.Math.ToRadians(proj.OrbitalAngularSpeed);
+            proj.OrbitAngle += Helpers.Math.ToRadians(proj.Speed);
+            proj.Angle = proj.Emitter.Angle + proj.OrbitAngle;
+            proj.X = proj.Emitter.X + (float)Math.Cos(proj.OrbitAngle + proj.Emitter.Angle) * proj.OrbitDistance;
+            proj.Y = proj.Emitter.Y + (float)Math.Sin(proj.OrbitAngle + proj.Emitter.Angle) * proj.OrbitDistance;
+        }
+
+        private void UpdatePositionOrbitally(Beam beam)
+        {
+            beam.OrbitAngle += Helpers.Math.ToRadians(beam.OrbitalAngularSpeed);
+            beam.Angle = beam.Emitter.Angle + beam.OrbitAngle + beam.OrbitOffsetAngle;
+            beam.X = beam.Emitter.X + (float)Math.Cos(beam.OrbitAngle + beam.Emitter.Angle) * beam.OrbitDistance;
+            beam.Y = beam.Emitter.Y + (float)Math.Sin(beam.OrbitAngle + beam.Emitter.Angle) * beam.OrbitDistance;
+        }
+
+        // orbital lasers demand a slightly different update
+        private void UpdatePositionOrbitally(Laser laser)
+        {
+            laser.OrbitAngle += Helpers.Math.ToRadians(laser.OrbitalAngularSpeed);
+            laser.Angle = laser.Emitter.Angle + laser.OrbitAngle + laser.OrbitOffsetAngle;
+            laser.X = laser.Emitter.X + (float)Math.Cos(laser.OrbitAngle + laser.Emitter.Angle) * (laser.OrbitDistance + laser.CurrentLength);
+            laser.Y = laser.Emitter.Y + (float)Math.Sin(laser.OrbitAngle + laser.Emitter.Angle) * (laser.OrbitDistance + laser.CurrentLength);
+        }
+    }   
 }
