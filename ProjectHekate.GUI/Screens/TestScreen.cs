@@ -53,7 +53,9 @@ namespace ProjectHekate.GUI.Screens
                 .Build();
 
             _engine.CreateController(512, 384, 0, true)
-                .WithOrbittingEmitter(100, 0, true, SomeCrap1)
+                .WithOrbittingEmitter(64, 0, true, SomeCrap1)
+                .WithOrbittingEmitter(64, Math.ToRadians(120), true, SomeCrap1)
+                .WithOrbittingEmitter(64, Math.ToRadians(240), true, SomeCrap1)
                 .Build();
         }
 
@@ -66,16 +68,19 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IBulletSystem bs, IInterpolationSystem iis)
         {
-            const int numBullets = 5;
+            const int numBullets = 16;
             const float angleDiff = Math.TwoPi / numBullets;
-            const int delay = 240;
+            const int delay = 30;
 
-            for (var i = 0; i < numBullets; i++)
-            {
-                bs.FireBeam(e.X, e.Y, (e.Angle + angleDiff * i), 32, 512, 60, 120, 4);
+            if (e.FramesAlive == delay) {
+                for (var i = 0; i < numBullets; i++) {
+                    //bs.FireOrbitingBeam(e, 100, (angleDiff*i), 0, 32, 512, 60, 240, 0, 4);
+                    bs.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
+                    bs.FireOrbitingLaser(e, 32, angleDiff*i, 16, 200, 5, 1f, 1 + e.FramesAlive % 3);
+                }
             }
-            e.Angle += Math.TwoPi / 18.0f;
-            yield return new WaitInFrames(delay);
+            e.Angle += Math.TwoPi / 360.0f;
+            yield return new WaitInFrames(0);
         }
 
         public override void LoadContent()
@@ -90,6 +95,7 @@ namespace ProjectHekate.GUI.Screens
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)){ Origin = new Vector2f(16,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(80, 0, 32, 16)){ Origin = new Vector2f(16,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("laser")));
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0, 64, 64, 64)) { Origin = new Vector2f(32, 32) });
         }
 
         public override void HandleInput(IInputManager<Mouse.Button, Vector2i, Window, Keyboard.Key> input, TimeSpan gameTime)
@@ -457,7 +463,7 @@ namespace ProjectHekate.GUI.Screens
                         new Vector2f(texRight, texTop + texHeight)
                     );
 
-                    var renderStates = new RenderStates(sprite.Texture);
+                    var renderStates = new RenderStates(sprite.Texture) { BlendMode = BlendMode.Add};
 
                     Game.Window.Draw(_vertexArray, renderStates);
                 }
