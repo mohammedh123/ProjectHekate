@@ -10,6 +10,7 @@ namespace ProjectHekate.Core
     public interface IEngine
     {
         IBulletSystem BulletSystem { get; }
+        IInterpolationSystem InterpolationSystem { get; }
 
         ControllerBuilder CreateController(float x, float y, float angle, bool enabled);
         void Update(float dt);
@@ -26,6 +27,11 @@ namespace ProjectHekate.Core
         public IBulletSystem BulletSystem
         {
             get { return _bulletSystem; }
+        }
+
+        public IInterpolationSystem InterpolationSystem
+        {
+            get { return _interpolationSystem; }
         }
 
         public Engine()
