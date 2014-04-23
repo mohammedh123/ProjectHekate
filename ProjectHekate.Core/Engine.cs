@@ -158,35 +158,7 @@ namespace ProjectHekate.Core
 
         private void UpdateControllersEmitters(Controller cont)
         {
-            foreach(var emitter in cont.Emitters)
-            {
-                if (!emitter.IsEnabled)
-                {
-                    continue;
-                }
-
-                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
-
-                if (emitter.Orbiting) {
-                    // use angle + distance to determine position
-                    emitter.X = cont.X + (float) Math.Cos(emitter.Angle)*emitter.OrbitDistance;
-                    emitter.Y = cont.Y + (float) Math.Sin(emitter.Angle)*emitter.OrbitDistance;
-                }
-                else {
-                    emitter.X = cont.X + emitter.OffsetX;
-                    emitter.Y = cont.Y + emitter.OffsetY;
-                }
-
-                // if the emitter does not have a special update function, skip the wait logic
-                if (emitter.UpdateFunc == null) {
-                    emitter.FramesAlive++;
-                    continue;
-                }
-                
-                AdvanceEmitterScript(emitter);
-
-                emitter.FramesAlive++;
-            }
+            UpdateActiveEmitters(cont, cont.Emitters);
         }
 
         private void UpdateStandaloneEmitters()
@@ -199,7 +171,45 @@ namespace ProjectHekate.Core
                 }
 
                 emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
+
+                UpdateActiveEmitters(emitter, emitter.Emitters);
                 
+                // if the emitter does not have a special update function, skip the wait logic
+                if (emitter.UpdateFunc == null)
+                {
+                    emitter.FramesAlive++;
+                    continue;
+                }
+
+                AdvanceEmitterScript(emitter);
+
+                emitter.FramesAlive++;
+            }
+        }
+
+        private void UpdateActiveEmitters(IPositionable anchor, IEnumerable<Emitter> emitters)
+        {
+            foreach (var emitter in emitters)
+            {
+                if (!emitter.IsEnabled)
+                {
+                    continue;
+                }
+
+                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
+
+                if (emitter.Orbiting)
+                {
+                    // use angle + distance to determine position
+                    emitter.X = anchor.X + (float)Math.Cos(anchor.Angle + emitter.Angle) * emitter.OrbitDistance;
+                    emitter.Y = anchor.Y + (float)Math.Sin(anchor.Angle + emitter.Angle) * emitter.OrbitDistance;
+                }
+                else
+                {
+                    emitter.X = anchor.X + emitter.OffsetX;
+                    emitter.Y = anchor.Y + emitter.OffsetY;
+                }
+
                 // if the emitter does not have a special update function, skip the wait logic
                 if (emitter.UpdateFunc == null)
                 {
