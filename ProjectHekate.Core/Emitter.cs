@@ -39,6 +39,8 @@ namespace ProjectHekate.Core
         public float OrbitDistance { get; set; }
 
 
+        internal readonly List<Emitter> Emitters = new List<Emitter>();
+
         internal Emitter()
         {}
 
