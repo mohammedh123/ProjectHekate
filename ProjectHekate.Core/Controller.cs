@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Core.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -11,11 +12,8 @@ namespace ProjectHekate.Core
     /// <summary>
     /// Controllers are objects that have emitters. The controller is disabled by default.
     /// </summary>
-    public interface IController
+    public interface IController : IPositionable
     {
-        float X { get; set; }
-        float Y { get; set; }
-        float Angle { get; set; }
         int FramesAlive { get; }
         bool IsEnabled { get; set; }
     }
