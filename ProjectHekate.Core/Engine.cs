@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Core.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -37,7 +38,7 @@ namespace ProjectHekate.Core
         /// <summary>
         /// Creates an emitter that is controlled via a script function.
         /// </summary>
-        IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc);
+        EmitterBuilder CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc);
 
         void Update(float dt);
     }
@@ -75,22 +76,12 @@ namespace ProjectHekate.Core
 
         public ControllerBuilder CreateScriptedController(float x, float y, float angle, bool enabled, ControllerUpdateDelegate updateFunc)
         {
-            return new ControllerBuilder(x, y, angle, enabled, this, updateFunc);
+            return new ControllerBuilder(x, y, angle, enabled, this, updateFunc); //todo: fix args
         }
 
-        public IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc)
+        public EmitterBuilder CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc)
         {
-            var emitter = new Emitter()
-                          {
-                              X = x,
-                              Y = y,
-                              Angle = angle,
-                              IsEnabled = true,
-                              UpdateFunc = updateFunc
-                          };
-            _emitters.Add(emitter);
-
-            return emitter;
+            return new EmitterBuilder(x,y,angle,enabled,updateFunc, this);
         }
 
         internal void AddController(Controller con)
@@ -98,9 +89,9 @@ namespace ProjectHekate.Core
             _controllers.Add(con);
         }
 
-        internal void AddEmitters(IEnumerable<Emitter> e)
+        internal void AddEmitter(Emitter e)
         {
-            _emitters.AddRange(e);
+            _emitters.Add(e);
         }
         
         public void Update(float dt)

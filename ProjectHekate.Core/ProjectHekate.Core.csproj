@@ -62,6 +62,7 @@
     <Compile Include="Controller.cs" />
     <Compile Include="ControllerBuilder.cs" />
     <Compile Include="Emitter.cs" />
+    <Compile Include="EmitterBuilder.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Helpers\Math.cs" />
     <Compile Include="Interfaces\IPositionable.cs" />
