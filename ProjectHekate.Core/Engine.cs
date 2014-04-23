@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Core.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -37,7 +38,7 @@ namespace ProjectHekate.Core
         /// <summary>
         /// Creates an emitter that is controlled via a script function.
         /// </summary>
-        IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc);
+        EmitterBuilder CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc);
 
         void Update(float dt);
     }
@@ -75,22 +76,12 @@ namespace ProjectHekate.Core
 
         public ControllerBuilder CreateScriptedController(float x, float y, float angle, bool enabled, ControllerUpdateDelegate updateFunc)
         {
-            return new ControllerBuilder(x, y, angle, enabled, this, updateFunc);
+            return new ControllerBuilder(x, y, angle, enabled, this, updateFunc); //todo: fix args
         }
 
-        public IEmitter CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc)
+        public EmitterBuilder CreateScriptedEmitter(float x, float y, float angle, bool enabled, EmitterUpdateDelegate updateFunc)
         {
-            var emitter = new Emitter()
-                          {
-                              X = x,
-                              Y = y,
-                              Angle = angle,
-                              IsEnabled = true,
-                              UpdateFunc = updateFunc
-                          };
-            _emitters.Add(emitter);
-
-            return emitter;
+            return new EmitterBuilder(x,y,angle,enabled,updateFunc, this);
         }
 
         internal void AddController(Controller con)
@@ -98,9 +89,9 @@ namespace ProjectHekate.Core
             _controllers.Add(con);
         }
 
-        internal void AddEmitters(IEnumerable<Emitter> e)
+        internal void AddEmitter(Emitter e)
         {
-            _emitters.AddRange(e);
+            _emitters.Add(e);
         }
         
         public void Update(float dt)
@@ -167,35 +158,7 @@ namespace ProjectHekate.Core
 
         private void UpdateControllersEmitters(Controller cont)
         {
-            foreach(var emitter in cont.Emitters)
-            {
-                if (!emitter.IsEnabled)
-                {
-                    continue;
-                }
-
-                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
-
-                if (emitter.Orbiting) {
-                    // use angle + distance to determine position
-                    emitter.X = cont.X + (float) Math.Cos(emitter.Angle)*emitter.OrbitDistance;
-                    emitter.Y = cont.Y + (float) Math.Sin(emitter.Angle)*emitter.OrbitDistance;
-                }
-                else {
-                    emitter.X = cont.X + emitter.OffsetX;
-                    emitter.Y = cont.Y + emitter.OffsetY;
-                }
-
-                // if the emitter does not have a special update function, skip the wait logic
-                if (emitter.UpdateFunc == null) {
-                    emitter.FramesAlive++;
-                    continue;
-                }
-                
-                AdvanceEmitterScript(emitter);
-
-                emitter.FramesAlive++;
-            }
+            UpdateActiveEmitters(cont, cont.Emitters);
         }
 
         private void UpdateStandaloneEmitters()
@@ -208,7 +171,45 @@ namespace ProjectHekate.Core
                 }
 
                 emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
+
+                UpdateActiveEmitters(emitter, emitter.Emitters);
                 
+                // if the emitter does not have a special update function, skip the wait logic
+                if (emitter.UpdateFunc == null)
+                {
+                    emitter.FramesAlive++;
+                    continue;
+                }
+
+                AdvanceEmitterScript(emitter);
+
+                emitter.FramesAlive++;
+            }
+        }
+
+        private void UpdateActiveEmitters(IPositionable anchor, IEnumerable<Emitter> emitters)
+        {
+            foreach (var emitter in emitters)
+            {
+                if (!emitter.IsEnabled)
+                {
+                    continue;
+                }
+
+                emitter.Angle = Helpers.Math.WrapAngle(emitter.Angle);
+
+                if (emitter.Orbiting)
+                {
+                    // use angle + distance to determine position
+                    emitter.X = anchor.X + (float)Math.Cos(anchor.Angle + emitter.Angle) * emitter.OrbitDistance;
+                    emitter.Y = anchor.Y + (float)Math.Sin(anchor.Angle + emitter.Angle) * emitter.OrbitDistance;
+                }
+                else
+                {
+                    emitter.X = anchor.X + emitter.OffsetX;
+                    emitter.Y = anchor.Y + emitter.OffsetY;
+                }
+
                 // if the emitter does not have a special update function, skip the wait logic
                 if (emitter.UpdateFunc == null)
                 {

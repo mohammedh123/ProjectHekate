@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Core.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -11,13 +12,10 @@ namespace ProjectHekate.Core
     /// <summary>
     /// Emitters are objects that fire off bullets. They are attached to a controller (you should not have a dangling emitter) and their positions are offset from the controller's position.
     /// </summary>
-    public interface IEmitter
+    public interface IEmitter : IPositionable
     {
-        float X { get; set; }
-        float Y { get; set; }
         float OffsetX { get; set; }
         float OffsetY { get; set; }
-        float Angle { get; set; }
         bool IsEnabled { get; set; }
         int FramesAlive { get; }
 
@@ -40,6 +38,8 @@ namespace ProjectHekate.Core
         public bool Orbiting { get; internal set; }
         public float OrbitDistance { get; set; }
 
+
+        internal readonly List<Emitter> Emitters = new List<Emitter>();
 
         internal Emitter()
         {}

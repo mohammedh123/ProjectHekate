@@ -58,11 +58,29 @@ namespace ProjectHekate.GUI.Screens
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
         {
-            if (controller.FramesAlive%60 == 0) {
-                for (int i = 0; i < 3; i++) {
-                    engine.CreateScriptedEmitter(controller.X, controller.Y, Math.GetRandomAngle(0, Math.Pi), true, SomeCrap1);
+            if (controller.FramesAlive == 60) {
+                var baseEmitter = engine.CreateScriptedEmitter(controller.X, controller.Y, Math.PiOver2, true, MoveDown);
+                var numShots = 3;
+                var diffAngle = Math.TwoPi/numShots;
+                for (int i = 0; i < numShots; i++) {
+                    baseEmitter = baseEmitter.WithOrbittingEmitter(200, diffAngle*i, true, SomeCrap1);
+                }
+                var finalEmitter = baseEmitter.Build();
+
+                for (int i = 0; i < numShots; i++)
+                {
+                    engine.BulletSystem.FireOrbitingCurvedLaser(finalEmitter, 200, diffAngle * i, 8, 50, 0, 0, 3, null);
+                    engine.BulletSystem.FireOrbitingCurvedLaser(finalEmitter, 100, diffAngle * i, 8, 50, 0, 0, 2, null);
                 }
             }
+
+            yield return new WaitInFrames(0);
+        }
+
+        public IEnumerator<WaitInFrames> MoveDown(Emitter e, IEngine engine)
+        {
+            e.Y += 0.5f;
+            e.Angle += 2*Math.Pi/180.0f;
 
             yield return new WaitInFrames(0);
         }
@@ -76,22 +94,34 @@ namespace ProjectHekate.GUI.Screens
         
         public IEnumerator<WaitInFrames> SomeCrap1(Emitter e, IEngine engine)
         {
-            const int numBullets = 4;
+            const int numBullets = 9;
             const float angleDiff = Math.TwoPi / numBullets;
             const int delay = 30;
 
             if (e.FramesAlive == delay) {
                 for (var i = 0; i < numBullets; i++) {
                     //bs.FireOrbitingBeam(e, 100, (angleDiff*i), 0, 32, 512, 60, 240, 0, 4);
-                    engine.BulletSystem.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
-                    engine.BulletSystem.FireOrbitingLaser(e, 32, angleDiff*i, 16, 200, 5, 1f, 1 + e.FramesAlive % 3);
+                    engine.BulletSystem.FireOrbitingScriptedBullet(e, 32, angleDiff * i, 0, 3, 6, OrbitDistanceIncreaseToMax);
                 }
+                engine.BulletSystem.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
             }
 
             e.X += (float)System.Math.Cos(e.Angle) * 2.0f;
             e.Y += (float)System.Math.Sin(e.Angle) * 2.0f;
 
             yield return new WaitInFrames(0);
+        }
+
+        public IEnumerator<WaitInFrames> OrbitDistanceIncreaseToMax<T>(T proj, IInterpolationSystem ins) where T : AbstractProjectile
+        {
+            proj.OrbitDistance = 64 + 64*(float)System.Math.Sin(proj.FramesAlive*Math.Pi/30.0f);
+
+            //if (proj.OrbitDistance < 128) {
+                yield return new WaitInFrames(0);
+            //}
+            //else {
+            //    yield return new WaitInFrames(1000);
+            //}
         }
 
         public override void LoadContent()
@@ -101,12 +131,20 @@ namespace ProjectHekate.GUI.Screens
 
             _playerSprite = new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0,0,32,32));
 
+            //0
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(32, 0, 16, 16)){ Origin = new Vector2f(8,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 0, 32, 16)){ Origin = new Vector2f(16,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(48, 16, 32, 16)){ Origin = new Vector2f(16,8) });
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(80, 0, 32, 16)){ Origin = new Vector2f(16,8) });
+
+            //4
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("laser")));
+
+            //5
             _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(0, 64, 64, 64)) { Origin = new Vector2f(32, 32) });
+
+            //6
+            _bulletSprites.Add(new Sprite(Game.TextureManager.GetTexture("tilemap"), new IntRect(112, 0, 32, 32)) { Origin = new Vector2f(16, 16) });
         }
 
         public override void HandleInput(IInputManager<Mouse.Button, Vector2i, Window, Keyboard.Key> input, TimeSpan gameTime)
