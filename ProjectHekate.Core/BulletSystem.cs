@@ -653,7 +653,6 @@ namespace ProjectHekate.Core
         private void UpdatePositionOrbitally(AbstractProjectile proj)
         {
             proj.OrbitAngle += Helpers.Math.ToRadians(proj.OrbitalAngularSpeed);
-            proj.OrbitAngle += Helpers.Math.ToRadians(proj.Speed);
             proj.Angle = proj.Emitter.Angle + proj.OrbitAngle;
             proj.X = proj.Emitter.X + (float)Math.Cos(proj.OrbitAngle + proj.Emitter.Angle) * proj.OrbitDistance;
             proj.Y = proj.Emitter.Y + (float)Math.Sin(proj.OrbitAngle + proj.Emitter.Angle) * proj.OrbitDistance;
