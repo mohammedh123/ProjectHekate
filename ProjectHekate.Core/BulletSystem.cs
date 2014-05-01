@@ -672,8 +672,8 @@ namespace ProjectHekate.Core
         {
             laser.OrbitAngle += Helpers.Math.ToRadians(laser.OrbitalAngularSpeed);
             laser.Angle = laser.Emitter.Angle + laser.OrbitAngle + laser.OrbitOffsetAngle;
-            laser.X = laser.Emitter.X + (float)Math.Cos(laser.OrbitAngle + laser.Emitter.Angle) * (laser.OrbitDistance + laser.CurrentLength);
-            laser.Y = laser.Emitter.Y + (float)Math.Sin(laser.OrbitAngle + laser.Emitter.Angle) * (laser.OrbitDistance + laser.CurrentLength);
+            laser.X = laser.Emitter.X + (float)Math.Cos(laser.OrbitAngle + laser.Emitter.Angle) * laser.OrbitDistance + (float)Math.Cos(laser.OrbitAngle + laser.Emitter.Angle + laser.OrbitOffsetAngle) * laser.CurrentLength;
+            laser.Y = laser.Emitter.Y + (float)Math.Sin(laser.OrbitAngle + laser.Emitter.Angle) * laser.OrbitDistance + (float)Math.Sin(laser.OrbitAngle + laser.Emitter.Angle + laser.OrbitOffsetAngle) * laser.CurrentLength;
         }
     }   
 }
