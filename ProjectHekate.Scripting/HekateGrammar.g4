@@ -133,7 +133,6 @@ primary
 literal
 	:	IntegerLiteral
 	|	FloatingPointLiteral
-	|	BooleanLiteral
 	;
 
 /*
@@ -154,12 +153,6 @@ ATTACH			: 'attach';
 BUILD			: 'build';
 FIRE			: 'fire';
 FROM			: 'from';
-
-// Boolean literals
-BooleanLiteral
-	:	'true'
-	|	'false'
-	;
 
 // Integer literals
 IntegerLiteral
