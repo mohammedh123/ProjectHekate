@@ -51,7 +51,7 @@ formalParameterList
 	;
 
 formalParameters
-	:	'(' formalParameterList ')'
+	:	'(' formalParameterList? ')'
 	;
 
 // statements
