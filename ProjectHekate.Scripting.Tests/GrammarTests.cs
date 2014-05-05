@@ -18,7 +18,22 @@ namespace ProjectHekate.Scripting.Tests
             var parser = new HekateGrammarParser(tokens);
             var tree = parser.script();
 
+            parser.NumberOfSyntaxErrors.Should().Be(0);
             tree.ChildCount.Should().Be(0);
+        }
+
+
+        [TestMethod]
+        public void ShouldParseSingleEmptyFunction()
+        {
+            var input = new AntlrInputStream("function Main() {}");
+            var lexer = new HekateGrammarLexer(input);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new HekateGrammarParser(tokens);
+            var tree = parser.script();
+
+            parser.NumberOfSyntaxErrors.Should().Be(0);
+            tree.ChildCount.Should().Be(1);
         }
     }
 }
