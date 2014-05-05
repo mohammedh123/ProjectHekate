@@ -64,9 +64,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HekateGrammar.g4.lexer.cs">
+      <DependentUpon>HekateGrammar.g4</DependentUpon>
+    </Compile>
+    <Compile Include="HekateGrammar.g4.parser.cs">
+      <DependentUpon>HekateGrammar.g4</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Antlr4 Include="HekateGrammar.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>ProjectHekate.Scripting</CustomToolNamespace>
+    </Antlr4>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
