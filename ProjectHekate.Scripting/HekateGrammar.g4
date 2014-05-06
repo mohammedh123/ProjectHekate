@@ -9,12 +9,7 @@ script
 	;
 
 functionDeclaration
-	:	'function' Identifier formalParameters
-		(
-			functionBody
-			|
-			';'
-		)
+	:	'function' Identifier formalParameters functionBody
 	;
 
 functionBody
@@ -57,13 +52,32 @@ formalParameters
 // statements
 statement
 	:	block
-	|	'if' parExpression statement ('else' statement)? ';'
+	|	'if' parExpression statement ('else' statement)?
 	|	'for' '(' forControl ')' statement
 	|	'while' parExpression statement
 	|	'break;'
 	|	'continue;'
 	|	';'
 	|	statementExpression ';'
+	|	attachEmitterStatement ';'
+	|	fireStatement ';'
+	|	waitStatement ';'
+	;
+
+attachEmitterStatement
+	:	Identifier 'attach' Identifier parExpressionList withUpdaterOption?
+	;
+
+fireStatement
+	:	'fire' Identifier parExpressionList fromEmitterOption
+	;
+
+waitStatement
+	:	'wait' expression 'frames'
+	;
+
+fromEmitterOption
+	:	'from' Identifier
 	;
 
 forControl
@@ -93,6 +107,10 @@ expressionList
 	:	expression (',' expression)*
 	;
 
+parExpressionList
+	: '(' expressionList? ')'
+	;
+
 statementExpression
 	:	expression
 	;
@@ -101,11 +119,16 @@ constantExpression
 	:	expression
 	;
 
+methodExpression
+	:	Identifier parExpressionList
+	;
+
 expression
 	:	primary
 	|	expression ('++' | '--')
 	|	('+'|'-'|'++'|'--') expression
 	|	'!' expression
+	|   expression '(' expressionList? ')'
 	|	expression ('*'|'/'|'%') expression
 	|	expression ('+'|'-') expression
 	|	expression ('<=' | '>=' | '>' | '<') expression
@@ -121,12 +144,19 @@ expression
 		|	'%='
 		)
 		expression
+	|	'create' 'emitter' parExpressionList withUpdaterOption?
+	|	'build' Identifier
+	;
+
+withUpdaterOption
+	:	'with' 'updater' methodExpression
 	;
 
 primary
 	:	'(' expression ')'
 	|	literal
 	|	Identifier
+	|	ContextIdentifier
 	;
 
 //literals
@@ -147,17 +177,21 @@ FOR			: 'for';
 WHILE		: 'while';
 IF			: 'if';
 
-CREATE_EMITTER	: 'create emitter';
-WITH_UPDATER	: 'with updater';
-ATTACH			: 'attach';
-BUILD			: 'build';
-FIRE			: 'fire';
-FROM			: 'from';
+CREATE		: 'create';
+EMITTER		: 'emitter';
+WITH		: 'with';
+UPDATER		: 'updater';
+ATTACH		: 'attach';
+BUILD		: 'build';
+FIRE		: 'fire';
+FROM		: 'from';
+WAIT		: 'wait';
+FRAMES		: 'frames';
 
 // Integer literals
 IntegerLiteral
 	:	'0'
-	|	Sign? NonZeroDigit (Digits?)
+	|	Sign? NonZeroDigit Digits*
 	;
 
 FloatingPointLiteral
@@ -166,7 +200,7 @@ FloatingPointLiteral
 
 fragment
 Digits
-	:	Digit (Digit)?
+	:	Digit+
 	;
 
 fragment
@@ -218,16 +252,21 @@ DIV_ASSIGN	: '/=';
 // Identifiers
 Identifier
 	:	Letter LetterOrDigit*
+	|	ContextIdentifier
+	;
+
+ContextIdentifier
+	: '$' Identifier
 	;
 
 fragment
 Letter
-	:	[a-zA-Z]
+	:	[a-zA-Z_]
 	;
 
 fragment
 LetterOrDigit
-	:	[a-zA-Z0-9]
+	:	[a-zA-Z0-9_]
 	;
 
 WS 
