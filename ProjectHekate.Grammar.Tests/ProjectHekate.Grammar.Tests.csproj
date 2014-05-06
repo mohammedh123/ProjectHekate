@@ -87,9 +87,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProjectHekate.Scripting\ProjectHekate.Scripting.csproj">
+    <ProjectReference Include="..\ProjectHekate.Grammar.Implementation\ProjectHekate.Grammar.Implementation.csproj">
       <Project>{955cd2dd-81e3-4597-b688-974e2fa21044}</Project>
-      <Name>ProjectHekate.Scripting</Name>
+      <Name>ProjectHekate.Grammar.Implementation</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

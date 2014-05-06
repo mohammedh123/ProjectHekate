@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Grammar.Tests", "ProjectHekate.Grammar.Tests\ProjectHekate.Grammar.Tests.csproj", "{A285FBB3-AADF-4CA5-A1FB-1DABACC3C495}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Scripting", "ProjectHekate.Scripting\ProjectHekate.Scripting.csproj", "{955CD2DD-81E3-4597-B688-974E2FA21044}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Grammar.Implementation", "ProjectHekate.Grammar.Implementation\ProjectHekate.Grammar.Implementation.csproj", "{955CD2DD-81E3-4597-B688-974E2FA21044}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

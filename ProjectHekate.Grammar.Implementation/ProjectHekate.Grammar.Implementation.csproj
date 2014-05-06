@@ -8,8 +8,8 @@
     <ProjectGuid>{955CD2DD-81E3-4597-B688-974E2FA21044}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProjectHekate.Scripting</RootNamespace>
-    <AssemblyName>ProjectHekate.Scripting</AssemblyName>
+    <RootNamespace>ProjectHekate.Grammar.Implementation</RootNamespace>
+    <AssemblyName>ProjectHekate.Grammar.Implementation</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
