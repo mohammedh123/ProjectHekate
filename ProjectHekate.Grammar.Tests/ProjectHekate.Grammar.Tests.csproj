@@ -84,13 +84,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProjectHekate.Grammar\ProjectHekate.Grammar.csproj">
-      <Project>{7b6a5deb-7893-4ec3-89c8-b16646a5bdb6}</Project>
-      <Name>ProjectHekate.Grammar</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\ProjectHekate.Scripting\ProjectHekate.Scripting.csproj">
+      <Project>{955cd2dd-81e3-4597-b688-974e2fa21044}</Project>
+      <Name>ProjectHekate.Scripting</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
