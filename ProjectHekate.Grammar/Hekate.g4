@@ -1,4 +1,4 @@
-grammar HekateGrammar;
+grammar Hekate;
 
 /*
  * Parser Rules

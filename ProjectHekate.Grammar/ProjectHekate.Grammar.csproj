@@ -8,8 +8,8 @@
     <ProjectGuid>{7B6A5DEB-7893-4EC3-89C8-B16646A5BDB6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProjectHekate.Scripting</RootNamespace>
-    <AssemblyName>ProjectHekate.Scripting</AssemblyName>
+    <RootNamespace>ProjectHekate.Grammar</RootNamespace>
+    <AssemblyName>ProjectHekate.Grammar</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>2757b56e</NuGetPackageImportStamp>
@@ -64,20 +64,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HekateGrammar.g4.lexer.cs">
-      <DependentUpon>HekateGrammar.g4</DependentUpon>
+    <Compile Include="Hekate.g4.lexer.cs">
+      <DependentUpon>Hekate.g4</DependentUpon>
     </Compile>
-    <Compile Include="HekateGrammar.g4.parser.cs">
-      <DependentUpon>HekateGrammar.g4</DependentUpon>
+    <Compile Include="Hekate.g4.parser.cs">
+      <DependentUpon>Hekate.g4</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Antlr4 Include="HekateGrammar.g4">
+    <Antlr4 Include="Hekate.g4">
       <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>ProjectHekate.Scripting</CustomToolNamespace>
-      <Visitor>True</Visitor>
-      <Listener>True</Listener>
+      <CustomToolNamespace>ProjectHekate.Grammar</CustomToolNamespace>
     </Antlr4>
     <None Include="packages.config" />
   </ItemGroup>

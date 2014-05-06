@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.GUI", "Projec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Core.Tests", "ProjectHekate.Core.Tests\ProjectHekate.Core.Tests.csproj", "{63E1FC12-004A-4DA0-A7E3-9841EF993C2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Scripting", "ProjectHekate.Scripting\ProjectHekate.Scripting.csproj", "{7B6A5DEB-7893-4EC3-89C8-B16646A5BDB6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Grammar", "ProjectHekate.Grammar\ProjectHekate.Grammar.csproj", "{7B6A5DEB-7893-4EC3-89C8-B16646A5BDB6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{EC80C258-2F4B-439E-91C5-58D909A62BFF}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		default.testsettings = default.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Scripting.Tests", "ProjectHekate.Scripting.Tests\ProjectHekate.Scripting.Tests.csproj", "{A285FBB3-AADF-4CA5-A1FB-1DABACC3C495}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Grammar.Tests", "ProjectHekate.Grammar.Tests\ProjectHekate.Grammar.Tests.csproj", "{A285FBB3-AADF-4CA5-A1FB-1DABACC3C495}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
-using Antlr4.Runtime;
-using FluentAssertions;
+﻿using Antlr4.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ProjectHekate.Grammar;
+using FluentAssertions;
 
-namespace ProjectHekate.Scripting.Tests
+namespace ProjectHekate.Grammar.Tests
 {
     [TestClass]
     public class GrammarTests
@@ -13,9 +12,9 @@ namespace ProjectHekate.Scripting.Tests
         public void ShouldParseEmptyStringToEmptyTree()
         {
             var input = new AntlrInputStream("");
-            var lexer = new HekateGrammarLexer(input);
+            var lexer = new HekateLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new HekateGrammarParser(tokens);
+            var parser = new HekateParser(tokens);
             var tree = parser.script();
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
@@ -26,9 +25,9 @@ namespace ProjectHekate.Scripting.Tests
         public void ShouldParseSingleEmptyFunction()
         {
             var input = new AntlrInputStream("function Main() {}");
-            var lexer = new HekateGrammarLexer(input);
+            var lexer = new HekateLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new HekateGrammarParser(tokens);
+            var parser = new HekateParser(tokens);
             var tree = parser.script();
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
@@ -39,9 +38,9 @@ namespace ProjectHekate.Scripting.Tests
         public void ShouldParseTwoEmptyFunctions()
         {
             var input = new AntlrInputStream("function SomeOtherShit(){}\r\nfunction Main() {}");
-            var lexer = new HekateGrammarLexer(input);
+            var lexer = new HekateLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new HekateGrammarParser(tokens);
+            var parser = new HekateParser(tokens);
             var tree = parser.script();
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
@@ -79,9 +78,9 @@ function Main()
 
     wait 5 frames;
 }");
-            var lexer = new HekateGrammarLexer(input);
+            var lexer = new HekateLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new HekateGrammarParser(tokens);
+            var parser = new HekateParser(tokens);
             var tree = parser.script();
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
