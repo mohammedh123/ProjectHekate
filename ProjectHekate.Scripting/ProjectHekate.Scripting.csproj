@@ -76,6 +76,8 @@
     <Antlr4 Include="HekateGrammar.g4">
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>ProjectHekate.Scripting</CustomToolNamespace>
+      <Visitor>True</Visitor>
+      <Listener>True</Listener>
     </Antlr4>
     <None Include="packages.config" />
   </ItemGroup>
