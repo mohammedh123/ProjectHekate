@@ -8,8 +8,8 @@ function Main()
 {
     if ($FramesAlive == 60) {
         var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown();
-        const var numShots = 3;
-        const var diffAngle = TWO_PI/numShots;
+        var numShots = 3;
+        var diffAngle = TWO_PI/numShots;
         
         for (var i = 0; i < numShots; i++) {
             baseEmitterBuilder attach OrbitingEmitter(200, diffAngle*i, true) with updater SomeCrap1();

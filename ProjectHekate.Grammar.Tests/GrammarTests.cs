@@ -60,8 +60,8 @@ function Main()
 {
     if ($FramesAlive == 60) {
         var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown();
-        const var numShots = 3;
-        const var diffAngle = TWO_PI/numShots;
+        var numShots = 3;
+        var diffAngle = TWO_PI/numShots;
         
         for (var i = 0; i < numShots; i++) {
             baseEmitterBuilder attach OrbitingEmitter(200, diffAngle*i, true) with updater SomeCrap1();
@@ -74,7 +74,7 @@ function Main()
             fire OrbitingCurvedLaser(200, diffAngle * i, 8, 50, 0, 0, 3) from finalEmitter;
             fire OrbitingCurvedLaser(100, diffAngle * i, 8, 50, 0, 0, 2) from finalEmitter;
         }
-    };
+    }
 
     wait 5 frames;
 }");
