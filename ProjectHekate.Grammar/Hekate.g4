@@ -7,6 +7,10 @@ grammar Hekate;
 script
 	:	functionDeclaration*
 	;
+	
+localVariableDeclaration
+	:	VAR Identifier ASSIGN expression
+	;
 
 functionDeclaration
 	:	FUNCTION Identifier formalParameters functionBody
@@ -17,24 +21,7 @@ functionBody
 	;
 
 block
-	:	LBRACE blockStatement* RBRACE
-	;
-
-localVariableDeclarationStatement
-	:	localVariableDeclaration SEMI
-	;
-
-localVariableDeclaration
-	:	nonConstVariableDeclaration
-	|	constVariableDeclaration
-	;
-
-nonConstVariableDeclaration
-	:	VAR Identifier ASSIGN expression
-	;
-
-constVariableDeclaration
-	:	CONST nonConstVariableDeclaration
+	:	LBRACE statement* RBRACE
 	;
 	
 formalParameter
@@ -51,31 +38,22 @@ formalParameters
 
 // statements
 statement
-	:	block
-	|	IF parExpression statement (ELSE statement)?
-	|	FOR LPAREN forControl RPAREN statement
-	|	WHILE parExpression statement
-	|	BREAK SEMI
-	|	CONTINUE SEMI
-	|	SEMI
-	|	statementExpression SEMI
-	|	attachEmitterStatement SEMI
-	|	fireStatement SEMI
-	|	waitStatement SEMI
+	:	block	# BlockStatement
+	|	IF parExpression statement (ELSE statement)?		# IfStatement
+	|	FOR LPAREN forControl RPAREN statement				# ForStatement
+	|	WHILE parExpression statement						# WhileStatement
+	|	BREAK SEMI				# BreakStatement
+	|	CONTINUE SEMI			# ContinueStatement
+	|	SEMI					# EmptyStatement
+	|	VAR Identifier ASSIGN createEmitterExpression SEMI	# CreateEmitterVariableStatement
+	|	VAR Identifier ASSIGN buildEmitterExpression SEMI	# BuildEmitterVariableStatement
+	|	localVariableDeclaration SEMI						# LocalVariableDeclarationStatement
+	|	expression SEMI			# ExpressionStatement
+	|	Identifier ATTACH Identifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
+	|	FIRE Identifier parExpressionList fromEmitterOption SEMI	# FireStatement
+	|	WAIT expression FRAMES SEMI		# WaitStatement
 	;
-
-attachEmitterStatement
-	:	Identifier ATTACH Identifier parExpressionList withUpdaterOption?
-	;
-
-fireStatement
-	:	FIRE Identifier parExpressionList fromEmitterOption
-	;
-
-waitStatement
-	:	WAIT expression FRAMES
-	;
-
+		
 fromEmitterOption
 	:	FROM Identifier
 	;
@@ -91,12 +69,7 @@ forInit
 
 forUpdate
 	:	expressionList
-	;
-	
-blockStatement
-	:	localVariableDeclarationStatement
-	|	statement
-	; 
+	;	
 
 // expressions
 parExpression
@@ -111,57 +84,55 @@ parExpressionList
 	: LPAREN expressionList? RPAREN
 	;
 
-statementExpression
-	:	expression
-	;
-
-constantExpression
-	:	expression
-	;
-
-methodExpression
+functionCallExpression
 	:	Identifier parExpressionList
 	;
 
-expression
-	:	primary
-	|	expression (INC | DEC)
-	|	(ADD|SUB|INC|DEC) expression
-	|	BANG expression
-	|   expression LPAREN expressionList? RPAREN
-	|	expression (MUL|DIV|MOD) expression
-	|	expression (ADD|SUB) expression
-	|	expression (LE | GE | GT | LT) expression
-	|	expression (EQUAL | NOTEQUAL) expression
-	|	expression AND expression
-	|	expression OR expression
-	|	expression
-		(	    ASSIGN
-		|	ADD_ASSIGN
-		|	SUB_ASSIGN
-		|	MUL_ASSIGN
-		|	DIV_ASSIGN
-		)
-		expression
-	|	CREATE EMITTER parExpressionList withUpdaterOption?
-	|	BUILD Identifier
+createEmitterExpression
+	:	CREATE EMITTER parExpressionList withUpdaterOption?
+	;
+
+buildEmitterExpression
+	:	BUILD Identifier
 	;
 
 withUpdaterOption
-	:	WITH UPDATER methodExpression
+	:	WITH UPDATER functionCallExpression
 	;
 
-primary
-	:	LPAREN expression RPAREN
-	|	literal
-	|	Identifier
-	|	ContextIdentifier
+expression
+	:	LPAREN expression RPAREN	# ParenthesizedExpression
+	|	literal						# LiteralExpression
+	|	Identifier					# IdentifierExpression
+	|	ContextIdentifier			# ContextIdentifierExpression
+	|	expression (INC|DEC)		# PostIncDecExpression
+	|	(INC|DEC) expression		# PreIncDecExpression 
+	|	SUB expression				# UnaryMinusExpression
+	|	BANG expression				# NotExpression
+	|	expression MUL expression	# MultiplyExpression
+	|	expression DIV expression	# DivideExpression
+	|	expression MOD expression	# ModulusExpression
+	|	expression ADD expression	# AddExpression
+	|	expression SUB expression	# SubExpression
+	|	expression LE expression	# LessThanEqualExpression
+	|	expression GE expression	# GreaterThanEqualExpression
+	|	expression LT expression	# LessThanExpression
+	|	expression GT expression	# GreaterThanExpression
+	|	expression EQUAL expression		# EqualExpression
+	|	expression NOTEQUAL expression	# NotEqualExpression
+	|	expression AND expression	# AndExpression
+	|	expression OR expression	# OrExpression
+	|	Identifier ASSIGN expression	# AssignmentExpression
+	|	Identifier ADD_ASSIGN expression	# AddAssignmentExpression
+	|	Identifier SUB_ASSIGN expression	# SubAssignmentExpression
+	|	Identifier MUL_ASSIGN expression	# MulAssignmentExpression
+	|	Identifier DIV_ASSIGN expression	# DivAssignmentExpression
 	;
-
+	
 //literals
 literal
-	:	IntegerLiteral
-	|	FloatingPointLiteral
+	:	IntegerLiteral			# IntegerLiteral
+	|	FloatingPointLiteral	# FloatingPointLiteral
 	;
 
 /*
