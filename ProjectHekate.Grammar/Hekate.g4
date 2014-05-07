@@ -9,7 +9,7 @@ script
 	;
 
 functionDeclaration
-	:	'function' Identifier formalParameters functionBody
+	:	FUNCTION Identifier formalParameters functionBody
 	;
 
 functionBody
@@ -17,11 +17,11 @@ functionBody
 	;
 
 block
-	:	'{' blockStatement* '}'
+	:	LBRACE blockStatement* RBRACE
 	;
 
 localVariableDeclarationStatement
-	:	localVariableDeclaration ';'
+	:	localVariableDeclaration SEMI
 	;
 
 localVariableDeclaration
@@ -30,11 +30,11 @@ localVariableDeclaration
 	;
 
 nonConstVariableDeclaration
-	:	'var' Identifier '=' expression
+	:	VAR Identifier ASSIGN expression
 	;
 
 constVariableDeclaration
-	: 'const' nonConstVariableDeclaration
+	:	CONST nonConstVariableDeclaration
 	;
 	
 formalParameter
@@ -42,46 +42,46 @@ formalParameter
 	;
 
 formalParameterList
-	:	formalParameter (',' formalParameter)*
+	:	formalParameter (COMMA formalParameter)*
 	;
 
 formalParameters
-	:	'(' formalParameterList? ')'
+	:	LPAREN formalParameterList? RPAREN
 	;
 
 // statements
 statement
 	:	block
-	|	'if' parExpression statement ('else' statement)?
-	|	'for' '(' forControl ')' statement
-	|	'while' parExpression statement
-	|	'break;'
-	|	'continue;'
-	|	';'
-	|	statementExpression ';'
-	|	attachEmitterStatement ';'
-	|	fireStatement ';'
-	|	waitStatement ';'
+	|	IF parExpression statement (ELSE statement)?
+	|	FOR LPAREN forControl RPAREN statement
+	|	WHILE parExpression statement
+	|	BREAK SEMI
+	|	CONTINUE SEMI
+	|	SEMI
+	|	statementExpression SEMI
+	|	attachEmitterStatement SEMI
+	|	fireStatement SEMI
+	|	waitStatement SEMI
 	;
 
 attachEmitterStatement
-	:	Identifier 'attach' Identifier parExpressionList withUpdaterOption?
+	:	Identifier ATTACH Identifier parExpressionList withUpdaterOption?
 	;
 
 fireStatement
-	:	'fire' Identifier parExpressionList fromEmitterOption
+	:	FIRE Identifier parExpressionList fromEmitterOption
 	;
 
 waitStatement
-	:	'wait' expression 'frames'
+	:	WAIT expression FRAMES
 	;
 
 fromEmitterOption
-	:	'from' Identifier
+	:	FROM Identifier
 	;
 
 forControl
-	:	forInit? ';' expression? ';' forUpdate
+	:	forInit? SEMI expression? SEMI forUpdate
 	;
 
 forInit
@@ -100,15 +100,15 @@ blockStatement
 
 // expressions
 parExpression
-	:	'(' expression ')'
+	:	LPAREN expression RPAREN
 	;
 
 expressionList
-	:	expression (',' expression)*
+	:	expression (COMMA expression)*
 	;
 
 parExpressionList
-	: '(' expressionList? ')'
+	: LPAREN expressionList? RPAREN
 	;
 
 statementExpression
@@ -125,35 +125,34 @@ methodExpression
 
 expression
 	:	primary
-	|	expression ('++' | '--')
-	|	('+'|'-'|'++'|'--') expression
-	|	'!' expression
-	|   expression '(' expressionList? ')'
-	|	expression ('*'|'/'|'%') expression
-	|	expression ('+'|'-') expression
-	|	expression ('<=' | '>=' | '>' | '<') expression
-	|	expression ('==' | '!=') expression
-	|	expression '&&' expression
-	|	expression '||' expression
+	|	expression (INC | DEC)
+	|	(ADD|SUB|INC|DEC) expression
+	|	BANG expression
+	|   expression LPAREN expressionList? RPAREN
+	|	expression (MUL|DIV|MOD) expression
+	|	expression (ADD|SUB) expression
+	|	expression (LE | GE | GT | LT) expression
+	|	expression (EQUAL | NOTEQUAL) expression
+	|	expression AND expression
+	|	expression OR expression
 	|	expression
-		(	'='
-		|	'+='
-		|	'-='
-		|	'*='
-		|	'/='
-		|	'%='
+		(	    ASSIGN
+		|	ADD_ASSIGN
+		|	SUB_ASSIGN
+		|	MUL_ASSIGN
+		|	DIV_ASSIGN
 		)
 		expression
-	|	'create' 'emitter' parExpressionList withUpdaterOption?
-	|	'build' Identifier
+	|	CREATE EMITTER parExpressionList withUpdaterOption?
+	|	BUILD Identifier
 	;
 
 withUpdaterOption
-	:	'with' 'updater' methodExpression
+	:	WITH UPDATER methodExpression
 	;
 
 primary
-	:	'(' expression ')'
+	:	LPAREN expression RPAREN
 	|	literal
 	|	Identifier
 	|	ContextIdentifier
@@ -176,6 +175,7 @@ VAR			: 'var';
 FOR			: 'for';
 WHILE		: 'while';
 IF			: 'if';
+BREAK		: 'break';
 
 CREATE		: 'create';
 EMITTER		: 'emitter';
@@ -225,6 +225,7 @@ RPAREN	: ')';
 LBRACE	: '{';
 RBRACE	: '}';
 SEMI	: ';';
+COMMA	: ',';
 
 // Operators
 ASSIGN		: '=';
