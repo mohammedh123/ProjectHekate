@@ -1,13 +1,21 @@
-function MoveDown()
+function CalculateSomething(x)
 {
-    $Y += 0.5;
+    var d = 0;
+    d += 39;
+    return x + 3;
+}
+
+emitterUpdater MoveDown(delta)
+{
+    $Y += (2*delta)/2;
     $Angle += TWO_PI/180.0;
+    wait 1 frames;
 }
         
 function Main()
 {
     if ($FramesAlive == 60) {
-        var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown();
+        var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown(0.5);
         var numShots = 3;
         var diffAngle = TWO_PI/numShots;
         

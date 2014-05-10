@@ -5,18 +5,30 @@ grammar Hekate;
  */
 
 script
-	:	functionDeclaration*
+	:	(functionDeclaration|emitterUpdaterDeclaration|bulletUpdaterDeclaration)*
 	;
 	
-localVariableDeclaration
+variableDeclaration
 	:	VAR Identifier ASSIGN expression
 	;
-
+	
 functionDeclaration
 	:	FUNCTION Identifier formalParameters functionBody
 	;
 
+emitterUpdaterDeclaration
+	:	EUPDATER Identifier formalParameters updaterBody
+	;
+
+bulletUpdaterDeclaration
+	:	BUPDATER Identifier formalParameters updaterBody
+	;
+
 functionBody
+	:	block
+	;
+
+updaterBody
 	:	block
 	;
 
@@ -47,11 +59,12 @@ statement
 	|	SEMI					# EmptyStatement
 	|	VAR Identifier ASSIGN createEmitterExpression SEMI	# CreateEmitterVariableStatement
 	|	VAR Identifier ASSIGN buildEmitterExpression SEMI	# BuildEmitterVariableStatement
-	|	localVariableDeclaration SEMI						# LocalVariableDeclarationStatement
+	|	variableDeclaration SEMI							# VariableDeclarationStatement
 	|	expression SEMI			# ExpressionStatement
 	|	Identifier ATTACH Identifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
 	|	FIRE Identifier parExpressionList fromEmitterOption SEMI	# FireStatement
 	|	WAIT expression FRAMES SEMI		# WaitStatement
+	|	RETURN expression SEMI			# ReturnStatement
 	;
 		
 fromEmitterOption
@@ -63,7 +76,7 @@ forControl
 	;
 
 forInit
-	:	localVariableDeclaration
+	:	variableDeclaration
 	|	expressionList
 	;
 
@@ -81,10 +94,10 @@ expressionList
 	;
 
 parExpressionList
-	: LPAREN expressionList? RPAREN
+	:	LPAREN expressionList? RPAREN
 	;
 
-functionCallExpression
+updaterCallExpression
 	:	Identifier parExpressionList
 	;
 
@@ -97,7 +110,7 @@ buildEmitterExpression
 	;
 
 withUpdaterOption
-	:	WITH UPDATER functionCallExpression
+	:	WITH UPDATER updaterCallExpression
 	;
 
 expression
@@ -127,6 +140,7 @@ expression
 	|	Identifier SUB_ASSIGN expression	# SubAssignmentExpression
 	|	Identifier MUL_ASSIGN expression	# MulAssignmentExpression
 	|	Identifier DIV_ASSIGN expression	# DivAssignmentExpression
+	|	Identifier parExpressionList		# FunctionCallExpression
 	;
 	
 //literals
@@ -147,11 +161,14 @@ FOR			: 'for';
 WHILE		: 'while';
 IF			: 'if';
 BREAK		: 'break';
+RETURN		: 'return';
 
 CREATE		: 'create';
 EMITTER		: 'emitter';
 WITH		: 'with';
 UPDATER		: 'updater';
+BUPDATER	: 'bulletUpdater';
+EUPDATER	: 'emitterUpdater';
 ATTACH		: 'attach';
 BUILD		: 'build';
 FIRE		: 'fire';
@@ -187,7 +204,7 @@ NonZeroDigit
 	
 fragment
 Sign
-	:	[+-]
+	:	[-]
 	;
 
 // Separators
@@ -203,6 +220,11 @@ ASSIGN		: '=';
 GT			: '>';
 LT			: '<';
 BANG		: '!';
+ADD			: '+';
+SUB			: '-';
+MUL			: '*';
+DIV			: '/';
+MOD         : '%';
 EQUAL		: '==';
 LE			: '<=';
 GE			: '>=';
@@ -211,11 +233,6 @@ AND			: '&&';
 OR			: '||';
 INC			: '++';
 DEC			: '--';
-ADD			: '+';
-SUB			: '-';
-MUL			: '*';
-DIV			: '/';
-MOD         : '%';
 ADD_ASSIGN	: '+=';
 SUB_ASSIGN	: '-=';
 MUL_ASSIGN	: '*=';
@@ -228,7 +245,7 @@ Identifier
 	;
 
 ContextIdentifier
-	: '$' Identifier
+	: DOLLAR Identifier
 	;
 
 fragment
@@ -240,6 +257,8 @@ fragment
 LetterOrDigit
 	:	[a-zA-Z0-9_]
 	;
+
+DOLLAR	: '$';
 
 WS 
 	: [ \t\r\n\u000C]+ -> skip;
