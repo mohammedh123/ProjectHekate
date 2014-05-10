@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Instructions.cs" />
+    <Compile Include="EmitterScriptState.cs" />
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
