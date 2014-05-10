@@ -23,6 +23,11 @@ namespace ProjectHekate.Scripting
         }
     }
 
+    public class BasicScriptRecord : AbstractScriptRecord
+    {
+        
+    }
+
     public class ProgramScriptRecord : AbstractScriptRecord
     {
         public IReadOnlyList<BulletUpdaterScriptRecord> BulletUpdaterScriptRecords { get; private set; }
