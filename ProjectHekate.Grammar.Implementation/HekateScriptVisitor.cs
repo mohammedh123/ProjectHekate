@@ -8,41 +8,62 @@ using ProjectHekate.Scripting;
 namespace ProjectHekate.Grammar.Implementation
 {
 
-    public class HekateScriptVisitor : HekateBaseVisitor<BytecodeCompiler>
+    public class HekateScriptVisitor : HekateBaseVisitor<AbstractScriptRecord>
     {
         private BytecodeCompiler _compiler;
+        private VirtualMachine _virtualMachine;
+        private ProgramScriptRecord _mainScriptRecord;
+        private Stack<AbstractScriptRecord> _scopeStack; 
 
-        public override BytecodeCompiler VisitScript(HekateParser.ScriptContext context)
+        public override AbstractScriptRecord VisitScript(HekateParser.ScriptContext context)
         {
-            // beginning of the script, create a new compiler that all children will use
+            // beginning of the script, create a new compiler/vm that all children will use
             _compiler = new BytecodeCompiler();
+            _virtualMachine = new VirtualMachine();
+            _mainScriptRecord = new ProgramScriptRecord();
+            _scopeStack = new Stack<AbstractScriptRecord>();
 
             foreach (var child in context.children)
             {
-                Visit(child);
+                // visit each child and append the code to the main record
+                var childRecord = Visit(child);
+                if(childRecord == null) throw new InvalidOperationException("A visit to a child resulted in a null return value; check the visitor and make sure it overrides " + child.GetType().Name + "\'s visit method.");
+                _mainScriptRecord.AppendCodeFromRecord(Visit(child));
             }
 
-            return _compiler;
+            return _mainScriptRecord;
         }
 
-        public override BytecodeCompiler VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
+        public override AbstractScriptRecord VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var bUpdaterRecord = new BulletUpdaterScriptRecord();
-
             var name = context.Identifier().GetText();
-
+            
+            _scopeStack.Push(bUpdaterRecord);
             foreach (var child in context.children) {
-                Visit(child);
+                bUpdaterRecord.AppendCodeFromRecord(Visit(child));
             }
+            _scopeStack.Pop();
 
-            return 1;
+            // done, now add to the pool of bullet updater records
+            _mainScriptRecord.AddBulletUpdaterScriptRecord(name, bUpdaterRecord);
+            
+            return bUpdaterRecord;
         }
 
-        public override BytecodeCompiler VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
+        public override AbstractScriptRecord VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
         {
-            var str = context.GetText();
+            return base.VisitBulletUpdaterDeclaration(context);
+        }
 
-            return str;
+        public override AbstractScriptRecord VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
+        {
+            return base.VisitFunctionDeclaration(context);
+        }
+
+        public override AbstractScriptRecord VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
+        {
+            return base.VisitExpressionStatement(context);
         }
     }
 }
