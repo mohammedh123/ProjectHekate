@@ -31,7 +31,7 @@ namespace ProjectHekate.Grammar.Implementation
                 // visit each child and append the code to the main record
                 var childRecord = Visit(child);
                 if(childRecord == null) throw new InvalidOperationException("A visit to a child resulted in a null return value; check the visitor and make sure it overrides " + child.GetType().Name + "\'s visit method.");
-                _mainScriptRecord.AppendCodeFromRecord(Visit(child));
+                _mainScriptRecord.AppendCodeFromRecord(childRecord);
             }
 
             return _mainScriptRecord;
