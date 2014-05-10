@@ -13,7 +13,10 @@ namespace ProjectHekate.Grammar.Implementation
         private BytecodeCompiler _compiler;
         private VirtualMachine _virtualMachine;
         private ProgramScriptRecord _mainScriptRecord;
-        private Stack<AbstractScriptRecord> _scopeStack; 
+        private Stack<AbstractScriptRecord> _scopeStack;
+
+        #region Top-level constructs
+
 
         public override AbstractScriptRecord VisitScript(HekateParser.ScriptContext context)
         {
@@ -66,9 +69,18 @@ namespace ProjectHekate.Grammar.Implementation
         }
 
 
+        #endregion
+
         public override AbstractScriptRecord VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
             return base.VisitExpressionStatement(context);
         }
+
+        #region Expression constructs
+        
+        
+
+
+        #endregion
     }
 }
