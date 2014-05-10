@@ -36,9 +36,13 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractScriptRecord VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
-            var bUpdaterRecord = new BulletUpdaterScriptRecord();
+            var paramContexts = context.formalParameters().formalParameterList().formalParameter();
+
+            var paramNames = paramContexts.Select(fpc => fpc.Identifier().GetText());
             var name = context.Identifier().GetText();
-            
+
+
+            var bUpdaterRecord = new BulletUpdaterScriptRecord(paramNames);
             _scopeStack.Push(bUpdaterRecord);
             foreach (var child in context.children) {
                 bUpdaterRecord.AppendCodeFromRecord(Visit(child));
@@ -60,6 +64,7 @@ namespace ProjectHekate.Grammar.Implementation
         {
             return base.VisitFunctionDeclaration(context);
         }
+
 
         public override AbstractScriptRecord VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {

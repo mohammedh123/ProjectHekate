@@ -94,6 +94,12 @@ namespace ProjectHekate.Scripting
 
     public class BulletUpdaterScriptRecord : AbstractScriptRecord
     {
+        public IEnumerable<string> ParameterNames { get; set; } 
+
+        public BulletUpdaterScriptRecord(IEnumerable<string> paramNames)
+        {
+            ParameterNames = paramNames;
+        }
     }
 
     public class EmitterUpdaterScriptRecord : AbstractScriptRecord
