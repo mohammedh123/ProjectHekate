@@ -6,21 +6,4 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Grammar.Implementation
 {
-    public class BytecodeCompiler
-    {
-        public void Generate(HekateParser.ExpressionStatementContext context)
-        {
-            
-        }
-    }
-
-    class BytecodeBlock
-    {
-        public List<uint> Bytes { get; set; }
-
-        public BytecodeBlock()
-        {
-            Bytes = new List<uint>();
-        }
-    }
 }

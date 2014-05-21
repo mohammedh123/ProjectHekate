@@ -1,0 +1,45 @@
+Limitations
+===========
+- Bullets cannot hold any extra data
+- Emitters cannot hold any extra data
+
+How will bullets be handled?
+============================
+- Virtual machine holds an array of state-per-bullet, i.e. code, current state
+- Virtual machine "updates" the bullets
+i.e.
+virtualMachine.Update(i);
+
+Virtual machine stores all the functions, bullet updaters, emitter updaters. How does it store them?
+Dictionaries of strings to CodeBlocks (maybe specific ones for each type of different block?)
+
+What is a CodeBlock?
+
+Quite literally, a List<uint> (a block of code).
+
+class CodeBlock
+{
+    List<uint> Code { get; set; }
+}
+
+class VirtualMachine
+{
+    private List<(Function?)CodeBlock> _functions { get; set; }
+    private List<(BulletUpdater?)CodeBlock> _functions { get; set; }
+    private List<(EmitterUpdater?)CodeBlock> _functions { get; set; }
+    Dictionary<string,int> Functions { get; set; }
+    Dictionary<string,int> BulletUpdaters { get; set; }
+    Dictionary<string,int> EmitterUpdaters { get; set; }
+}
+
+ScriptState? It will store current instruction index, and an index determining which block it is running
+
+Functions can only call:
+- other functions
+Functions CANNOT USE THE WAIT STATEMENT! They may or may not return a value.
+
+Emitter updaters can only call:
+- functions
+
+Bullet updaters can only call:
+- functions

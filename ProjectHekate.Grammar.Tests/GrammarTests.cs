@@ -1,7 +1,10 @@
-﻿using Antlr4.Runtime;
+﻿using System;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProjectHekate.Grammar;
 using FluentAssertions;
+using ProjectHekate.Grammar.Implementation;
 
 namespace ProjectHekate.Grammar.Tests
 {
@@ -50,16 +53,24 @@ namespace ProjectHekate.Grammar.Tests
         [TestMethod]
         public void ShouldParseComplexScript()
         {
-            var input = new AntlrInputStream(@"function MoveDown()
+            var input = new AntlrInputStream(@"function CalculateSomething(x)
 {
-    $Y += 0.5;
+    var d = 0;
+    d += 39;
+    return x + 3;
+}
+
+emitterUpdater MoveDown(delta)
+{
+    $Y += (2*delta)/2;
     $Angle += TWO_PI/180.0;
+    wait 1 frames;
 }
         
 function Main()
 {
     if ($FramesAlive == 60) {
-        var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown();
+        var baseEmitterBuilder = create emitter($X, $Y, PI_OVER_2, true) with updater MoveDown(0.5);
         var numShots = 3;
         var diffAngle = TWO_PI/numShots;
         
@@ -81,10 +92,14 @@ function Main()
             var lexer = new HekateLexer(input);
             var tokens = new CommonTokenStream(lexer);
             var parser = new HekateParser(tokens);
+            parser.BuildParseTree = true;
+
             var tree = parser.script();
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
-            tree.ChildCount.Should().Be(2);
+            tree.ChildCount.Should().Be(3);
+
+            new HekateScriptVisitor().Visit(tree);
         }
     }
 }

@@ -7,37 +7,31 @@ using ProjectHekate.Scripting;
 
 namespace ProjectHekate.Grammar.Implementation
 {
-
-    public class HekateScriptVisitor : HekateBaseVisitor<AbstractScriptRecord>
+    public class HekateScriptVisitor : HekateBaseVisitor<CodeBlock>
     {
-        private BytecodeCompiler _compiler;
         private VirtualMachine _virtualMachine;
-        private ProgramScriptRecord _mainScriptRecord;
-        private Stack<AbstractScriptRecord> _scopeStack;
+        private Stack<CodeBlock> _scopeStack;
 
         #region Top-level constructs
 
 
-        public override AbstractScriptRecord VisitScript(HekateParser.ScriptContext context)
+        public override CodeBlock VisitScript(HekateParser.ScriptContext context)
         {
             // beginning of the script, create a new compiler/vm that all children will use
-            _compiler = new BytecodeCompiler();
             _virtualMachine = new VirtualMachine();
-            _mainScriptRecord = new ProgramScriptRecord();
-            _scopeStack = new Stack<AbstractScriptRecord>();
+            _scopeStack = new Stack<CodeBlock>();
 
             foreach (var child in context.children)
             {
                 // visit each child and append the code to the main record
                 var childRecord = Visit(child);
                 if(childRecord == null) throw new InvalidOperationException("A visit to a child resulted in a null return value; check the visitor and make sure it overrides " + child.GetType().Name + "\'s visit method.");
-                _mainScriptRecord.AppendCodeFromRecord(childRecord);
             }
 
-            return _mainScriptRecord;
+            return null; // TODO: WHAT THE FUCK?
         }
 
-        public override AbstractScriptRecord VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
+        public override CodeBlock VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
 
@@ -45,25 +39,25 @@ namespace ProjectHekate.Grammar.Implementation
             var name = context.Identifier().GetText();
 
 
-            var bUpdaterRecord = new BulletUpdaterScriptRecord(paramNames);
-            _scopeStack.Push(bUpdaterRecord);
+            var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
+            _scopeStack.Push(bUpdaterCodeBlock);
             foreach (var child in context.children) {
-                bUpdaterRecord.AppendCodeFromRecord(Visit(child));
+                bUpdaterCodeBlock.Add(Visit(child));
             }
             _scopeStack.Pop();
 
             // done, now add to the pool of bullet updater records
-            _mainScriptRecord.AddBulletUpdaterScriptRecord(name, bUpdaterRecord);
+            _virtualMachine.AddBulletUpdaterCodeBlock(name, bUpdaterCodeBlock);
             
-            return bUpdaterRecord;
+            return bUpdaterCodeBlock;
         }
 
-        public override AbstractScriptRecord VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
+        public override CodeBlock VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
         {
             return base.VisitBulletUpdaterDeclaration(context);
         }
 
-        public override AbstractScriptRecord VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
+        public override CodeBlock VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
         {
             return base.VisitFunctionDeclaration(context);
         }
@@ -71,16 +65,33 @@ namespace ProjectHekate.Grammar.Implementation
 
         #endregion
 
-        public override AbstractScriptRecord VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
+        public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
             return base.VisitExpressionStatement(context);
         }
 
         #region Expression constructs
-        
-        
+
+
+        public override CodeBlock VisitAddAssignmentExpression(HekateParser.AddAssignmentExpressionContext context)
+        {
+            var code = new CodeBlock();
+            var identifierName = context.Identifier().GetText();
+
+            var currentScope = _scopeStack.Peek();
+            // TODO: FINISH THE REST OF THIS
+            code.Add(Instructions.Assign);
+            
+                    
+            return null;
+        }
 
 
         #endregion
+
+        private bool IsIdentifierProperty(string identifierName)
+        {
+            return identifierName.Any() && identifierName[0] == '$';
+        }
     }
 }
