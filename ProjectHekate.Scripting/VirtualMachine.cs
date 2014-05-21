@@ -71,7 +71,8 @@ namespace ProjectHekate.Scripting
 
         public void Add(CodeBlock block)
         {
-            _code.AddRange(block.Code);
+            if(block != null)
+                _code.AddRange(block.Code);
         }
 
         /// <summary>
