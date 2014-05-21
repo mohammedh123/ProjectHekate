@@ -116,8 +116,7 @@ withUpdaterOption
 expression
 	:	LPAREN expression RPAREN	# ParenthesizedExpression
 	|	literal						# LiteralExpression
-	|	Identifier					# IdentifierExpression
-	|	ContextIdentifier			# ContextIdentifierExpression
+	|	Identifier			        # IdentifierExpression
 	|	expression (INC|DEC)		# PostIncDecExpression
 	|	(INC|DEC) expression		# PreIncDecExpression 
 	|	SUB expression				# UnaryMinusExpression
@@ -240,12 +239,16 @@ DIV_ASSIGN	: '/=';
 
 // Identifiers
 Identifier
-	:	Letter LetterOrDigit*
+	:	NormalIdentifier
 	|	ContextIdentifier
 	;
 
+NormalIdentifier
+	:	Letter LetterOrDigit*
+	;
+
 ContextIdentifier
-	: DOLLAR Identifier
+	:	DOLLAR NormalIdentifier
 	;
 
 fragment
