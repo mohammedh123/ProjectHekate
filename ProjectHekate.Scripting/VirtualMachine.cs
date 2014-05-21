@@ -146,7 +146,13 @@ namespace ProjectHekate.Scripting
     // TODO: do i even _NEED_ this SHIT?
     public class FunctionCodeBlock : CodeBlock
     {
-
+        public FunctionCodeBlock(IEnumerable<string> paramNames)
+        {
+            // the parameters are added as local variables
+            foreach(var paramName in paramNames) {
+                AddNumericalVariable(paramName);
+            }
+        }
     }
 
     // TODO: do i even _NEED_ this SHIT?
@@ -164,7 +170,13 @@ namespace ProjectHekate.Scripting
     // TODO: do i even _NEED_ this SHIT?
     public class EmitterUpdaterCodeBlock : CodeBlock
     {
-        
+        public EmitterUpdaterCodeBlock(IEnumerable<string> paramNames)
+        {
+            // the parameters are added as local variables
+            foreach(var paramName in paramNames) {
+                AddNumericalVariable(paramName);
+            }
+        }
     }
 
     public class ScriptState
