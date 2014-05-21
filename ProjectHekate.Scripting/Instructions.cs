@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Scripting
 {
-    enum Instructions
+    public enum Instructions : byte
     {
         Push,
         Pop,
@@ -24,11 +24,13 @@ namespace ProjectHekate.Scripting
         OperatorNotEqual,
         OperatorAnd,
         OperatorOr,
+        Assign,
         Jump,
         Compare,
         FunctionCall,
-        GetProperty,
         GetUpdater,
+        GetProperty,
+        SetProperty,
         GetVariable,
         SetVariable,
         Fire,
