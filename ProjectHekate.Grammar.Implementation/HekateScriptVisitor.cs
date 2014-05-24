@@ -9,7 +9,7 @@ namespace ProjectHekate.Grammar.Implementation
 {
     public class HekateScriptVisitor : HekateBaseVisitor<CodeBlock>
     {
-        private VirtualMachine _virtualMachine;
+        private IVirtualMachine _virtualMachine;
         private Stack<CodeBlock> _scopeStack;
 
         #region Top-level constructs

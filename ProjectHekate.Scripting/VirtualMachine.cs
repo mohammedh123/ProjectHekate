@@ -205,7 +205,44 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    public class VirtualMachine
+    public interface IVirtualMachine
+    {
+        IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; }
+        IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; }
+        IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; }
+
+        /// <summary>
+        /// Adds a function code block to the virtual machine.
+        /// </summary>
+        /// <param name="name">The name of the bullet updater</param>
+        /// <param name="codeBlock">The function code block</param>
+        /// <returns>Returns the index of the function code block (also populates the Index property of the code block)</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a function with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the function has already been added, but with a different name</exception>
+        int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock);
+
+        /// <summary>
+        /// Adds a bullet updater code block to the virtual machine.
+        /// </summary>
+        /// <param name="name">The name of the bullet updater</param>
+        /// <param name="codeBlock">The bullet updater code block</param>
+        /// <returns>Returns the index of the bullet updater code block (also populates the Index property of the code block)</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
+        int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock);
+
+        /// <summary>
+        /// Adds an emitter updater code block to the program code block.
+        /// </summary>
+        /// <param name="name">The name of the emitter updater</param>
+        /// <param name="codeBlock">The code block for the emitter updater</param>
+        /// <returns>Returns the index of the emitter updater code block (also populates the Index property of the codeBlock)</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the emitter updater has already been added, but with a different name</exception>
+        int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock);
+    }
+
+    public class VirtualMachine : IVirtualMachine
     {
         public const int MaxNumericalVariables = 64;
         public const int MaxEmitterVariables = 8;
@@ -238,40 +275,16 @@ namespace ProjectHekate.Scripting
             EmitterUpdaterCodeBlocks = _emitterUpdaterCodeBlocks.AsReadOnly();
         }
 
-        /// <summary>
-        /// Adds a function code block to the virtual machine.
-        /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
-        /// <param name="codeBlock">The function code block</param>
-        /// <returns>Returns the index of the function code block (also populates the Index property of the code block)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a function with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the function has already been added, but with a different name</exception>
         public int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _functionCodeBlocks, _functionCodeBlockNameToIndex, codeBlock);
         }
 
-        /// <summary>
-        /// Adds a bullet updater code block to the virtual machine.
-        /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
-        /// <param name="codeBlock">The bullet updater code block</param>
-        /// <returns>Returns the index of the bullet updater code block (also populates the Index property of the code block)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
         public int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex, codeBlock);
         }
 
-        /// <summary>
-        /// Adds an emitter updater code block to the program code block.
-        /// </summary>
-        /// <param name="name">The name of the emitter updater</param>
-        /// <param name="codeBlock">The code block for the emitter updater</param>
-        /// <returns>Returns the index of the emitter updater code block (also populates the Index property of the codeBlock)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the emitter updater has already been added, but with a different name</exception>
         public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeBlock);
