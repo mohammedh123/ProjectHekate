@@ -61,7 +61,24 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override CodeBlock VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
         {
-            return base.VisitFunctionDeclaration(context);
+            var paramContexts = context.formalParameters().formalParameterList().formalParameter();
+
+            var paramNames = paramContexts.Select(fpc => fpc.Identifier().GetText());
+            var name = context.Identifier().GetText();
+
+
+            var funcCodeBlock = new FunctionCodeBlock(paramNames);
+            _scopeStack.Push(funcCodeBlock);
+            foreach (var child in context.children)
+            {
+                funcCodeBlock.Add(Visit(child));
+            }
+            _scopeStack.Pop();
+
+            // done, now add to the pool of bullet updater records
+            _virtualMachine.AddFunctionCodeBlock(name, funcCodeBlock);
+
+            return funcCodeBlock;
         }
 
 
@@ -81,19 +98,26 @@ namespace ProjectHekate.Grammar.Implementation
             var identifierName = context.Identifier().GetText();
 
             var currentScope = _scopeStack.Peek();
-            // TODO: FINISH THE REST OF THIS
-            code.Add(Instructions.Assign);
             
-                    
+            // Add assignment code:
+            // Instructions.Assign
+            // [Identifier of some sort: property, or local variable]
+            // Uses Stack[0] (top of stack) for value
+            
             return null;
+        }
+
+        public override CodeBlock VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
+        {
+            switch (context.Operator.Type) {
+                case HekateParser.ADD:
+                    break;
+            }
+            
+            return base.VisitBinaryExpression(context);
         }
 
 
         #endregion
-
-        private bool IsIdentifierProperty(string identifierName)
-        {
-            return identifierName.Any() && identifierName[0] == '$';
-        }
     }
 }
