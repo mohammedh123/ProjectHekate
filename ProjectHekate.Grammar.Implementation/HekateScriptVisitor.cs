@@ -11,7 +11,6 @@ namespace ProjectHekate.Grammar.Implementation
     {
         private IVirtualMachine _virtualMachine;
         private Stack<CodeBlock> _scopeStack;
-        private BytecodeCompiler _compiler;
 
         #region Top-level constructs
 
@@ -21,7 +20,6 @@ namespace ProjectHekate.Grammar.Implementation
             // beginning of the script, create a new compiler/vm that all children will use
             _virtualMachine = new VirtualMachine();
             _scopeStack = new Stack<CodeBlock>();
-            _compiler = new BytecodeCompiler(_virtualMachine);
 
             foreach (var child in context.children)
             {
@@ -109,9 +107,19 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override CodeBlock VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
         {
-            switch (context.Operator.Type) {
-                case HekateParser.ADD:
-                    break;
+            var code = new CodeBlock();
+
+            // Binary expression code:
+            // Generate constant code for left expression (should push onto stack)
+            // Generate constant code for right expression (should push onto stack)
+            // Instruction.{depends on context.Operator.Type}
+
+            code.Add(Visit(context.expression(0)));
+            code.Add(Visit(context.expression(1)));
+
+            switch (context.Operator.Type)
+            {
+                case HekateParser.ADD:  code.
             }
             
             return base.VisitBinaryExpression(context);
