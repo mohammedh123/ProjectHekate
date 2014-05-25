@@ -11,6 +11,7 @@ namespace ProjectHekate.Grammar.Implementation
     {
         private IVirtualMachine _virtualMachine;
         private Stack<CodeBlock> _scopeStack;
+        private BytecodeCompiler _compiler;
 
         #region Top-level constructs
 
@@ -20,6 +21,7 @@ namespace ProjectHekate.Grammar.Implementation
             // beginning of the script, create a new compiler/vm that all children will use
             _virtualMachine = new VirtualMachine();
             _scopeStack = new Stack<CodeBlock>();
+            _compiler = new BytecodeCompiler(_virtualMachine);
 
             foreach (var child in context.children)
             {
