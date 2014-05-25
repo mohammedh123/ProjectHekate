@@ -116,13 +116,30 @@ namespace ProjectHekate.Grammar.Implementation
 
             code.Add(Visit(context.expression(0)));
             code.Add(Visit(context.expression(1)));
+            code.Add(GetBinaryOperatorFromContext(context));
 
+            return code;
+        }
+
+        private Instruction GetBinaryOperatorFromContext(HekateParser.BinaryExpressionContext context)
+        {
             switch (context.Operator.Type)
             {
-                case HekateParser.ADD:  code.
+                case HekateParser.MUL:      return Instruction.OperatorMultiply;
+		        case HekateParser.DIV:	    return Instruction.OperatorDivide;
+		        case HekateParser.MOD:	    return Instruction.OperatorMod;
+		        case HekateParser.ADD:	    return Instruction.OperatorAdd;
+		        case HekateParser.SUB:	    return Instruction.OperatorSubtract;
+		        case HekateParser.LE:	    return Instruction.OperatorLessThanEqual;
+		        case HekateParser.GE:	    return Instruction.OperatorGreaterThanEqual;
+		        case HekateParser.LT:	    return Instruction.OperatorLessThan;
+		        case HekateParser.GT:	    return Instruction.OperatorGreaterThan;
+		        case HekateParser.EQUAL:	return Instruction.OperatorEqual;
+		        case HekateParser.NOTEQUAL:	return Instruction.OperatorNotEqual;
+		        case HekateParser.AND:	    return Instruction.OperatorAnd;
+		        case HekateParser.OR:	    return Instruction.OperatorOr;
+                default:                    throw new InvalidOperationException("You forgot to add support for an operator! Check the code for support for the " + context.Operator.Text + " operator.");
             }
-            
-            return base.VisitBinaryExpression(context);
         }
 
 
