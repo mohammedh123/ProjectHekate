@@ -117,23 +117,27 @@ expression
 	:	LPAREN expression RPAREN	# ParenthesizedExpression
 	|	literal						# LiteralExpression
 	|	Identifier			        # IdentifierExpression
-	|	expression (INC|DEC)		# PostIncDecExpression
-	|	(INC|DEC) expression		# PreIncDecExpression 
+	|	expression Operator=(INC|DEC)		# PostIncDecExpression
+	|	Operator=(INC|DEC) expression		# PreIncDecExpression 
 	|	SUB expression				# UnaryMinusExpression
 	|	BANG expression				# NotExpression
-	|	expression MUL expression	# MultiplyExpression
-	|	expression DIV expression	# DivideExpression
-	|	expression MOD expression	# ModulusExpression
-	|	expression ADD expression	# AddExpression
-	|	expression SUB expression	# SubExpression
-	|	expression LE expression	# LessThanEqualExpression
-	|	expression GE expression	# GreaterThanEqualExpression
-	|	expression LT expression	# LessThanExpression
-	|	expression GT expression	# GreaterThanExpression
-	|	expression EQUAL expression		# EqualExpression
-	|	expression NOTEQUAL expression	# NotEqualExpression
-	|	expression AND expression	# AndExpression
-	|	expression OR expression	# OrExpression
+	|	expression
+		Operator=(		
+			MUL 
+		|	DIV
+		|	MOD
+		|	ADD
+		|	SUB
+		|	LE
+		|	GE
+		|	LT
+		|	GT
+		|	EQUAL
+		|	NOTEQUAL
+		|	AND
+		|	OR
+		)
+		expression	# BinaryExpression
 	|	Identifier ASSIGN expression	# AssignmentExpression
 	|	Identifier ADD_ASSIGN expression	# AddAssignmentExpression
 	|	Identifier SUB_ASSIGN expression	# SubAssignmentExpression
