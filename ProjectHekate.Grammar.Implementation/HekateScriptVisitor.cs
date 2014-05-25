@@ -100,7 +100,7 @@ namespace ProjectHekate.Grammar.Implementation
             var currentScope = _scopeStack.Peek();
             
             // Add assignment code:
-            // Instructions.Assign
+            // Instruction.Assign
             // [Identifier of some sort: property, or local variable]
             // Uses Stack[0] (top of stack) for value
             

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Scripting
 {
-    public enum Instructions : byte
+    public enum Instruction : byte
     {
         Push,
         Pop,

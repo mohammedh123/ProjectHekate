@@ -59,7 +59,7 @@ namespace ProjectHekate.Scripting
             EmitterVariables = _emitterVariables.AsReadOnly();
         }
 
-        public void Add(Instructions inst)
+        public void Add(Instruction inst)
         {
             _code.Add((byte)inst);
         }
