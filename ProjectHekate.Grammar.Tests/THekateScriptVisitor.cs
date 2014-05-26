@@ -15,7 +15,7 @@ namespace ProjectHekate.Grammar.Tests
     {
         protected const string WrappedProgramStringUnfmted = "function main(){{{0};}}";
         [TestClass]
-        public class GenerateConstantExpression : THekateScriptVisitor
+        public class VisitBinaryExpression : THekateScriptVisitor
         {
             private HekateParser.BinaryExpressionContext GenerateBinaryExpressionContext(string expression)
             {
@@ -29,7 +29,7 @@ namespace ProjectHekate.Grammar.Tests
             }
 
             [TestClass]
-            public class Addition : GenerateConstantExpression
+            public class Addition : VisitBinaryExpression
             {
                 [TestMethod]
                 public void ShouldGenerateCodeForBasicExpression()
