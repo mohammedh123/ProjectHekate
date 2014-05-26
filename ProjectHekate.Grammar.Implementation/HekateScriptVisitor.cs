@@ -87,6 +87,11 @@ namespace ProjectHekate.Grammar.Implementation
             return base.VisitExpressionStatement(context);
         }
 
+        public override CodeBlock VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
         #region Expression constructs
 
 
