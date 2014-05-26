@@ -118,7 +118,6 @@ expression
 	|	literal						# LiteralExpression
 	|	Identifier			        # IdentifierExpression
 	|	expression Operator=(INC|DEC)		# PostIncDecExpression
-	|	Operator=(INC|DEC) expression		# PreIncDecExpression 
 	|	SUB expression				# UnaryMinusExpression
 	|	BANG expression				# NotExpression
 	|	expression
