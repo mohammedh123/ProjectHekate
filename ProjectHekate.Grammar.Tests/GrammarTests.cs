@@ -98,8 +98,6 @@ function Main()
 
             parser.NumberOfSyntaxErrors.Should().Be(0);
             tree.ChildCount.Should().Be(3);
-
-            new HekateScriptVisitor().Visit(tree);
         }
     }
 }
