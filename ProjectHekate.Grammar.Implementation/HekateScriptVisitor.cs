@@ -132,6 +132,7 @@ namespace ProjectHekate.Grammar.Implementation
             var text = context.GetText();
             var value = float.Parse(text);
 
+            code.Add(Instruction.Push);
             code.Add(value);
 
             return code;
