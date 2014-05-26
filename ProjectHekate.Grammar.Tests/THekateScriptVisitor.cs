@@ -30,7 +30,6 @@ namespace ProjectHekate.Grammar.Tests
         [TestClass]
         public class VisitBinaryExpression : THekateScriptVisitor
         {
-
             [TestClass]
             public class Addition : VisitBinaryExpression
             {
@@ -47,11 +46,34 @@ namespace ProjectHekate.Grammar.Tests
 
                     // Verify
                     result.Code.Should().HaveCount(5);
-                    result.Code.Should().HaveElementAt(0, Instruction.Push);
-                    result.Code.Should().HaveElementAt(1, 3);
-                    result.Code.Should().HaveElementAt(2, Instruction.Push);
-                    result.Code.Should().HaveElementAt(3, 5);
-                    result.Code.Should().HaveElementAt(4, Instruction.OperatorAdd);
+                    result.Code[0].Should().Be((byte)Instruction.Push);
+                    result.Code[1].Should().Be(3);
+                    result.Code[2].Should().Be((byte)Instruction.Push);
+                    result.Code[3].Should().Be(5);
+                    result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
+                }
+
+                [TestMethod]
+                public void ShouldGenerateCodeForComplexExpression()
+                {
+                    // Setup: dummy data + mock vm out
+                    const string expression = "(3+5)+7";
+
+                    ResetSubject();
+
+                    // Act
+                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
+
+                    // Verify
+                    result.Code.Should().HaveCount(8);
+                    result.Code[0].Should().Be((byte)Instruction.Push);
+                    result.Code[1].Should().Be(3);
+                    result.Code[2].Should().Be((byte)Instruction.Push);
+                    result.Code[3].Should().Be(5);
+                    result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
+                    result.Code[5].Should().Be((byte)Instruction.Push);
+                    result.Code[6].Should().Be(7);
+                    result.Code[7].Should().Be((byte)Instruction.OperatorAdd);
                 }
             }
         }
@@ -71,8 +93,24 @@ namespace ProjectHekate.Grammar.Tests
 
                 // Verify
                 result.Code.Should().HaveCount(2);
-                result.Code.Should().HaveElementAt(0, Instruction.Push);
-                result.Code.Should().HaveElementAt(1, literal);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(literal);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForFloatLiteral()
+            {
+                // Setup
+                const float literal = 3.455f;
+                string literalExpression = literal.ToString();
+
+                // Act
+                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(literal);
             }
         }
     }
