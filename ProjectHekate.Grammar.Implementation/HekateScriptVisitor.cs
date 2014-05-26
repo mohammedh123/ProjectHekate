@@ -121,6 +121,17 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
+        {
+            var code = new CodeBlock();
+            var text = context.GetText();
+            var value = float.Parse(text);
+
+            code.Add(value);
+
+            return code;
+        }
+
         private Instruction GetBinaryOperatorFromContext(HekateParser.BinaryExpressionContext context)
         {
             switch (context.Operator.Type)
