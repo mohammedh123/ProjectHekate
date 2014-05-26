@@ -33,8 +33,8 @@ namespace ProjectHekate.Scripting
     {
         public int Index { get; set;  }
 
-        public IReadOnlyList<uint> Code { get; private set; }
-        private readonly List<uint> _code;
+        public IReadOnlyList<float> Code { get; private set; }
+        private readonly List<float> _code;
 
         public IReadOnlyList<IdentifierRecord> NumericalVariables { get; private set; }
         private readonly List<IdentifierRecord> _numericalVariables;
@@ -46,7 +46,7 @@ namespace ProjectHekate.Scripting
         
         public CodeBlock()
         {
-            _code = new List<uint>();
+            _code = new List<float>();
             Code = _code.AsReadOnly();
 
             _numericalVariables = new List<IdentifierRecord>();
@@ -74,6 +74,11 @@ namespace ProjectHekate.Scripting
             if(block == null) throw new ArgumentNullException("block");
 
             _code.AddRange(block.Code);
+        }
+
+        public void Add(float f)
+        {
+            _code.Add(f);
         }
 
         /// <summary>
