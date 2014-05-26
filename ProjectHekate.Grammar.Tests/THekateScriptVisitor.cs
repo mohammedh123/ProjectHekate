@@ -55,5 +55,25 @@ namespace ProjectHekate.Grammar.Tests
                 }
             }
         }
+
+        [TestClass]
+        public class VisitLiteralExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForIntegerLiteral()
+            {
+                // Setup
+                const int literal = 3;
+                string literalExpression = literal.ToString();
+
+                // Act
+                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code.Should().HaveElementAt(0, Instruction.Push);
+                result.Code.Should().HaveElementAt(1, literal);
+            }
+        }
     }
 }
