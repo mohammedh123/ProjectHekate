@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using AutoMoq.Helpers;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,19 +15,21 @@ namespace ProjectHekate.Grammar.Tests
     public class THekateScriptVisitor : AutoMoqTestFixture<HekateScriptVisitor>
     {
         protected const string WrappedProgramStringUnfmted = "function main(){{{0};}}";
+
+        protected virtual TContextType GenerateContext<TContextType>(string expression) where TContextType : class, IParseTree
+        {
+            var lexer = new HekateLexer(new AntlrInputStream(String.Format(WrappedProgramStringUnfmted, expression)));
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new HekateParser(tokens);
+
+            var tree = parser.script();
+
+            return tree.GetFirstDescendantOfType<TContextType>();
+        }
+
         [TestClass]
         public class VisitBinaryExpression : THekateScriptVisitor
         {
-            private HekateParser.BinaryExpressionContext GenerateBinaryExpressionContext(string expression)
-            {
-                var lexer = new HekateLexer(new AntlrInputStream(String.Format(WrappedProgramStringUnfmted, expression)));
-                var tokens = new CommonTokenStream(lexer);
-                var parser = new HekateParser(tokens);
-
-                var tree = parser.script();
-
-                return tree.GetFirstDescendantOfType<HekateParser.BinaryExpressionContext>();
-            }
 
             [TestClass]
             public class Addition : VisitBinaryExpression
@@ -40,7 +43,7 @@ namespace ProjectHekate.Grammar.Tests
                     ResetSubject();
 
                     // Act
-                    var result = Subject.VisitBinaryExpression(GenerateBinaryExpressionContext(expression));
+                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
 
                     // Verify
                     result.Code.Should().HaveCount(5);
