@@ -110,13 +110,26 @@ namespace ProjectHekate.Grammar.Implementation
             return null;
         }
 
+        public override CodeBlock VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
+        {
+            var code = new CodeBlock();
+
+            // Unary expression code:
+            // Generate code for expression (should push onto stack)
+            // Instruction.{depends on context.Operator.Type}
+            code.Add(Visit(context.expression()));
+            code.Add(GetUnaryOperatorFromContext(context));
+
+            return code;
+        }
+
         public override CodeBlock VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
         {
             var code = new CodeBlock();
 
             // Binary expression code:
-            // Generate constant code for left expression (should push onto stack)
-            // Generate constant code for right expression (should push onto stack)
+            // Generate code for left expression (should push onto stack)
+            // Generate code for right expression (should push onto stack)
             // Instruction.{depends on context.Operator.Type}
 
             code.Add(Visit(context.expression(0)));
@@ -138,23 +151,33 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        private Instruction GetUnaryOperatorFromContext(HekateParser.UnaryExpressionContext context)
+        {
+            switch (context.Operator.Type)
+            {
+                case HekateParser.SUB:      return Instruction.Negate;
+                case HekateParser.BANG:     return Instruction.OperatorNot;
+                default:                    throw new InvalidOperationException("You forgot to add support for an operator! Check the code for support for the " + context.Operator.Text + " operator.");
+            }
+        }
+
         private Instruction GetBinaryOperatorFromContext(HekateParser.BinaryExpressionContext context)
         {
             switch (context.Operator.Type)
             {
                 case HekateParser.MUL:      return Instruction.OperatorMultiply;
-		        case HekateParser.DIV:	    return Instruction.OperatorDivide;
-		        case HekateParser.MOD:	    return Instruction.OperatorMod;
-		        case HekateParser.ADD:	    return Instruction.OperatorAdd;
-		        case HekateParser.SUB:	    return Instruction.OperatorSubtract;
-		        case HekateParser.LE:	    return Instruction.OperatorLessThanEqual;
-		        case HekateParser.GE:	    return Instruction.OperatorGreaterThanEqual;
-		        case HekateParser.LT:	    return Instruction.OperatorLessThan;
-		        case HekateParser.GT:	    return Instruction.OperatorGreaterThan;
-		        case HekateParser.EQUAL:	return Instruction.OperatorEqual;
-		        case HekateParser.NOTEQUAL:	return Instruction.OperatorNotEqual;
-		        case HekateParser.AND:	    return Instruction.OperatorAnd;
-		        case HekateParser.OR:	    return Instruction.OperatorOr;
+                case HekateParser.DIV:      return Instruction.OperatorDivide;
+                case HekateParser.MOD:      return Instruction.OperatorMod;
+                case HekateParser.ADD:      return Instruction.OperatorAdd;
+                case HekateParser.SUB:      return Instruction.OperatorSubtract;
+                case HekateParser.LE:       return Instruction.OperatorLessThanEqual;
+                case HekateParser.GE:       return Instruction.OperatorGreaterThanEqual;
+                case HekateParser.LT:       return Instruction.OperatorLessThan;
+                case HekateParser.GT:       return Instruction.OperatorGreaterThan;
+                case HekateParser.EQUAL:    return Instruction.OperatorEqual;
+                case HekateParser.NOTEQUAL: return Instruction.OperatorNotEqual;
+                case HekateParser.AND:      return Instruction.OperatorAnd;
+                case HekateParser.OR:       return Instruction.OperatorOr;
                 default:                    throw new InvalidOperationException("You forgot to add support for an operator! Check the code for support for the " + context.Operator.Text + " operator.");
             }
         }

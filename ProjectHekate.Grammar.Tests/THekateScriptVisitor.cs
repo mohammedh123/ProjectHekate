@@ -28,106 +28,92 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
+        public class VisitUnaryExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForLogicalNot()
+            {
+                // Setup: dummy data + mock vm out
+                const int value = 1;
+                var expression = String.Format("!{0}", value);
+
+                ResetSubject();
+
+                // Act
+                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(3);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(value);
+                result.Code[2].Should().Be((byte)Instruction.OperatorNot);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForNegativeNumber()
+            {
+                // Setup: dummy data + mock vm out
+                const int value = 5;
+                var expression = String.Format("-{0}", value);
+
+                ResetSubject();
+
+                // Act
+                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(3);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(value);
+                result.Code[2].Should().Be((byte)Instruction.Negate);
+            }
+        }
+
+        [TestClass]
         public class VisitBinaryExpression : THekateScriptVisitor
         {
-            [TestClass]
-            public class Addition : VisitBinaryExpression
+            [TestMethod]
+            public void ShouldGenerateCodeForAddition()
             {
-                [TestMethod]
-                public void ShouldGenerateCodeForBasicExpression()
-                {
-                    // Setup: dummy data + mock vm out
-                    const string expression = "3+5";
+                // Setup: dummy data + mock vm out
+                const int left = 3;
+                const float right = 5.35f;
+                var expression = String.Format("{0}+{1}", left, right);
 
-                    ResetSubject();
+                ResetSubject();
 
-                    // Act
-                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
+                // Act
+                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
 
-                    // Verify
-                    result.Code.Should().HaveCount(5);
-                    result.Code[0].Should().Be((byte)Instruction.Push);
-                    result.Code[1].Should().Be(3);
-                    result.Code[2].Should().Be((byte)Instruction.Push);
-                    result.Code[3].Should().Be(5);
-                    result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
-                }
+                // Verify
+                result.Code.Should().HaveCount(5);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(left);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(right);
+                result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
+            }
 
-                [TestMethod]
-                public void ShouldGenerateCodeForExpressionIncludingSingleParenthesizedExpression()
-                {
-                    // Setup: dummy data + mock vm out
-                    const string expression = "(3+5)+7";
+            [TestMethod]
+            public void ShouldGenerateCodeForSubtraction()
+            {
+                // Setup: dummy data + mock vm out
+                const int left = 3;
+                const float right = 5.39f;
+                var expression = String.Format("{0}-{1}", left, right);
 
-                    ResetSubject();
+                ResetSubject();
 
-                    // Act
-                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
+                // Act
+                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
 
-                    // Verify
-                    result.Code.Should().HaveCount(8);
-                    result.Code[0].Should().Be((byte)Instruction.Push);
-                    result.Code[1].Should().Be(3);
-                    result.Code[2].Should().Be((byte)Instruction.Push);
-                    result.Code[3].Should().Be(5);
-                    result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
-                    result.Code[5].Should().Be((byte)Instruction.Push);
-                    result.Code[6].Should().Be(7);
-                    result.Code[7].Should().Be((byte)Instruction.OperatorAdd);
-                }
-                
-                [TestMethod]
-                public void ShouldGenerateCodeForComplexExpression()
-                {
-                    // Setup: dummy data + mock vm out
-                    const string expression = "-35+((3+5)+7)";
-
-                    ResetSubject();
-
-                    // Act
-                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
-
-                    // Verify
-                    result.Code.Should().HaveCount(11);
-                    result.Code[0].Should().Be((byte)Instruction.Push);
-                    result.Code[1].Should().Be(-35);
-                    result.Code[2].Should().Be((byte)Instruction.Push);
-                    result.Code[3].Should().Be(3);
-                    result.Code[4].Should().Be((byte)Instruction.Push);
-                    result.Code[5].Should().Be(5);
-                    result.Code[6].Should().Be((byte)Instruction.OperatorAdd);
-                    result.Code[7].Should().Be((byte)Instruction.Push);
-                    result.Code[8].Should().Be(7);
-                    result.Code[9].Should().Be((byte)Instruction.OperatorAdd);
-                    result.Code[10].Should().Be((byte)Instruction.OperatorAdd);
-                }
-
-                [TestMethod]
-                public void ShouldGenerateCodeForComplexExpressionWithVariable()
-                {
-                    // Setup: dummy data + mock vm out
-                    const string expression = @"var someVariable = 5;
-someVariable+((3+5)+7)";
-
-                    ResetSubject();
-
-                    // Act
-                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
-
-                    // Verify
-                    result.Code.Should().HaveCount(11);
-                    result.Code[0].Should().Be((byte)Instruction.GetVariable);
-                    result.Code[1].Should().Be(0); // index of variable
-                    result.Code[2].Should().Be((byte)Instruction.Push);
-                    result.Code[3].Should().Be(3);
-                    result.Code[4].Should().Be((byte)Instruction.Push);
-                    result.Code[5].Should().Be(5);
-                    result.Code[6].Should().Be((byte)Instruction.OperatorAdd);
-                    result.Code[7].Should().Be((byte)Instruction.Push);
-                    result.Code[8].Should().Be(7);
-                    result.Code[9].Should().Be((byte)Instruction.OperatorAdd);
-                    result.Code[10].Should().Be((byte)Instruction.OperatorAdd);
-                }
+                // Verify
+                result.Code.Should().HaveCount(5);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(left);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(right);
+                result.Code[4].Should().Be((byte)Instruction.OperatorSubtract);
             }
         }
 
