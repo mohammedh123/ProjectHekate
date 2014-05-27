@@ -75,8 +75,7 @@ namespace ProjectHekate.Grammar.Tests
                     result.Code[6].Should().Be(7);
                     result.Code[7].Should().Be((byte)Instruction.OperatorAdd);
                 }
-
-
+                
                 [TestMethod]
                 public void ShouldGenerateCodeForComplexExpression()
                 {
@@ -92,6 +91,33 @@ namespace ProjectHekate.Grammar.Tests
                     result.Code.Should().HaveCount(11);
                     result.Code[0].Should().Be((byte)Instruction.Push);
                     result.Code[1].Should().Be(-35);
+                    result.Code[2].Should().Be((byte)Instruction.Push);
+                    result.Code[3].Should().Be(3);
+                    result.Code[4].Should().Be((byte)Instruction.Push);
+                    result.Code[5].Should().Be(5);
+                    result.Code[6].Should().Be((byte)Instruction.OperatorAdd);
+                    result.Code[7].Should().Be((byte)Instruction.Push);
+                    result.Code[8].Should().Be(7);
+                    result.Code[9].Should().Be((byte)Instruction.OperatorAdd);
+                    result.Code[10].Should().Be((byte)Instruction.OperatorAdd);
+                }
+
+                [TestMethod]
+                public void ShouldGenerateCodeForComplexExpressionWithVariable()
+                {
+                    // Setup: dummy data + mock vm out
+                    const string expression = @"var someVariable = 5;
+someVariable+((3+5)+7)";
+
+                    ResetSubject();
+
+                    // Act
+                    var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
+
+                    // Verify
+                    result.Code.Should().HaveCount(11);
+                    result.Code[0].Should().Be((byte)Instruction.GetVariable);
+                    result.Code[1].Should().Be(0); // index of variable
                     result.Code[2].Should().Be((byte)Instruction.Push);
                     result.Code[3].Should().Be(3);
                     result.Code[4].Should().Be((byte)Instruction.Push);
