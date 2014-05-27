@@ -10,7 +10,7 @@ namespace ProjectHekate.Scripting
     {
         Push,
         Pop,
-        OperatorNegative,
+        Negate,
         OperatorAdd,
         OperatorSubtract,
         OperatorMultiply,
@@ -24,6 +24,7 @@ namespace ProjectHekate.Scripting
         OperatorNotEqual,
         OperatorAnd,
         OperatorOr,
+        OperatorNot,
         Assign,
         Jump,
         Compare,
