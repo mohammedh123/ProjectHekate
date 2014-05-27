@@ -118,10 +118,13 @@ expression
 	|	literal						# LiteralExpression
 	|	Identifier			        # IdentifierExpression
 	|	expression Operator=(INC|DEC)		# PostIncDecExpression
-	|	SUB expression				# UnaryMinusExpression
-	|	BANG expression				# NotExpression
+	|	Operator=(
+			SUB
+		|	BANG
+		)
+		expression	# UnaryExpression
 	|	expression
-		Operator=(		
+		Operator=(
 			MUL 
 		|	DIV
 		|	MOD
@@ -147,8 +150,8 @@ expression
 	
 //literals
 literal
-	:	IntegerLiteral			# IntegerLiteral
-	|	FloatingPointLiteral	# FloatingPointLiteral
+	:	FloatingPointLiteral
+	|	IntegerLiteral
 	;
 
 /*
@@ -181,11 +184,11 @@ FRAMES		: 'frames';
 // Integer literals
 IntegerLiteral
 	:	'0'
-	|	Sign? NonZeroDigit Digits*
+	|	NonZeroDigit Digits*
 	;
 
 FloatingPointLiteral
-	:	Sign? Digits '.' Digits?
+	:	Digits '.' Digits
 	;
 
 fragment
@@ -204,11 +207,6 @@ NonZeroDigit
 	:	[1-9]
 	;
 	
-fragment
-Sign
-	:	[-]
-	;
-
 // Separators
 LPAREN	: '(';
 RPAREN	: ')';
