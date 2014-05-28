@@ -170,10 +170,10 @@ namespace ProjectHekate.Grammar.Implementation
                 case HekateParser.MOD:      return Instruction.OperatorMod;
                 case HekateParser.ADD:      return Instruction.OperatorAdd;
                 case HekateParser.SUB:      return Instruction.OperatorSubtract;
-                case HekateParser.LE:       return Instruction.OperatorLessThanEqual;
-                case HekateParser.GE:       return Instruction.OperatorGreaterThanEqual;
                 case HekateParser.LT:       return Instruction.OperatorLessThan;
                 case HekateParser.GT:       return Instruction.OperatorGreaterThan;
+                case HekateParser.LE:       return Instruction.OperatorLessThanEqual;
+                case HekateParser.GE:       return Instruction.OperatorGreaterThanEqual;
                 case HekateParser.EQUAL:    return Instruction.OperatorEqual;
                 case HekateParser.NOTEQUAL: return Instruction.OperatorNotEqual;
                 case HekateParser.AND:      return Instruction.OperatorAnd;
