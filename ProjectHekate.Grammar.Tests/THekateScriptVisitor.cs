@@ -30,12 +30,11 @@ namespace ProjectHekate.Grammar.Tests
         [TestClass]
         public class VisitUnaryExpression : THekateScriptVisitor
         {
-            [TestMethod]
-            public void ShouldGenerateCodeForLogicalNot()
+            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
             {
                 // Setup: dummy data + mock vm out
                 const int value = 1;
-                var expression = String.Format("!{0}", value);
+                var expression = String.Format("{0}{1}", operatorString, value);
 
                 ResetSubject();
 
@@ -46,26 +45,19 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code.Should().HaveCount(3);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(value);
-                result.Code[2].Should().Be((byte)Instruction.OperatorNot);
+                result.Code[2].Should().Be((byte)op);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalNot()
+            {
+                TestCodeGenerationForOperator("!", Instruction.OperatorNot);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForNegativeNumber()
             {
-                // Setup: dummy data + mock vm out
-                const int value = 5;
-                var expression = String.Format("-{0}", value);
-
-                ResetSubject();
-
-                // Act
-                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
-
-                // Verify
-                result.Code.Should().HaveCount(3);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(value);
-                result.Code[2].Should().Be((byte)Instruction.Negate);
+                TestCodeGenerationForOperator("-", Instruction.Negate);
             }
         }
 
@@ -94,6 +86,24 @@ namespace ProjectHekate.Grammar.Tests
             }
 
             [TestMethod]
+            public void ShouldGenerateCodeForMultiplication()
+            {
+                TestCodeGenerationForOperator("*", Instruction.OperatorMultiply);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForDivision()
+            {
+                TestCodeGenerationForOperator("/", Instruction.OperatorDivide);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForModulus()
+            {
+                TestCodeGenerationForOperator("%", Instruction.OperatorMod);
+            }
+
+            [TestMethod]
             public void ShouldGenerateCodeForAddition()
             {
                 TestCodeGenerationForOperator("+", Instruction.OperatorAdd);
@@ -102,9 +112,55 @@ namespace ProjectHekate.Grammar.Tests
             [TestMethod]
             public void ShouldGenerateCodeForSubtraction()
             {
-                TestCodeGenerationForOperator("+", Instruction.OperatorSubtract);
+                TestCodeGenerationForOperator("-", Instruction.OperatorSubtract);
             }
 
+            [TestMethod]
+            public void ShouldGenerateCodeForLessThan()
+            {
+                TestCodeGenerationForOperator("<", Instruction.OperatorLessThan);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForGreaterThan()
+            {
+                TestCodeGenerationForOperator(">", Instruction.OperatorGreaterThan);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForLessThanEqual()
+            {
+                TestCodeGenerationForOperator("<=", Instruction.OperatorLessThanEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForGreaterThanEqual()
+            {
+                TestCodeGenerationForOperator(">=", Instruction.OperatorGreaterThanEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForEquality()
+            {
+                TestCodeGenerationForOperator("==", Instruction.OperatorEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForInequality()
+            {
+                TestCodeGenerationForOperator("!=", Instruction.OperatorNotEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalAnd()
+            {
+                TestCodeGenerationForOperator("&&", Instruction.OperatorAnd);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalOr()
+            {
+                TestCodeGenerationForOperator("||", Instruction.OperatorOr);
             }
         }
 
