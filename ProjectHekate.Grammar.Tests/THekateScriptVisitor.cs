@@ -72,13 +72,12 @@ namespace ProjectHekate.Grammar.Tests
         [TestClass]
         public class VisitBinaryExpression : THekateScriptVisitor
         {
-            [TestMethod]
-            public void ShouldGenerateCodeForAddition()
+            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
             {
                 // Setup: dummy data + mock vm out
-                const int left = 3;
-                const float right = 5.35f;
-                var expression = String.Format("{0}+{1}", left, right);
+                const int left = 1;
+                const float right = 0;
+                var expression = String.Format("{0}{1}{2}", left, operatorString, right);
 
                 ResetSubject();
 
@@ -91,29 +90,21 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[1].Should().Be(left);
                 result.Code[2].Should().Be((byte)Instruction.Push);
                 result.Code[3].Should().Be(right);
-                result.Code[4].Should().Be((byte)Instruction.OperatorAdd);
+                result.Code[4].Should().Be((byte)op);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForAddition()
+            {
+                TestCodeGenerationForOperator("+", Instruction.OperatorAdd);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForSubtraction()
             {
-                // Setup: dummy data + mock vm out
-                const int left = 3;
-                const float right = 5.39f;
-                var expression = String.Format("{0}-{1}", left, right);
+                TestCodeGenerationForOperator("+", Instruction.OperatorSubtract);
+            }
 
-                ResetSubject();
-
-                // Act
-                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
-
-                // Verify
-                result.Code.Should().HaveCount(5);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(left);
-                result.Code[2].Should().Be((byte)Instruction.Push);
-                result.Code[3].Should().Be(right);
-                result.Code[4].Should().Be((byte)Instruction.OperatorSubtract);
             }
         }
 
