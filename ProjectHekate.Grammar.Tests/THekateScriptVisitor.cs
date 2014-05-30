@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -25,6 +26,32 @@ namespace ProjectHekate.Grammar.Tests
             var tree = parser.script();
 
             return tree.GetFirstDescendantOfType<TContextType>();
+        }
+
+        [TestClass]
+        public class VisitVariableDeclaration : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForVariableDeclaration()
+            {
+                // Setup: dummy data
+                const string expression = "var someIdentifier = 1.35";
+                
+                ResetSubject();
+                Mocker.GetMock<IScopeManager>()
+                    .Setup(ism => ism.GetCurrentScope())
+                    .Returns(new CodeBlock());
+
+                // Act
+                var result = Subject.VisitVariableDeclaration(GenerateContext<HekateParser.VariableDeclarationContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(4);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1.35f);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+            }
         }
 
         [TestClass]

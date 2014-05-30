@@ -94,6 +94,32 @@ namespace ProjectHekate.Grammar.Implementation
             return Visit(context.expression());
         }
 
+        #region Statements
+        
+        public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
+        {
+            var code = new CodeBlock();
+            var scope = _scopeManager.GetCurrentScope();
+
+            var variableName = context.Identifier().GetText();
+            var index = scope.AddNumericalVariable(variableName);
+
+            // NOTE: this declaration only happens for numeral assignments
+            // Variable declaration code:
+            // {evaluate expression, should place value on stack}
+            // Instruction.SetVariable
+            // {index of the variable}
+
+            code.Add(Visit(context.expression()));
+            code.Add(Instruction.SetVariable);
+            code.Add(index);
+
+            return code;
+        }
+
+        #endregion
+        
+
         #region Expression constructs
 
 
