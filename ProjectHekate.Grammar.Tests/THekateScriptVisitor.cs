@@ -63,6 +63,65 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[3].Should().Be(0);
             }
         }
+        
+        [TestClass]
+        public class VisitAssignmentExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForExistingNumericalVariable()
+            {
+                // Setup: create codeblock with existing numerical variable, mock scope out
+                const string variableName = "someNumericalVariable";
+                var expression = String.Format("{0} = 3.5", variableName);
+                var codeBlock = new CodeBlock();
+                codeBlock.AddNumericalVariable(variableName);
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act
+                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(4);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(3.5f);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionForNonexistentNumericalVariable()
+            {
+                // Setup: create codeblock with existing numerical variable, mock scope out
+                const string variableName = "someNumericalVariable";
+                var expression = String.Format("{0} = 3.5", variableName);
+                var codeBlock = new CodeBlock();
+                codeBlock.AddEmitterVariable(variableName);
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act + Verify
+                var result =
+                    Subject.Invoking(
+                        hsv => hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression)))
+                        .ShouldThrow<ArgumentException>();
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionForExistingEmitterVariable()
+            {
+                // Setup: create codeblock with existing emitter variable, mock scope out
+                const string variableName = "someNumericalVariable";
+                var expression = String.Format("{0} = 3.5", variableName);
+                var codeBlock = new CodeBlock();
+                codeBlock.AddEmitterVariable(variableName);
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act + Verify
+                var result =
+                    Subject.Invoking(
+                        hsv => hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression)))
+                        .ShouldThrow<ArgumentException>();
+            }
+        }
 
         [TestClass]
         public class VisitUnaryExpression : THekateScriptVisitor

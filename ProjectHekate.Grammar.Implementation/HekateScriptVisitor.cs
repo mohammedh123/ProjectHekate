@@ -122,6 +122,24 @@ namespace ProjectHekate.Grammar.Implementation
 
         #region Expression constructs
 
+        public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
+        {
+            var code = new CodeBlock();
+            var scope = _scopeManager.GetCurrentScope();
+
+            var variableName = context.Identifier().GetText();
+            var index = scope.GetNumericalVariable(variableName).Index;
+
+            // Variable declaration code:
+            // (exact same as variable declaration code), only difference will be that the parser checks
+            // to make sure the variable exists; otherwise, it throws an exception
+
+            code.Add(Visit(context.expression()));
+            code.Add(Instruction.SetVariable);
+            code.Add(index);
+
+            return code;
+        }
 
         public override CodeBlock VisitAddAssignmentExpression(HekateParser.AddAssignmentExpressionContext context)
         {
