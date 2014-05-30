@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace ProjectHekate.Scripting
 {
+    public enum IdentifierType
+    {
+        Property,
+        Variable
+    }
+
     public struct IdentifierRecord
     {
         private readonly string _name;
