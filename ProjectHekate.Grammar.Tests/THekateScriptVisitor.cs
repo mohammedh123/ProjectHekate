@@ -32,7 +32,7 @@ namespace ProjectHekate.Grammar.Tests
         {
             private void TestCodeGenerationForOperator(string operatorString, Instruction op)
             {
-                // Setup: dummy data + mock vm out
+                // Setup: dummy data
                 const int value = 1;
                 var expression = String.Format("{0}{1}", operatorString, value);
 
@@ -66,7 +66,7 @@ namespace ProjectHekate.Grammar.Tests
         {
             private void TestCodeGenerationForOperator(string operatorString, Instruction op)
             {
-                // Setup: dummy data + mock vm out
+                // Setup: dummy data
                 const int left = 1;
                 const float right = 0;
                 var expression = String.Format("{0}{1}{2}", left, operatorString, right);
