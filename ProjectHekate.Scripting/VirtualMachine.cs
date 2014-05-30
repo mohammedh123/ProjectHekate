@@ -132,7 +132,7 @@ namespace ProjectHekate.Scripting
             if (_numericalVariablesNameToIndex.ContainsKey(name))
                 throw new ArgumentException("An identifier with the name \"" + name + "\" already exists (as a numerical variable) in this script.", "name");
 
-            var identifier = new IdentifierRecord(name, identifierList.Count + 1); // this is so bad and unsafe
+            var identifier = new IdentifierRecord(name, identifierList.Count); // this is so bad and unsafe
             identifierList.Add(identifier);
             identifierNameToIndexMap[name] = identifier.Index;
 
