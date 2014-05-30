@@ -28,6 +28,19 @@ namespace ProjectHekate.Grammar.Tests
             return tree.GetFirstDescendantOfType<TContextType>();
         }
 
+        protected virtual void SetUpGetCurrentScope(CodeBlock block)
+        {
+            Mocker.GetMock<IScopeManager>()
+                .Setup(ism => ism.GetCurrentScope())
+                .Returns(block);
+        }
+
+        [TestInitialize]
+        public void InitializeSubject()
+        {
+            ResetSubject();
+        }
+
         [TestClass]
         public class VisitVariableDeclaration : THekateScriptVisitor
         {
@@ -37,10 +50,7 @@ namespace ProjectHekate.Grammar.Tests
                 // Setup: dummy data
                 const string expression = "var someIdentifier = 1.35";
                 
-                ResetSubject();
-                Mocker.GetMock<IScopeManager>()
-                    .Setup(ism => ism.GetCurrentScope())
-                    .Returns(new CodeBlock());
+                SetUpGetCurrentScope(new CodeBlock());
 
                 // Act
                 var result = Subject.VisitVariableDeclaration(GenerateContext<HekateParser.VariableDeclarationContext>(expression));
@@ -62,8 +72,6 @@ namespace ProjectHekate.Grammar.Tests
                 // Setup: dummy data
                 const int value = 1;
                 var expression = String.Format("{0}{1}", operatorString, value);
-
-                ResetSubject();
 
                 // Act
                 var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
@@ -97,8 +105,6 @@ namespace ProjectHekate.Grammar.Tests
                 const int left = 1;
                 const float right = 0;
                 var expression = String.Format("{0}{1}{2}", left, operatorString, right);
-
-                ResetSubject();
 
                 // Act
                 var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
