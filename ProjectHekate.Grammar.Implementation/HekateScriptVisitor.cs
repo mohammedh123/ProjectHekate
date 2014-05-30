@@ -9,18 +9,20 @@ namespace ProjectHekate.Grammar.Implementation
 {
     public class HekateScriptVisitor : HekateBaseVisitor<CodeBlock>
     {
-        private IVirtualMachine _virtualMachine;
-        private Stack<CodeBlock> _scopeStack;
+        private readonly IVirtualMachine _virtualMachine;
+        private readonly IScopeManager _scopeManager;
+
+        public HekateScriptVisitor(IVirtualMachine virtualMachine, IScopeManager scopeManager)
+        {
+            _virtualMachine = virtualMachine;
+            _scopeManager = scopeManager;
+        }
 
         #region Top-level constructs
 
 
         public override CodeBlock VisitScript(HekateParser.ScriptContext context)
         {
-            // beginning of the script, create a new compiler/vm that all children will use
-            _virtualMachine = new VirtualMachine();
-            _scopeStack = new Stack<CodeBlock>();
-
             foreach (var child in context.children)
             {
                 // visit each child and append the code to the main record
@@ -40,11 +42,11 @@ namespace ProjectHekate.Grammar.Implementation
 
 
             var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
-            _scopeStack.Push(bUpdaterCodeBlock);
+            _scopeManager.Add(bUpdaterCodeBlock);
             foreach (var child in context.children) {
                 bUpdaterCodeBlock.Add(Visit(child));
             }
-            _scopeStack.Pop();
+            _scopeManager.Remove();
 
             // done, now add to the pool of bullet updater records
             _virtualMachine.AddBulletUpdaterCodeBlock(name, bUpdaterCodeBlock);
@@ -66,12 +68,12 @@ namespace ProjectHekate.Grammar.Implementation
 
 
             var funcCodeBlock = new FunctionCodeBlock(paramNames);
-            _scopeStack.Push(funcCodeBlock);
+            _scopeManager.Add(funcCodeBlock);
             foreach (var child in context.children)
             {
                 funcCodeBlock.Add(Visit(child));
             }
-            _scopeStack.Pop();
+            _scopeManager.Remove();
 
             // done, now add to the pool of bullet updater records
             _virtualMachine.AddFunctionCodeBlock(name, funcCodeBlock);
@@ -100,7 +102,7 @@ namespace ProjectHekate.Grammar.Implementation
             var code = new CodeBlock();
             var identifierName = context.Identifier().GetText();
 
-            var currentScope = _scopeStack.Peek();
+            var currentScope = _scopeManager.GetCurrentScope();
             
             // Add assignment code:
             // Instruction.Assign
