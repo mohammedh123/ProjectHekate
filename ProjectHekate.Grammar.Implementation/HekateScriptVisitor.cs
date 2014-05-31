@@ -174,16 +174,7 @@ namespace ProjectHekate.Grammar.Implementation
             else { // b
                 code.Add(codeToAdd); // i
                 code.Add(Visit(context.expression())); // ii
-
-                // iii
-                switch (context.Operator.Type) {
-                    case HekateParser.MUL_ASSIGN: code.Add(Instruction.OperatorMultiply); break;
-                    case HekateParser.DIV_ASSIGN: code.Add(Instruction.OperatorDivide); break;
-                    case HekateParser.ADD_ASSIGN: code.Add(Instruction.OperatorAdd); break;
-                    case HekateParser.SUB_ASSIGN: code.Add(Instruction.OperatorSubtract); break;
-                    default: 
-                        throw new InvalidOperationException("You forgot to add a case for a compound assignment operator! Check the code for VisitAssignmentExpression.");
-                }
+                code.Add(GetCompoundAssignmentOperatorFromContext(context)); // iii
             }
 
             // 2,3
@@ -265,6 +256,19 @@ namespace ProjectHekate.Grammar.Implementation
             }
         }
 
+        private Instruction GetCompoundAssignmentOperatorFromContext(HekateParser.AssignmentExpressionContext context)
+        {
+            switch (context.Operator.Type)
+            {
+                case HekateParser.MUL_ASSIGN:   return Instruction.OperatorMultiply;
+                case HekateParser.DIV_ASSIGN:   return Instruction.OperatorDivide;
+                case HekateParser.ADD_ASSIGN:   return Instruction.OperatorAdd;
+                case HekateParser.SUB_ASSIGN:   return Instruction.OperatorSubtract;
+                default:
+                    throw new InvalidOperationException(
+                        "You forgot to add a case for a compound assignment operator! Check the code for GetCompoundAssignmentOperatorFromContext.");
+            }
+        }
 
         #endregion
 
