@@ -141,11 +141,15 @@ expression
 		|	OR
 		)
 		expression	# BinaryExpression
-	|	(NormalIdentifier | PropertyIdentifier) ASSIGN expression	# AssignmentExpression
-	|	(NormalIdentifier | PropertyIdentifier) ADD_ASSIGN expression	# AddAssignmentExpression
-	|	(NormalIdentifier | PropertyIdentifier) SUB_ASSIGN expression	# SubAssignmentExpression
-	|	(NormalIdentifier | PropertyIdentifier) MUL_ASSIGN expression	# MulAssignmentExpression
-	|	(NormalIdentifier | PropertyIdentifier) DIV_ASSIGN expression	# DivAssignmentExpression
+	|	(NormalIdentifier | PropertyIdentifier) 
+		Operator=(
+			ASSIGN
+		|	MUL_ASSIGN 
+		|	DIV_ASSIGN
+		|	ADD_ASSIGN
+		|	SUB_ASSIGN
+		)
+		expression  # AssignmentExpression
 	|	NormalIdentifier parExpressionList		# FunctionCallExpression
 	;
 	
