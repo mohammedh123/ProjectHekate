@@ -125,17 +125,38 @@ namespace ProjectHekate.Grammar.Implementation
         public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
             var code = new CodeBlock();
-            var scope = _scopeManager.GetCurrentScope();
 
-            var variableName = context.Identifier().GetText();
-            var index = scope.GetNumericalVariable(variableName).Index;
+            var isNormalIdentifier = context.NormalIdentifier() != null;
+            var isPropertyIdentifier = context.PropertyIdentifier() != null;
 
-            // Variable declaration code:
-            // (exact same as variable declaration code), only difference will be that the parser checks
-            // to make sure the variable exists; otherwise, it throws an exception
+            // NOTE: this assignment only happens for numeral assignments
+            // Assignment expression code:
+            // {evaluate expression, should place value on stack}
+            // Instruction.SetVariable or Instruction.SetProperty
+            // {index of the variable}
+
+            int index;
+            Instruction op;
+            if (isNormalIdentifier)
+            {
+                var scope = _scopeManager.GetCurrentScope();
+                var identifierName = context.NormalIdentifier().GetText();
+                index = scope.GetNumericalVariable(identifierName).Index;
+                op = Instruction.SetVariable;
+            }
+            else if (isPropertyIdentifier)
+            {
+                var identifierName = context.PropertyIdentifier().GetText();
+                index = _virtualMachine.GetProperty(identifierName).Index;
+                op = Instruction.SetProperty;
+            }
+            else
+            {
+                throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitAssignmentExpression.");
+            }
 
             code.Add(Visit(context.expression()));
-            code.Add(Instruction.SetVariable);
+            code.Add(op);
             code.Add(index);
 
             return code;

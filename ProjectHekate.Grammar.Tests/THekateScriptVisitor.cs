@@ -68,7 +68,7 @@ namespace ProjectHekate.Grammar.Tests
         public class VisitAssignmentExpression : THekateScriptVisitor
         {
             [TestMethod]
-            public void ShouldGenerateCodeForExistingNumericalVariable()
+            public void ShouldGenerateCodeForAssigningToExistingNumericalVariable()
             {
                 // Setup: create codeblock with existing numerical variable, mock scope out
                 const string variableName = "someNumericalVariable";
@@ -89,9 +89,48 @@ namespace ProjectHekate.Grammar.Tests
             }
 
             [TestMethod]
-            public void ShouldThrowExceptionForNonexistentNumericalVariable()
+            public void ShouldGenerateCodeForAssigningToExistingProperty()
             {
-                // Setup: create codeblock with existing numerical variable, mock scope out
+                // Setup: add property to vm
+                const string propertyName = "$SomeProperty";
+                var expression = String.Format("{0} = 3.5", propertyName);
+                var dummyRecord = new IdentifierRecord(propertyName, 0);
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetProperty(propertyName))
+                    .Returns(dummyRecord);
+
+                // Act
+                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(4);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(3.5f);
+                result.Code[2].Should().Be((byte)Instruction.SetProperty);
+                result.Code[3].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionForAssigningToNonexistentProperty()
+            {
+                // Setup: none
+                const string propertyName = "$SomeProperty";
+                var expression = String.Format("{0} = 3.5", propertyName);
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetProperty(propertyName))
+                    .Throws<ArgumentException>();
+
+                // Act + Verify
+                var result =
+                    Subject.Invoking(
+                        hsv => hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression)))
+                        .ShouldThrow<ArgumentException>();
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionForAssigningToNonexistentNumericalVariable()
+            {
+                // Setup: create codeblock, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeBlock = new CodeBlock();
@@ -106,7 +145,7 @@ namespace ProjectHekate.Grammar.Tests
             }
 
             [TestMethod]
-            public void ShouldThrowExceptionForExistingEmitterVariable()
+            public void ShouldThrowExceptionForAssigningToExistingEmitterVariable()
             {
                 // Setup: create codeblock with existing emitter variable, mock scope out
                 const string variableName = "someEmitterVariable";
