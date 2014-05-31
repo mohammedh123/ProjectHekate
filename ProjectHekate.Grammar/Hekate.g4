@@ -9,19 +9,19 @@ script
 	;
 	
 variableDeclaration
-	:	VAR Identifier ASSIGN expression
+	:	VAR NormalIdentifier ASSIGN expression
 	;
 	
 functionDeclaration
-	:	FUNCTION Identifier formalParameters functionBody
+	:	FUNCTION NormalIdentifier formalParameters functionBody
 	;
 
 emitterUpdaterDeclaration
-	:	EUPDATER Identifier formalParameters updaterBody
+	:	EUPDATER NormalIdentifier formalParameters updaterBody
 	;
 
 bulletUpdaterDeclaration
-	:	BUPDATER Identifier formalParameters updaterBody
+	:	BUPDATER NormalIdentifier formalParameters updaterBody
 	;
 
 functionBody
@@ -37,7 +37,7 @@ block
 	;
 	
 formalParameter
-	:	Identifier
+	:	NormalIdentifier
 	;
 
 formalParameterList
@@ -57,18 +57,18 @@ statement
 	|	BREAK SEMI				# BreakStatement
 	|	CONTINUE SEMI			# ContinueStatement
 	|	SEMI					# EmptyStatement
-	|	VAR Identifier ASSIGN createEmitterExpression SEMI	# CreateEmitterVariableStatement
-	|	VAR Identifier ASSIGN buildEmitterExpression SEMI	# BuildEmitterVariableStatement
+	|	VAR NormalIdentifier ASSIGN createEmitterExpression SEMI	# CreateEmitterVariableStatement
+	|	VAR NormalIdentifier ASSIGN buildEmitterExpression SEMI	# BuildEmitterVariableStatement
 	|	variableDeclaration SEMI							# VariableDeclarationStatement
 	|	expression SEMI			# ExpressionStatement
-	|	Identifier ATTACH Identifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
-	|	FIRE Identifier parExpressionList fromEmitterOption SEMI	# FireStatement
+	|	NormalIdentifier ATTACH NormalIdentifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
+	|	FIRE NormalIdentifier parExpressionList fromEmitterOption SEMI	# FireStatement
 	|	WAIT expression FRAMES SEMI		# WaitStatement
 	|	RETURN expression SEMI			# ReturnStatement
 	;
 		
 fromEmitterOption
-	:	FROM Identifier
+	:	FROM NormalIdentifier
 	;
 
 forControl
@@ -98,7 +98,7 @@ parExpressionList
 	;
 
 updaterCallExpression
-	:	Identifier parExpressionList
+	:	NormalIdentifier parExpressionList
 	;
 
 createEmitterExpression
@@ -106,7 +106,7 @@ createEmitterExpression
 	;
 
 buildEmitterExpression
-	:	BUILD Identifier
+	:	BUILD NormalIdentifier
 	;
 
 withUpdaterOption
@@ -115,8 +115,9 @@ withUpdaterOption
 
 expression
 	:	LPAREN expression RPAREN	# ParenthesizedExpression
-	|	literal						# LiteralExpression
-	|	Identifier			        # IdentifierExpression
+	|	Literal						# LiteralExpression
+	|	NormalIdentifier			        # NormalIdentifierExpression
+	|	PropertyIdentifier					# PropertyIdentifierExpression
 	|	expression Operator=(INC|DEC)		# PostIncDecExpression
 	|	Operator=(
 			SUB
@@ -140,20 +141,14 @@ expression
 		|	OR
 		)
 		expression	# BinaryExpression
-	|	Identifier ASSIGN expression	# AssignmentExpression
-	|	Identifier ADD_ASSIGN expression	# AddAssignmentExpression
-	|	Identifier SUB_ASSIGN expression	# SubAssignmentExpression
-	|	Identifier MUL_ASSIGN expression	# MulAssignmentExpression
-	|	Identifier DIV_ASSIGN expression	# DivAssignmentExpression
-	|	Identifier parExpressionList		# FunctionCallExpression
+	|	(NormalIdentifier | PropertyIdentifier) ASSIGN expression	# AssignmentExpression
+	|	(NormalIdentifier | PropertyIdentifier) ADD_ASSIGN expression	# AddAssignmentExpression
+	|	(NormalIdentifier | PropertyIdentifier) SUB_ASSIGN expression	# SubAssignmentExpression
+	|	(NormalIdentifier | PropertyIdentifier) MUL_ASSIGN expression	# MulAssignmentExpression
+	|	(NormalIdentifier | PropertyIdentifier) DIV_ASSIGN expression	# DivAssignmentExpression
+	|	NormalIdentifier parExpressionList		# FunctionCallExpression
 	;
 	
-//literals
-literal
-	:	FloatingPointLiteral
-	|	IntegerLiteral
-	;
-
 /*
  * Lexer Rules
  */
@@ -165,6 +160,8 @@ VAR			: 'var';
 FOR			: 'for';
 WHILE		: 'while';
 IF			: 'if';
+ELSE		: 'else';
+CONTINUE	: 'continue';
 BREAK		: 'break';
 RETURN		: 'return';
 
@@ -181,12 +178,20 @@ FROM		: 'from';
 WAIT		: 'wait';
 FRAMES		: 'frames';
 
+//literals
+Literal
+	:	FloatingPointLiteral
+	|	IntegerLiteral
+	;
+
 // Integer literals
+fragment
 IntegerLiteral
 	:	'0'
 	|	NonZeroDigit Digits*
 	;
 
+fragment
 FloatingPointLiteral
 	:	Digits '.' Digits
 	;
@@ -239,18 +244,14 @@ MUL_ASSIGN	: '*=';
 DIV_ASSIGN	: '/=';
 
 // Identifiers
-Identifier
-	:	NormalIdentifier
-	|	ContextIdentifier
-	;
-
 NormalIdentifier
 	:	Letter LetterOrDigit*
 	;
 
-ContextIdentifier
+PropertyIdentifier
 	:	DOLLAR NormalIdentifier
 	;
+
 
 fragment
 Letter

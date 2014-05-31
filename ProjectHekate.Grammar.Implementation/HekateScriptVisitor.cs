@@ -37,8 +37,8 @@ namespace ProjectHekate.Grammar.Implementation
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
 
-            var paramNames = paramContexts.Select(fpc => fpc.Identifier().GetText());
-            var name = context.Identifier().GetText();
+            var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
+            var name = context.NormalIdentifier().GetText();
 
 
             var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
@@ -63,8 +63,8 @@ namespace ProjectHekate.Grammar.Implementation
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
 
-            var paramNames = paramContexts.Select(fpc => fpc.Identifier().GetText());
-            var name = context.Identifier().GetText();
+            var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
+            var name = context.NormalIdentifier().GetText();
 
 
             var funcCodeBlock = new FunctionCodeBlock(paramNames);
@@ -94,14 +94,14 @@ namespace ProjectHekate.Grammar.Implementation
             return Visit(context.expression());
         }
 
-        #region Statements
+        #region Statement constructs
         
         public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
         {
             var code = new CodeBlock();
             var scope = _scopeManager.GetCurrentScope();
 
-            var variableName = context.Identifier().GetText();
+            var variableName = context.NormalIdentifier().GetText();
             var index = scope.AddNumericalVariable(variableName);
 
             // NOTE: this declaration only happens for numeral assignments
