@@ -25,7 +25,6 @@ namespace ProjectHekate.Scripting
         OperatorAnd,
         OperatorOr,
         OperatorNot,
-        Assign,
         Jump,
         Compare,
         FunctionCall,
