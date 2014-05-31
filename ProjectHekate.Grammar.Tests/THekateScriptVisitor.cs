@@ -109,7 +109,7 @@ namespace ProjectHekate.Grammar.Tests
             public void ShouldThrowExceptionForExistingEmitterVariable()
             {
                 // Setup: create codeblock with existing emitter variable, mock scope out
-                const string variableName = "someNumericalVariable";
+                const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeBlock = new CodeBlock();
                 codeBlock.AddEmitterVariable(variableName);
