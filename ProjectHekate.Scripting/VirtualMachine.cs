@@ -155,8 +155,7 @@ namespace ProjectHekate.Scripting
             return identifierList[index];
         }
     }
-
-    // TODO: do i even _NEED_ this SHIT?
+    
     public class FunctionCodeBlock : CodeBlock
     {
         public FunctionCodeBlock(IEnumerable<string> paramNames)
@@ -168,7 +167,6 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    // TODO: do i even _NEED_ this SHIT?
     public class BulletUpdaterCodeBlock : CodeBlock
     {
         public BulletUpdaterCodeBlock(IEnumerable<string> paramNames)
@@ -180,7 +178,6 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    // TODO: do i even _NEED_ this SHIT?
     public class EmitterUpdaterCodeBlock : CodeBlock
     {
         public EmitterUpdaterCodeBlock(IEnumerable<string> paramNames)
@@ -222,6 +219,7 @@ namespace ProjectHekate.Scripting
         IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; }
         IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; }
         IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; }
+        IReadOnlyList<IdentifierRecord> PropertyRecords { get; } 
 
         /// <summary>
         /// Adds a function code block to the virtual machine.
@@ -252,6 +250,22 @@ namespace ProjectHekate.Scripting
         /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the emitter updater has already been added, but with a different name</exception>
         int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock);
+
+        /// <summary>
+        /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
+        /// </summary>
+        /// <param name="name">The name of the property</param>
+        /// <returns>Returns the index of the property</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
+        int AddProperty(string name);
+
+        /// <summary>
+        /// Gets a property
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Returns the identifier record of the property with the given name</returns>
+        /// <exception cref="ArgumentException">Thrown when a property with that name does not exist</exception>
+        IdentifierRecord GetProperty(string name);
     }
 
     public class VirtualMachine : IVirtualMachine
@@ -264,13 +278,16 @@ namespace ProjectHekate.Scripting
         public IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; private set; }
         public IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; private set; }
         public IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; private set; }
+        public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
 
         private readonly List<FunctionCodeBlock> _functionCodeBlocks;
         private readonly List<BulletUpdaterCodeBlock> _bulletUpdaterCodeBlocks;
         private readonly List<EmitterUpdaterCodeBlock> _emitterUpdaterCodeBlocks;
+        private readonly List<IdentifierRecord> _propertyRecords;
         private readonly Dictionary<string, int> _functionCodeBlockNameToIndex;
         private readonly Dictionary<string, int> _bulletUpdaterCodeBlockNameToIndex;
         private readonly Dictionary<string, int> _emitterUpdaterCodeBlockNameToIndex;
+        private readonly Dictionary<string, int> _propertyNameToIndex;
 
         public VirtualMachine()
         {
@@ -283,8 +300,13 @@ namespace ProjectHekate.Scripting
             _emitterUpdaterCodeBlocks = new List<EmitterUpdaterCodeBlock>();
             _emitterUpdaterCodeBlockNameToIndex = new Dictionary<string, int>();
 
+            _propertyRecords = new List<IdentifierRecord>();
+            _propertyNameToIndex = new Dictionary<string, int>();
+
+            FunctionCodeBlocks = _functionCodeBlocks.AsReadOnly();
             BulletUpdaterCodeBlocks = _bulletUpdaterCodeBlocks.AsReadOnly();
             EmitterUpdaterCodeBlocks = _emitterUpdaterCodeBlocks.AsReadOnly();
+            PropertyRecords = _propertyRecords.AsReadOnly();
         }
 
         public int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock)
@@ -300,6 +322,29 @@ namespace ProjectHekate.Scripting
         public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeBlock);
+        }
+
+        public int AddProperty(string name)
+        {
+            // TODO: make method thread-safe
+            if (_propertyNameToIndex.ContainsKey(name))
+                throw new ArgumentException("A property with the name \"" + name + "\" already exists in this virtual machine.", "name");
+
+            var identifier = new IdentifierRecord(name, _propertyRecords.Count); // this is so bad and unsafe
+            _propertyRecords.Add(identifier);
+            _propertyNameToIndex[name] = identifier.Index;
+
+            return identifier.Index;
+        }
+
+        public IdentifierRecord GetProperty(string name)
+        {
+            int index;
+            var worked = _propertyNameToIndex.TryGetValue(name, out index);
+
+            if (!worked) throw new ArgumentException("A property with the name " + name + " could not be found.");
+
+            return _propertyRecords[index];
         }
 
         private int AddSpecializedCodeBlock<TCodeBlockType>(string name, ICollection<TCodeBlockType> codeBlockList, IDictionary<string,int> codeBlockNameToIndexMap, TCodeBlockType codeBlock) where TCodeBlockType : CodeBlock
