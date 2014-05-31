@@ -160,6 +160,55 @@ namespace ProjectHekate.Grammar.Tests
                         hsv => hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression)))
                         .ShouldThrow<ArgumentException>();
             }
+
+
+
+            private void TestCompoundAssignmentWithExistingNumericalVariable(string opStr, Instruction op)
+            {
+                // Setup: create codeblock with existing numerical variable, mock scope out
+                const string variableName = "someNumericalVariable";
+                var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
+                var codeBlock = new CodeBlock();
+                codeBlock.AddNumericalVariable(variableName);
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act
+                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(7);
+                result.Code[0].Should().Be((byte)Instruction.GetVariable);
+                result.Code[1].Should().Be(0);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(3.5f);
+                result.Code[4].Should().Be((byte)op);
+                result.Code[5].Should().Be((byte)Instruction.SetVariable);
+                result.Code[6].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForMultiplyAssignToExistingNumericalVariable()
+            {
+                TestCompoundAssignmentWithExistingNumericalVariable("*", Instruction.OperatorMultiply);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForDivideAssignToExistingNumericalVariable()
+            {
+                TestCompoundAssignmentWithExistingNumericalVariable("/", Instruction.OperatorDivide);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForAddAssignToExistingNumericalVariable()
+            {
+                TestCompoundAssignmentWithExistingNumericalVariable("+", Instruction.OperatorAdd);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForSubtractAssignToExistingNumericalVariable()
+            {
+                TestCompoundAssignmentWithExistingNumericalVariable("-", Instruction.OperatorSubtract);
+            }
         }
 
         [TestClass]

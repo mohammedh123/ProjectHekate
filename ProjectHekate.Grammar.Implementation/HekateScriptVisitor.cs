@@ -131,50 +131,66 @@ namespace ProjectHekate.Grammar.Implementation
 
             // NOTE: this assignment only happens for numeral assignments
             // Assignment expression code:
-            // {evaluate expression, should place value on stack}
-            // Instruction.SetVariable or Instruction.SetProperty
-            // {index of the variable}
+            // 1a. if normal assign
+            //  {evaluate expression, should place value on stack}
+            // 1b. if mul/div/add/sub
+            //  i.   {evaluate identifier's value, should place value on stack}
+            //  ii.  {evaluate expression, should place value on stack}
+            //  iii. {an Instruction depending on what kind of assignment}
+            // 2. Instruction.SetVariable or Instruction.SetProperty
+            // 3. {index of the variable}
 
+
+            // determine whether its a variable or a property
             int index;
-            Instruction op;
+            Instruction assignmentOp;
+            CodeBlock codeToAdd; // to make sure redundant checks arent done later on)
             if (isNormalIdentifier)
             {
                 var scope = _scopeManager.GetCurrentScope();
                 var identifierName = context.NormalIdentifier().GetText();
                 index = scope.GetNumericalVariable(identifierName).Index;
-                op = Instruction.SetVariable;
+                assignmentOp = Instruction.SetVariable;
+
+                codeToAdd = GenerateCodeForValueOfVariable(identifierName);
             }
             else if (isPropertyIdentifier)
             {
                 var identifierName = context.PropertyIdentifier().GetText();
                 index = _virtualMachine.GetProperty(identifierName).Index;
-                op = Instruction.SetProperty;
+                assignmentOp = Instruction.SetProperty;
+
+                codeToAdd = GenerateCodeForValueOfProperty(identifierName);
             }
             else
             {
                 throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitAssignmentExpression.");
             }
 
-            code.Add(Visit(context.expression()));
-            code.Add(op);
+            // 1
+            if (context.Operator.Type == HekateParser.ASSIGN) { // a
+                code.Add(Visit(context.expression()));
+            }
+            else { // b
+                code.Add(codeToAdd); // i
+                code.Add(Visit(context.expression())); // ii
+
+                // iii
+                switch (context.Operator.Type) {
+                    case HekateParser.MUL_ASSIGN: code.Add(Instruction.OperatorMultiply); break;
+                    case HekateParser.DIV_ASSIGN: code.Add(Instruction.OperatorDivide); break;
+                    case HekateParser.ADD_ASSIGN: code.Add(Instruction.OperatorAdd); break;
+                    case HekateParser.SUB_ASSIGN: code.Add(Instruction.OperatorSubtract); break;
+                    default: 
+                        throw new InvalidOperationException("You forgot to add a case for a compound assignment operator! Check the code for VisitAssignmentExpression.");
+                }
+            }
+
+            // 2,3
+            code.Add(assignmentOp);
             code.Add(index);
 
             return code;
-        }
-
-        public override CodeBlock VisitAddAssignmentExpression(HekateParser.AddAssignmentExpressionContext context)
-        {
-            var code = new CodeBlock();
-            var identifierName = context.Identifier().GetText();
-
-            var currentScope = _scopeManager.GetCurrentScope();
-            
-            // Add assignment code:
-            // Instruction.Assign
-            // [Identifier of some sort: property, or local variable]
-            // Uses Stack[0] (top of stack) for value
-            
-            return null;
         }
 
         public override CodeBlock VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
@@ -251,5 +267,28 @@ namespace ProjectHekate.Grammar.Implementation
 
 
         #endregion
+
+        private CodeBlock GenerateCodeForValueOfVariable(string name)
+        {
+            var scope = _scopeManager.GetCurrentScope();
+            var index = scope.GetNumericalVariable(name).Index;
+
+            var code = new CodeBlock();
+            code.Add(Instruction.GetVariable);
+            code.Add(index);
+
+            return code;
+        }
+
+        private CodeBlock GenerateCodeForValueOfProperty(string name)
+        {
+            var index = _virtualMachine.GetProperty(name).Index;
+
+            var code = new CodeBlock();
+            code.Add(Instruction.GetProperty);
+            code.Add(index);
+
+            return code;
+        }
     }
 }
