@@ -232,6 +232,14 @@ namespace ProjectHekate.Scripting
         int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock);
 
         /// <summary>
+        /// Gets a function code block by name if it exists.
+        /// </summary>
+        /// <param name="name">The name of the function code block</param>
+        /// <returns>The function code block mapped with the given name</returns>
+        /// <exception cref="ArgumentException">Thrown when a function with that name does not exist</exception>
+        FunctionCodeBlock GetFunctionCodeBlock(string name);
+
+        /// <summary>
         /// Adds a bullet updater code block to the virtual machine.
         /// </summary>
         /// <param name="name">The name of the bullet updater</param>
@@ -240,6 +248,14 @@ namespace ProjectHekate.Scripting
         /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
         int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock);
+
+        /// <summary>
+        /// Gets a bullet updater code block by name if it exists.
+        /// </summary>
+        /// <param name="name">The name of the bullet updater code block</param>
+        /// <returns>The bullet updater code block mapped with the given name</returns>
+        /// <exception cref="ArgumentException">Thrown when a bullet updater with that name does not exist</exception>
+        BulletUpdaterCodeBlock GetBulletUpdaterCodeBlock(string name);
 
         /// <summary>
         /// Adds an emitter updater code block to the program code block.
@@ -252,6 +268,14 @@ namespace ProjectHekate.Scripting
         int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock);
 
         /// <summary>
+        /// Gets a emitter updater code block by name if it exists.
+        /// </summary>
+        /// <param name="name">The name of the emitter updater code block</param>
+        /// <returns>The emitter updater code block mapped with the given name</returns>
+        /// <exception cref="ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
+        EmitterUpdaterCodeBlock GetEmitterUpdaterCodeBlock(string name);
+
+        /// <summary>
         /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
         /// </summary>
         /// <param name="name">The name of the property</param>
@@ -260,7 +284,7 @@ namespace ProjectHekate.Scripting
         int AddProperty(string name);
 
         /// <summary>
-        /// Gets a property
+        /// Gets a property.
         /// </summary>
         /// <param name="name"></param>
         /// <returns>Returns the identifier record of the property with the given name</returns>
@@ -314,14 +338,29 @@ namespace ProjectHekate.Scripting
             return AddSpecializedCodeBlock(name, _functionCodeBlocks, _functionCodeBlockNameToIndex, codeBlock);
         }
 
+        public FunctionCodeBlock GetFunctionCodeBlock(string name)
+        {
+            return GetSpecializedCodeBlock(name, "function", _functionCodeBlocks, _functionCodeBlockNameToIndex);
+        }
+
         public int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex, codeBlock);
         }
 
+        public BulletUpdaterCodeBlock GetBulletUpdaterCodeBlock(string name)
+        {
+            return GetSpecializedCodeBlock(name, "bullet updater", _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex);
+        }
+
         public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock)
         {
             return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeBlock);
+        }
+
+        public EmitterUpdaterCodeBlock GetEmitterUpdaterCodeBlock(string name)
+        {
+            return GetSpecializedCodeBlock(name, "emitter updater", _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex);
         }
 
         public int AddProperty(string name)
@@ -339,12 +378,7 @@ namespace ProjectHekate.Scripting
 
         public IdentifierRecord GetProperty(string name)
         {
-            int index;
-            var worked = _propertyNameToIndex.TryGetValue(name, out index);
-
-            if (!worked) throw new ArgumentException("A property with the name " + name + " could not be found.");
-
-            return _propertyRecords[index];
+            return GetSpecializedCodeBlock(name, "property", _propertyRecords, _propertyNameToIndex);
         }
 
         private int AddSpecializedCodeBlock<TCodeBlockType>(string name, ICollection<TCodeBlockType> codeBlockList, IDictionary<string,int> codeBlockNameToIndexMap, TCodeBlockType codeBlock) where TCodeBlockType : CodeBlock
@@ -358,6 +392,14 @@ namespace ProjectHekate.Scripting
             codeBlockNameToIndexMap[name] = codeBlock.Index;
 
             return codeBlock.Index;
+        }
+
+        private TCodeBlockType GetSpecializedCodeBlock<TCodeBlockType>(string name, string nameOfCodeBlockForExceptionMessage, IReadOnlyList<TCodeBlockType> specializedCodeBlocks, Dictionary<string, int> specializedCodeBlockNameToIndex)
+        {
+            if(!specializedCodeBlockNameToIndex.ContainsKey(name))
+                throw new ArgumentException("A " + nameOfCodeBlockForExceptionMessage + " with the name \"" + name + "\" could not be found.", name);
+
+            return specializedCodeBlocks[specializedCodeBlockNameToIndex[name]];
         }
 
         private void ThrowIfCodeBlockWithNameAlreadyExists(string name)
