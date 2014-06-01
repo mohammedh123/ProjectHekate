@@ -122,6 +122,18 @@ namespace ProjectHekate.Grammar.Implementation
 
         #region Expression constructs
 
+        public override CodeBlock VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
+        {
+            var code = new CodeBlock();
+            var text = context.GetText();
+            var value = float.Parse(text);
+
+            code.Add(Instruction.Push);
+            code.Add(value);
+
+            return code;
+        }
+
         public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
             var code = new CodeBlock();
@@ -209,18 +221,6 @@ namespace ProjectHekate.Grammar.Implementation
             code.Add(Visit(context.expression(0)));
             code.Add(Visit(context.expression(1)));
             code.Add(GetBinaryOperatorFromContext(context));
-
-            return code;
-        }
-
-        public override CodeBlock VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
-        {
-            var code = new CodeBlock();
-            var text = context.GetText();
-            var value = float.Parse(text);
-
-            code.Add(Instruction.Push);
-            code.Add(value);
 
             return code;
         }
