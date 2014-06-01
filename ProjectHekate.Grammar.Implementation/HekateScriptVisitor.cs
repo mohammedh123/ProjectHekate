@@ -136,11 +136,17 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override CodeBlock VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
         {
+            // Normal identifier expression code:
+            // Instructions.Push
+            // {index of variable if it exists}
             return GenerateCodeForValueOfVariable(context.NormalIdentifier().GetText());
         }
 
         public override CodeBlock VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
         {
+            // Property identifier expression code:
+            // Instructions.Push
+            // {index of property if it exists}
             return GenerateCodeForValueOfProperty(context.PropertyIdentifier().GetText());
         }
 
