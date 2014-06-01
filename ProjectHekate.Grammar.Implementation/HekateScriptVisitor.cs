@@ -275,6 +275,25 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitFunctionCallExpression(HekateParser.FunctionCallExpressionContext context)
+        {
+            var code = new CodeBlock();
+
+            var functionName = context.NormalIdentifier().GetText();
+            var functionIndex = _virtualMachine.GetFunctionCodeBlock(functionName);
+
+            // Function call expression code:
+            // Generate code for each parameter value (each should push a value onto the stack)
+            // Instruction.FunctionCall
+            // {function code block's index}
+
+            code.Add(Visit(context.parExpressionList()));
+            code.Add(Instruction.FunctionCall);
+            code.Add(functionIndex);
+
+            return code;
+        }
+
         public override CodeBlock VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
         {
             var code = new CodeBlock();

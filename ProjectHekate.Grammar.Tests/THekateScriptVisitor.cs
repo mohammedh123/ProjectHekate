@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
@@ -173,6 +174,139 @@ namespace ProjectHekate.Grammar.Tests
                 Subject.Invoking(
                     hsv => hsv.VisitPropertyIdentifierExpression(GenerateContext<HekateParser.PropertyIdentifierExpressionContext>(expression)))
                     .ShouldThrow<ArgumentException>();
+            }
+        }
+
+        [TestClass]
+        public class VisitUnaryExpression : THekateScriptVisitor
+        {
+            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
+            {
+                // Setup: dummy data
+                const int value = 1;
+                var expression = String.Format("{0}{1}", operatorString, value);
+
+                // Act
+                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(3);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(value);
+                result.Code[2].Should().Be((byte)op);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalNot()
+            {
+                TestCodeGenerationForOperator("!", Instruction.OperatorNot);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForNegativeNumber()
+            {
+                TestCodeGenerationForOperator("-", Instruction.Negate);
+            }
+        }
+
+        [TestClass]
+        public class VisitBinaryExpression : THekateScriptVisitor
+        {
+            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
+            {
+                // Setup: dummy data
+                const int left = 1;
+                const float right = 0;
+                var expression = String.Format("{0}{1}{2}", left, operatorString, right);
+
+                // Act
+                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(5);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(left);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(right);
+                result.Code[4].Should().Be((byte)op);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForMultiplication()
+            {
+                TestCodeGenerationForOperator("*", Instruction.OperatorMultiply);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForDivision()
+            {
+                TestCodeGenerationForOperator("/", Instruction.OperatorDivide);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForModulus()
+            {
+                TestCodeGenerationForOperator("%", Instruction.OperatorMod);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForAddition()
+            {
+                TestCodeGenerationForOperator("+", Instruction.OperatorAdd);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForSubtraction()
+            {
+                TestCodeGenerationForOperator("-", Instruction.OperatorSubtract);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForLessThan()
+            {
+                TestCodeGenerationForOperator("<", Instruction.OperatorLessThan);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForGreaterThan()
+            {
+                TestCodeGenerationForOperator(">", Instruction.OperatorGreaterThan);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForLessThanEqual()
+            {
+                TestCodeGenerationForOperator("<=", Instruction.OperatorLessThanEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForGreaterThanEqual()
+            {
+                TestCodeGenerationForOperator(">=", Instruction.OperatorGreaterThanEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForEquality()
+            {
+                TestCodeGenerationForOperator("==", Instruction.OperatorEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForInequality()
+            {
+                TestCodeGenerationForOperator("!=", Instruction.OperatorNotEqual);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalAnd()
+            {
+                TestCodeGenerationForOperator("&&", Instruction.OperatorAnd);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForConditionalOr()
+            {
+                TestCodeGenerationForOperator("||", Instruction.OperatorOr);
             }
         }
 
@@ -392,135 +526,50 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
-        public class VisitUnaryExpression : THekateScriptVisitor
+        public class VisitFunctionCallExpression : THekateScriptVisitor
         {
-            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
+            private void TestFunctionCallGenerationWithParameters(int numParameters)
             {
-                // Setup: dummy data
-                const int value = 1;
-                var expression = String.Format("{0}{1}", operatorString, value);
+                // Setup: create function
+                const string functionName = "SomeFunctionName";
+                var variableValues = Enumerable.Range(1, numParameters).ToList();
+                var expression = String.Format("{0}({1})", functionName, String.Join(",", variableValues.Select(v => v.ToString())));
+
+                var parameterValues = variableValues.Select(v => "param" + v);
+                var funcCodeBlock = new FunctionCodeBlock(parameterValues) { Index = 0 };
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetFunctionCodeBlock(functionName))
+                    .Returns(funcCodeBlock);
 
                 // Act
-                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression));
+                var result = Subject.VisitFunctionCallExpression(GenerateContext<HekateParser.FunctionCallExpressionContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(3);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(value);
-                result.Code[2].Should().Be((byte)op);
+                var i = 0;
+                for (i = 0; i < numParameters;) {
+                    result.Code[i++].Should().Be((byte)Instruction.Push);
+                    result.Code[i++].Should().Be(variableValues[i]);
+                }
+                result.Code[i++].Should().Be((byte)Instruction.FunctionCall);
+                result.Code[i++].Should().Be(funcCodeBlock.Index);    
             }
 
             [TestMethod]
-            public void ShouldGenerateCodeForConditionalNot()
+            public void ShouldGenerateCodeForCallingAnExistingFunctionWithZeroParameters()
             {
-                TestCodeGenerationForOperator("!", Instruction.OperatorNot);
+                TestFunctionCallGenerationWithParameters(0);
             }
 
             [TestMethod]
-            public void ShouldGenerateCodeForNegativeNumber()
+            public void ShouldGenerateCodeForCallingAnExistingFunctionWithOneParameter()
             {
-                TestCodeGenerationForOperator("-", Instruction.Negate);
-            }
-        }
-
-        [TestClass]
-        public class VisitBinaryExpression : THekateScriptVisitor
-        {
-            private void TestCodeGenerationForOperator(string operatorString, Instruction op)
-            {
-                // Setup: dummy data
-                const int left = 1;
-                const float right = 0;
-                var expression = String.Format("{0}{1}{2}", left, operatorString, right);
-
-                // Act
-                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression));
-
-                // Verify
-                result.Code.Should().HaveCount(5);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(left);
-                result.Code[2].Should().Be((byte)Instruction.Push);
-                result.Code[3].Should().Be(right);
-                result.Code[4].Should().Be((byte)op);
+                TestFunctionCallGenerationWithParameters(1);
             }
 
             [TestMethod]
-            public void ShouldGenerateCodeForMultiplication()
+            public void ShouldGenerateCodeForCallingAnExistingFunctionWithThreeParameters()
             {
-                TestCodeGenerationForOperator("*", Instruction.OperatorMultiply);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForDivision()
-            {
-                TestCodeGenerationForOperator("/", Instruction.OperatorDivide);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForModulus()
-            {
-                TestCodeGenerationForOperator("%", Instruction.OperatorMod);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForAddition()
-            {
-                TestCodeGenerationForOperator("+", Instruction.OperatorAdd);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForSubtraction()
-            {
-                TestCodeGenerationForOperator("-", Instruction.OperatorSubtract);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForLessThan()
-            {
-                TestCodeGenerationForOperator("<", Instruction.OperatorLessThan);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForGreaterThan()
-            {
-                TestCodeGenerationForOperator(">", Instruction.OperatorGreaterThan);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForLessThanEqual()
-            {
-                TestCodeGenerationForOperator("<=", Instruction.OperatorLessThanEqual);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForGreaterThanEqual()
-            {
-                TestCodeGenerationForOperator(">=", Instruction.OperatorGreaterThanEqual);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForEquality()
-            {
-                TestCodeGenerationForOperator("==", Instruction.OperatorEqual);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForInequality()
-            {
-                TestCodeGenerationForOperator("!=", Instruction.OperatorNotEqual);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForConditionalAnd()
-            {
-                TestCodeGenerationForOperator("&&", Instruction.OperatorAnd);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForConditionalOr()
-            {
-                TestCodeGenerationForOperator("||", Instruction.OperatorOr);
+                TestFunctionCallGenerationWithParameters(3);
             }
         }
     }
