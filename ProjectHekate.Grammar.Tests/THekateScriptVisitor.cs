@@ -545,10 +545,11 @@ namespace ProjectHekate.Grammar.Tests
                 var result = Subject.VisitFunctionCallExpression(GenerateContext<HekateParser.FunctionCallExpressionContext>(expression));
 
                 // Verify
+                result.Code.Should().HaveCount(numParameters*2 + 2);
                 var i = 0;
-                for (i = 0; i < numParameters;) {
+                for (i = 0; i < numParameters*2;) {
                     result.Code[i++].Should().Be((byte)Instruction.Push);
-                    result.Code[i++].Should().Be(variableValues[i]);
+                    result.Code[i++].Should().Be(variableValues[(i-1)/2]);
                 }
                 result.Code[i++].Should().Be((byte)Instruction.FunctionCall);
                 result.Code[i++].Should().Be(funcCodeBlock.Index);    

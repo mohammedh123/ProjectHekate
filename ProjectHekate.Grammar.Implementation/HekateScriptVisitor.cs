@@ -123,15 +123,13 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override CodeBlock VisitParExpressionList(HekateParser.ParExpressionListContext context)
         {
-            return Visit(context.expressionList());
+            return context.expressionList() == null ? new CodeBlock() : Visit(context.expressionList());
         }
 
         public override CodeBlock VisitExpressionList(HekateParser.ExpressionListContext context)
         {
             var code = new CodeBlock();
-
-            if (context == null) return code;
-
+            
             foreach (var expressionContext in context.expression()) {
                 code.Add(Visit(expressionContext));
             }
@@ -302,7 +300,7 @@ namespace ProjectHekate.Grammar.Implementation
             var code = new CodeBlock();
 
             var functionName = context.NormalIdentifier().GetText();
-            var functionIndex = _virtualMachine.GetFunctionCodeBlock(functionName);
+            var functionIndex = _virtualMachine.GetFunctionCodeBlock(functionName).Index;
 
             // Function call expression code:
             // Generate code for each parameter value (each should push a value onto the stack)
