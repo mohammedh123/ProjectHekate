@@ -124,7 +124,7 @@ namespace ProjectHekate.Grammar.Tests
             [TestMethod]
             public void ShouldThrowArgumentExceptionForNonMatchingVariable()
             {
-                // Setup: create codeblock with existing numerical variable, mock scope out
+                // Setup: create codeblock, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
                 var codeBlock = new CodeBlock();
@@ -133,6 +133,45 @@ namespace ProjectHekate.Grammar.Tests
                 // Act + Verify
                 Subject.Invoking(
                     hsv => hsv.VisitNormalIdentifierExpression(GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression)))
+                    .ShouldThrow<ArgumentException>();
+            }
+        }
+
+        [TestClass]
+        public class VisitPropertyIdentifierExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForMatchingProperty()
+            {
+                // Setup: create codeblock with existing property, mock vm out
+                const string identifier = "$SomeIdentifier";
+                var expression = String.Format("{0}", identifier);
+                var dummyRecord = new IdentifierRecord(identifier, 0);
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetProperty(identifier))
+                    .Returns(dummyRecord);
+
+                // Act
+                var result = Subject.VisitPropertyIdentifierExpression(GenerateContext<HekateParser.PropertyIdentifierExpressionContext>(expression));
+
+                // Verify
+                result.Code[0].Should().Be((byte)Instruction.GetProperty);
+                result.Code[1].Should().Be(dummyRecord.Index);
+            }
+
+            [TestMethod]
+            public void ShouldThrowArgumentExceptionForNonMatchingVariable()
+            {
+                // Setup: create codeblock, mock vm out
+                const string identifier = "$SomeIdentifier";
+                var expression = String.Format("{0}", identifier);
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetProperty(identifier))
+                    .Throws<ArgumentException>();
+
+                // Act + Verify
+                Subject.Invoking(
+                    hsv => hsv.VisitPropertyIdentifierExpression(GenerateContext<HekateParser.PropertyIdentifierExpressionContext>(expression)))
                     .ShouldThrow<ArgumentException>();
             }
         }

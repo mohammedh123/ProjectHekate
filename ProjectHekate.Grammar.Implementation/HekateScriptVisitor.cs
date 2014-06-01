@@ -139,6 +139,11 @@ namespace ProjectHekate.Grammar.Implementation
             return GenerateCodeForValueOfVariable(context.NormalIdentifier().GetText());
         }
 
+        public override CodeBlock VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
+        {
+            return GenerateCodeForValueOfProperty(context.PropertyIdentifier().GetText());
+        }
+
         public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
             var code = new CodeBlock();
