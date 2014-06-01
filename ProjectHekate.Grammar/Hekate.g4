@@ -25,7 +25,7 @@ bulletUpdaterDeclaration
 	;
 
 functionBody
-	:	block
+	:	blockWithReturn
 	;
 
 updaterBody
@@ -35,7 +35,11 @@ updaterBody
 block
 	:	LBRACE statement* RBRACE
 	;
-	
+
+blockWithReturn
+	:	LBRACE (statement|returnStatement)* RBRACE
+	;
+
 formalParameter
 	:	NormalIdentifier
 	;
@@ -64,7 +68,10 @@ statement
 	|	NormalIdentifier ATTACH NormalIdentifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
 	|	FIRE NormalIdentifier parExpressionList fromEmitterOption SEMI	# FireStatement
 	|	WAIT expression FRAMES SEMI		# WaitStatement
-	|	RETURN expression SEMI			# ReturnStatement
+	;
+
+returnStatement
+	:	RETURN expression SEMI
 	;
 		
 fromEmitterOption
