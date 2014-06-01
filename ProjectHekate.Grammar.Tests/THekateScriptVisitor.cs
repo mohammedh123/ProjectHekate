@@ -177,6 +177,74 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
+        public class VisitPostIncDecExpression : THekateScriptVisitor
+        {
+            private void TestIncDecWithExistingVariableOrProperty(bool isIncrementing, IdentifierType type)
+            {
+                // Setup: create codeblock with existing numerical variable/property, mock scope out
+                const string identifier = "someIdentifier";
+                var expression = String.Format("{0}{1}{2}", type == IdentifierType.Property ? "$" : "", identifier, isIncrementing ? "++" : "--");
+
+                var idx = -1;
+                if (type == IdentifierType.Variable) {
+                    var codeBlock = new CodeBlock();
+                    idx = codeBlock.AddNumericalVariable(identifier);
+                    SetUpGetCurrentScope(codeBlock);
+                }
+                else if(type == IdentifierType.Property) {
+                    var dummyRecord = new IdentifierRecord(identifier, 0);
+                    idx = dummyRecord.Index;
+                    Mocker.GetMock<IVirtualMachine>()
+                        .Setup(ivm => ivm.GetProperty(identifier))
+                        .Returns(dummyRecord);
+                }
+
+                // Act
+                var result = Subject.VisitPostIncDecExpression(GenerateContext<HekateParser.PostIncDecExpressionContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(7);
+                result.Code[1].Should().Be(idx);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(1);
+                result.Code[4].Should().Be(isIncrementing ? (byte)Instruction.OperatorAdd : (byte)Instruction.OperatorSubtract);
+                if (type == IdentifierType.Variable) {
+                    result.Code[0].Should().Be((byte) Instruction.GetVariable);
+                    result.Code[5].Should().Be((byte) Instruction.SetVariable);
+                }
+                else if (type == IdentifierType.Property) {
+                    result.Code[0].Should().Be((byte) Instruction.GetProperty);
+                    result.Code[5].Should().Be((byte) Instruction.SetProperty);
+                }
+                result.Code[6].Should().Be(idx);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForIncrementingExistingNumericalVariable()
+            {
+                TestIncDecWithExistingVariableOrProperty(true, IdentifierType.Variable);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForIncrementingExistingNumericalProperty()
+            {
+                TestIncDecWithExistingVariableOrProperty(true, IdentifierType.Property);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForDecrementingExistingNumericalVariable()
+            {
+                TestIncDecWithExistingVariableOrProperty(false, IdentifierType.Variable);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForDecrementingExistingNumericalProperty()
+            {
+                TestIncDecWithExistingVariableOrProperty(false, IdentifierType.Property);
+            }
+        }
+
+        [TestClass]
         public class VisitAssignmentExpression : THekateScriptVisitor
         {
             [TestMethod]

@@ -150,6 +150,69 @@ namespace ProjectHekate.Grammar.Implementation
             return GenerateCodeForValueOfProperty(context.PropertyIdentifier().GetText());
         }
 
+        public override CodeBlock VisitPostIncDecExpression(HekateParser.PostIncDecExpressionContext context)
+        {
+            var code = new CodeBlock();
+
+            // TODO: heavily reuses code from VisitAssignmentExpression - figure out a way to de-duplicate code
+
+            var isNormalIdentifier = context.NormalIdentifier() != null;
+            var isPropertyIdentifier = context.PropertyIdentifier() != null;
+
+            // Post-inc/decrement expression code:
+            // Instruction.GetVariable/Property
+            // {index of variable/property}
+            // Instructions.Push
+            // {1}
+            // Instruction.OperatorAdd/Subtract
+            // Instruction.SetVariable/Property
+            // {index of variable/property}
+
+            // determine whether its a variable or a property
+            int index;
+            Instruction assignmentOp;
+            CodeBlock codeForValueOfLeftSide; // to make sure redundant checks arent done later on)
+            if (isNormalIdentifier)
+            {
+                var scope = _scopeManager.GetCurrentScope();
+                var identifierName = context.NormalIdentifier().GetText();
+                index = scope.GetNumericalVariable(identifierName).Index;
+                assignmentOp = Instruction.SetVariable;
+
+                codeForValueOfLeftSide = GenerateCodeForValueOfVariable(identifierName);
+            }
+            else if (isPropertyIdentifier)
+            {
+                var identifierName = context.PropertyIdentifier().GetText();
+                index = _virtualMachine.GetProperty(identifierName).Index;
+                assignmentOp = Instruction.SetProperty;
+
+                codeForValueOfLeftSide = GenerateCodeForValueOfProperty(identifierName);
+            }
+            else
+            {
+                throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitPostIncDecExpression.");
+            }
+
+            code.Add(codeForValueOfLeftSide);
+            code.Add(Instruction.Push);
+            code.Add(1);
+
+            Instruction instToAdd;
+            switch (context.Operator.Type) {
+                case HekateParser.INC:  instToAdd = Instruction.OperatorAdd; break;
+                case HekateParser.DEC:  instToAdd = Instruction.OperatorSubtract; break;
+                default:
+                    throw new InvalidOperationException("The post-increment/decrement expression had an operator that was neither increment nor decrement. Check VisitPostIncDecExpression code.");
+            }
+
+            code.Add(instToAdd);
+            code.Add(assignmentOp);
+            code.Add(index);
+
+            return code;
+        }
+
         public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
             var code = new CodeBlock();
