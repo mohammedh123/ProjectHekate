@@ -125,7 +125,7 @@ expression
 	|	Literal						# LiteralExpression
 	|	NormalIdentifier			        # NormalIdentifierExpression
 	|	PropertyIdentifier					# PropertyIdentifierExpression
-	|	expression Operator=(INC|DEC)		# PostIncDecExpression
+	|	(NormalIdentifier|PropertyIdentifier) Operator=(INC|DEC)		# PostIncDecExpression
 	|	Operator=(
 			SUB
 		|	BANG
