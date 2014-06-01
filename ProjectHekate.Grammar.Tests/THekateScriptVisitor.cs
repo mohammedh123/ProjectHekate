@@ -63,7 +63,43 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[3].Should().Be(0);
             }
         }
-        
+
+        [TestClass]
+        public class VisitLiteralExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForIntegerLiteral()
+            {
+                // Setup
+                const int literal = 3;
+                string literalExpression = literal.ToString();
+
+                // Act
+                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(literal);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForFloatLiteral()
+            {
+                // Setup
+                const float literal = 3.455f;
+                string literalExpression = literal.ToString();
+
+                // Act
+                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(literal);
+            }
+        }
+
         [TestClass]
         public class VisitAssignmentExpression : THekateScriptVisitor
         {
@@ -74,7 +110,7 @@ namespace ProjectHekate.Grammar.Tests
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeBlock = new CodeBlock();
-                codeBlock.AddNumericalVariable(variableName);
+                var idx = codeBlock.AddNumericalVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
                 // Act
@@ -85,7 +121,7 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(3.5f);
                 result.Code[2].Should().Be((byte)Instruction.SetVariable);
-                result.Code[3].Should().Be(0);
+                result.Code[3].Should().Be(idx);
             }
 
             [TestMethod]
@@ -107,7 +143,7 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(3.5f);
                 result.Code[2].Should().Be((byte)Instruction.SetProperty);
-                result.Code[3].Should().Be(0);
+                result.Code[3].Should().Be(dummyRecord.Index);
             }
 
             [TestMethod]
@@ -169,7 +205,7 @@ namespace ProjectHekate.Grammar.Tests
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
                 var codeBlock = new CodeBlock();
-                codeBlock.AddNumericalVariable(variableName);
+                var idx = codeBlock.AddNumericalVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
                 // Act
@@ -178,12 +214,12 @@ namespace ProjectHekate.Grammar.Tests
                 // Verify
                 result.Code.Should().HaveCount(7);
                 result.Code[0].Should().Be((byte)Instruction.GetVariable);
-                result.Code[1].Should().Be(0);
+                result.Code[1].Should().Be(idx);
                 result.Code[2].Should().Be((byte)Instruction.Push);
                 result.Code[3].Should().Be(3.5f);
                 result.Code[4].Should().Be((byte)op);
                 result.Code[5].Should().Be((byte)Instruction.SetVariable);
-                result.Code[6].Should().Be(0);
+                result.Code[6].Should().Be(idx);
             }
 
             [TestMethod]
@@ -341,42 +377,6 @@ namespace ProjectHekate.Grammar.Tests
             public void ShouldGenerateCodeForConditionalOr()
             {
                 TestCodeGenerationForOperator("||", Instruction.OperatorOr);
-            }
-        }
-
-        [TestClass]
-        public class VisitLiteralExpression : THekateScriptVisitor
-        {
-            [TestMethod]
-            public void ShouldGenerateCodeForIntegerLiteral()
-            {
-                // Setup
-                const int literal = 3;
-                string literalExpression = literal.ToString();
-
-                // Act
-                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
-
-                // Verify
-                result.Code.Should().HaveCount(2);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(literal);
-            }
-
-            [TestMethod]
-            public void ShouldGenerateCodeForFloatLiteral()
-            {
-                // Setup
-                const float literal = 3.455f;
-                string literalExpression = literal.ToString();
-
-                // Act
-                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression));
-
-                // Verify
-                result.Code.Should().HaveCount(2);
-                result.Code[0].Should().Be((byte)Instruction.Push);
-                result.Code[1].Should().Be(literal);
             }
         }
     }
