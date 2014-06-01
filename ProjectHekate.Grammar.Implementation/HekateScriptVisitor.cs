@@ -84,18 +84,13 @@ namespace ProjectHekate.Grammar.Implementation
 
         #endregion
 
-        public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
-        {
-            return base.VisitExpressionStatement(context);
-        }
 
-        public override CodeBlock VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
+        #region Statement constructs
+        public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
             return Visit(context.expression());
         }
 
-        #region Statement constructs
-        
         public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
         {
             var code = new CodeBlock();
@@ -118,7 +113,34 @@ namespace ProjectHekate.Grammar.Implementation
         }
 
         #endregion
+
+        #region Miscellaneous statements (usually ones that wrap around expressions)
         
+        public override CodeBlock VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
+        public override CodeBlock VisitParExpressionList(HekateParser.ParExpressionListContext context)
+        {
+            return Visit(context.expressionList());
+        }
+
+        public override CodeBlock VisitExpressionList(HekateParser.ExpressionListContext context)
+        {
+            var code = new CodeBlock();
+
+            if (context == null) return code;
+
+            foreach (var expressionContext in context.expression()) {
+                code.Add(Visit(expressionContext));
+            }
+
+            return code;
+        }
+
+        #endregion
+
 
         #region Expression constructs
 
