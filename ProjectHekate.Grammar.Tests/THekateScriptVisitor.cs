@@ -101,6 +101,43 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
+        public class VisitNormalIdentifierExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForMatchingVariable()
+            {
+                // Setup: create codeblock with existing numerical variable, mock scope out
+                const string identifier = "someIdentifier";
+                var expression = String.Format("{0}", identifier);
+                var codeBlock = new CodeBlock();
+                var idx = codeBlock.AddNumericalVariable(identifier);
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act
+                var result = Subject.VisitNormalIdentifierExpression(GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression));
+
+                // Verify
+                result.Code[0].Should().Be((byte)Instruction.GetVariable);
+                result.Code[1].Should().Be(idx);
+            }
+
+            [TestMethod]
+            public void ShouldThrowArgumentExceptionForNonMatchingVariable()
+            {
+                // Setup: create codeblock with existing numerical variable, mock scope out
+                const string identifier = "someIdentifier";
+                var expression = String.Format("{0}", identifier);
+                var codeBlock = new CodeBlock();
+                SetUpGetCurrentScope(codeBlock);
+
+                // Act + Verify
+                Subject.Invoking(
+                    hsv => hsv.VisitNormalIdentifierExpression(GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression)))
+                    .ShouldThrow<ArgumentException>();
+            }
+        }
+
+        [TestClass]
         public class VisitAssignmentExpression : THekateScriptVisitor
         {
             [TestMethod]

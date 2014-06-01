@@ -134,6 +134,11 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
+        {
+            return GenerateCodeForValueOfVariable(context.NormalIdentifier().GetText());
+        }
+
         public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
             var code = new CodeBlock();
