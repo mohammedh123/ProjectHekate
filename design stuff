@@ -20,19 +20,18 @@ Quite literally, a List<uint> (a block of code).
 class CodeBlock
 {
     List<uint> Code { get; set; }
+
+    list of numerical variables
+    list of emitter variables
+    internal reference to VM (so that it can access the list of emitter properties)
+
 }
 
-class VirtualMachine
-{
-    private List<(Function?)CodeBlock> _functions { get; set; }
-    private List<(BulletUpdater?)CodeBlock> _functions { get; set; }
-    private List<(EmitterUpdater?)CodeBlock> _functions { get; set; }
-    Dictionary<string,int> Functions { get; set; }
-    Dictionary<string,int> BulletUpdaters { get; set; }
-    Dictionary<string,int> EmitterUpdaters { get; set; }
-}
+where are variable values stored? in the ScriptState class
 
-ScriptState? It will store current instruction index, and an index determining which block it is running
+class VirtualMachine .. in code
+
+class ScriptState .. in code
 
 Functions can only call:
 - other functions
