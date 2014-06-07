@@ -75,7 +75,7 @@ namespace ProjectHekate.Grammar.Implementation
             }
             _scopeManager.Remove();
 
-            // done, now add to the pool of bullet updater records
+            // done, now add to the pool of function records
             _virtualMachine.AddFunctionCodeBlock(name, funcCodeBlock);
 
             return funcCodeBlock;
@@ -89,6 +89,7 @@ namespace ProjectHekate.Grammar.Implementation
         public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
             return Visit(context.expression());
+            // TODO: pop after expression statement
         }
 
         public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
