@@ -66,6 +66,26 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
+        public class VisitReturnStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForReturnStatement()
+            {
+                // Setup: dummy data
+                const string expression = "return 3;";
+                
+                // Act
+                var result = Subject.VisitReturnStatement(GenerateContext<HekateParser.ReturnStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(3);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(3);
+                result.Code[2].Should().Be((byte)Instruction.Return);
+            }
+        }
+
+        [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {
             [TestMethod]

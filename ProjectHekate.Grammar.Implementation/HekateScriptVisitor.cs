@@ -112,6 +112,20 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitReturnStatement(HekateParser.ReturnStatementContext context)
+        {
+            var code = new CodeBlock();
+
+            // Return statement code:
+            // Generate code for expression
+            // Instruction.Return
+
+            code.Add(Visit(context.expression()));
+            code.Add(Instruction.Return);
+
+            return code;
+        }
+
         #endregion
 
         #region Miscellaneous statements (usually ones that wrap around expressions)

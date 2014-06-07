@@ -27,6 +27,7 @@ namespace ProjectHekate.Scripting
         OperatorNot,
         Jump,
         Compare,
+        Return,
         FunctionCall,
         GetUpdater,
         GetProperty,
