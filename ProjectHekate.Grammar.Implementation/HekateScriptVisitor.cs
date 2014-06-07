@@ -41,22 +41,39 @@ namespace ProjectHekate.Grammar.Implementation
             var name = context.NormalIdentifier().GetText();
 
 
+            var eUpdaterCodeBlock = new EmitterUpdaterCodeBlock(paramNames);
+            _scopeManager.Add(eUpdaterCodeBlock);
+            foreach (var child in context.children) {
+                eUpdaterCodeBlock.Add(Visit(child));
+            }
+            _scopeManager.Remove();
+
+            // done, now add to the pool of emitter updater records
+            _virtualMachine.AddEmitterUpdaterCodeBlock(name, eUpdaterCodeBlock);
+            
+            return eUpdaterCodeBlock;
+        }
+
+        public override CodeBlock VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
+        {
+            var paramContexts = context.formalParameters().formalParameterList().formalParameter();
+
+            var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
+            var name = context.NormalIdentifier().GetText();
+
+
             var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
             _scopeManager.Add(bUpdaterCodeBlock);
-            foreach (var child in context.children) {
+            foreach (var child in context.children)
+            {
                 bUpdaterCodeBlock.Add(Visit(child));
             }
             _scopeManager.Remove();
 
             // done, now add to the pool of bullet updater records
             _virtualMachine.AddBulletUpdaterCodeBlock(name, bUpdaterCodeBlock);
-            
-            return bUpdaterCodeBlock;
-        }
 
-        public override CodeBlock VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
-        {
-            return base.VisitBulletUpdaterDeclaration(context);
+            return bUpdaterCodeBlock;
         }
 
         public override CodeBlock VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
