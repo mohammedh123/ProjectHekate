@@ -153,6 +153,11 @@ namespace ProjectHekate.Grammar.Implementation
             return Visit(context.expression());
         }
 
+        public override CodeBlock VisitParExpression(HekateParser.ParExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
         public override CodeBlock VisitParExpressionList(HekateParser.ParExpressionListContext context)
         {
             return context.expressionList() == null ? new CodeBlock() : Visit(context.expressionList());
@@ -164,6 +169,22 @@ namespace ProjectHekate.Grammar.Implementation
             
             foreach (var expressionContext in context.expression()) {
                 code.Add(Visit(expressionContext));
+            }
+
+            return code;
+        }
+
+        public override CodeBlock VisitBlockStatement(HekateParser.BlockStatementContext context)
+        {
+            return Visit(context.block());
+        }
+
+        public override CodeBlock VisitBlock(HekateParser.BlockContext context)
+        {
+            var code = new CodeBlock();
+
+            foreach (var statementContext in context.statement()) {
+                code.Add(Visit(statementContext));
             }
 
             return code;
