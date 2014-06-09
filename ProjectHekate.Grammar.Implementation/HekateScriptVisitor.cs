@@ -144,6 +144,43 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitIfStatement(HekateParser.IfStatementContext context)
+        {
+            var code = new CodeBlock();
+            var ifBodyStatement = context.statement(0);
+            var elseStatement = context.statement(1);
+
+            // If statement code
+            // Generate parExpression code
+            // Instruction.JumpIfZero
+            // The offset to jump if the parExpression is 0 (size of statement)
+            // Generate expression code for statement
+            // Instruction.Jump if needed
+            // offset to jump if needed
+            // Generate code for statement (if it exists)
+
+            code.Add(Visit(context.parExpression()));
+            code.Add(Instruction.JumpIfZero);
+
+            var ifBodyCode = Visit(ifBodyStatement);
+
+            if (elseStatement != null) {
+                code.Add(ifBodyCode.Size + 2); // + 2 because of the jump statement
+                code.Add(ifBodyCode);
+
+                var elseCode = Visit(elseStatement);
+                code.Add(Instruction.Jump);
+                code.Add(elseCode.Size);
+                code.Add(elseCode);
+            }
+            else {
+                code.Add(ifBodyCode.Size); // + 2 because of the jump statement
+                code.Add(ifBodyCode);
+            }
+
+            return code;
+        }
+
         #endregion
 
         #region Miscellaneous statements (usually ones that wrap around expressions)

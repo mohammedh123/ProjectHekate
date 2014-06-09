@@ -86,6 +86,115 @@ namespace ProjectHekate.Grammar.Tests
         }
 
         [TestClass]
+        public class VisitIfStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyIfStatement()
+            {
+                // Setup: dummy data
+                const string expression = "if(1) {}";
+
+                // Act
+                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(4);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForIfStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"if(1) {
+    3;                                          
+}";
+
+                // Act
+                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(6);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(2);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForIfWithElseStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"if(1) {
+    3;                                          
+}
+else {
+    4;
+}";
+
+                // Act
+                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(10);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(4);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Jump);
+                result.Code[7].Should().Be(2);
+                result.Code[8].Should().Be((byte)Instruction.Push);
+                result.Code[9].Should().Be(4);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForIfWithElseIfAndElseStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"if(1) {
+    3;                                          
+}
+else if(2) {
+    4;
+}
+else {
+    5;
+}";
+
+                // Act
+                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(18);
+                result.Code[ 0].Should().Be((byte)Instruction.Push);
+                result.Code[ 1].Should().Be(1);
+                result.Code[ 2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[ 3].Should().Be(4);
+                result.Code[ 4].Should().Be((byte)Instruction.Push);
+                result.Code[ 5].Should().Be(3);
+                result.Code[ 6].Should().Be((byte)Instruction.Jump);
+                result.Code[ 7].Should().Be(10);
+                result.Code[ 8].Should().Be((byte)Instruction.Push);
+                result.Code[ 9].Should().Be(2);
+                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[11].Should().Be(4);
+                result.Code[12].Should().Be((byte)Instruction.Push);
+                result.Code[13].Should().Be(4);
+                result.Code[14].Should().Be((byte)Instruction.Jump);
+                result.Code[15].Should().Be(2);
+                result.Code[16].Should().Be((byte)Instruction.Push);
+                result.Code[17].Should().Be(5);
+            }
+        }
+
+        [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {
             [TestMethod]
