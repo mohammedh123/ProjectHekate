@@ -49,6 +49,8 @@ namespace ProjectHekate.Scripting
         public IReadOnlyList<IdentifierRecord> EmitterVariables { get; private set; }
         private readonly List<IdentifierRecord> _emitterVariables;
         private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
+
+        public int Size { get { return _code.Count; } }
         
         public CodeBlock()
         {
