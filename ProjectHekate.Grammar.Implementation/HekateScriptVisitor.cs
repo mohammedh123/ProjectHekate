@@ -174,7 +174,7 @@ namespace ProjectHekate.Grammar.Implementation
                 code.Add(elseCode);
             }
             else {
-                code.Add(ifBodyCode.Size); // + 2 because of the jump statement
+                code.Add(ifBodyCode.Size);
                 code.Add(ifBodyCode);
             }
 
