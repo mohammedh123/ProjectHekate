@@ -260,6 +260,18 @@ else {
             }
 
             [TestMethod]
+            public void ShouldThrowExceptionForIntegerOverflow()
+            {
+                // Setup
+                const string literalExpression = "9999999999999999999999999999999999999999999999999999999999999999";
+
+                // Act+Verify
+                Subject
+                    .Invoking(hsv => hsv.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression)))
+                    .ShouldThrow<OverflowException>();
+            }
+
+            [TestMethod]
             public void ShouldGenerateCodeForFloatLiteral()
             {
                 // Setup
@@ -273,6 +285,18 @@ else {
                 result.Code.Should().HaveCount(2);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(literal);
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionForFloatOverflow()
+            {
+                // Setup
+                const string literalExpression = "999999999999999999999999999999999999999999999.99999999999999999999999999999999";
+
+                // Act+Verify
+                Subject
+                    .Invoking(hsv => hsv.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression)))
+                    .ShouldThrow<OverflowException>();
             }
         }
 
