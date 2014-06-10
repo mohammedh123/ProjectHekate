@@ -195,6 +195,52 @@ else {
         }
 
         [TestClass]
+        public class VisitWhileStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyWhileStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"while(1) {}";
+
+                // Act
+                var result = Subject.VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(6);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(2);
+                result.Code[4].Should().Be((byte)Instruction.Jump);
+                result.Code[5].Should().Be(-4);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForSimpleWhileStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"while(1) {
+    3;
+}";
+
+                // Act
+                var result = Subject.VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(8);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(4);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Jump);
+                result.Code[7].Should().Be(-6);
+            }
+        }
+
+        [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {
             [TestMethod]
