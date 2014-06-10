@@ -79,7 +79,7 @@ fromEmitterOption
 	;
 
 forControl
-	:	forInit? SEMI expression? SEMI forUpdate
+	:	forInit? SEMI expression? SEMI forUpdate?
 	;
 
 forInit
