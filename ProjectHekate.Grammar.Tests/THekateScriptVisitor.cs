@@ -241,6 +241,138 @@ else {
         }
 
         [TestClass]
+        public class VisitForStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyForStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"for(;;) {}";
+
+                // Act
+                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.Jump);
+                result.Code[1].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyForStatementButWithInit()
+            {
+                // Setup: dummy data
+                const string expression = @"for(var i = 23;;) {}";
+                SetUpGetCurrentScope(new CodeBlock());
+
+                // Act
+                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(6);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(23);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+                result.Code[4].Should().Be((byte)Instruction.Jump);
+                result.Code[5].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyForStatementButWithInitAndExpression()
+            {
+                // Setup: dummy data
+                const string expression = @"for(var i = 5; i < 10;) {}";
+                SetUpGetCurrentScope(new CodeBlock());
+
+                // Act
+                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(11);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(5);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+                result.Code[4].Should().Be((byte)Instruction.GetVariable);
+                result.Code[5].Should().Be(0);
+                result.Code[6].Should().Be((byte)Instruction.Push);
+                result.Code[7].Should().Be(10);
+                result.Code[8].Should().Be((byte)Instruction.OperatorLessThan);
+                result.Code[9].Should().Be((byte)Instruction.Jump);
+                result.Code[10].Should().Be(-5);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForEmptyForStatementButWithInitExpressionAndUpdate()
+            {
+                // Setup: dummy data
+                const string expression = @"for(var i = 5; i < 10; i++) {}";
+                SetUpGetCurrentScope(new CodeBlock());
+
+                // Act
+                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(18);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(5);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+                result.Code[4].Should().Be((byte)Instruction.GetVariable);
+                result.Code[5].Should().Be(0);
+                result.Code[6].Should().Be((byte)Instruction.Push);
+                result.Code[7].Should().Be(10);
+                result.Code[8].Should().Be((byte)Instruction.OperatorLessThan);
+                result.Code[9].Should().Be((byte)Instruction.GetVariable);
+                result.Code[10].Should().Be(0);
+                result.Code[11].Should().Be((byte)Instruction.Push);
+                result.Code[12].Should().Be(1);
+                result.Code[13].Should().Be((byte)Instruction.OperatorAdd);
+                result.Code[14].Should().Be((byte)Instruction.SetVariable);
+                result.Code[15].Should().Be(0);
+                result.Code[16].Should().Be((byte)Instruction.Jump);
+                result.Code[17].Should().Be(-12);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForCompleteForStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"for(var i = 5; i < 10; i++) {
+    3;
+}";
+                SetUpGetCurrentScope(new CodeBlock());
+
+                // Act
+                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(20);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(5);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
+                result.Code[3].Should().Be(0);
+                result.Code[4].Should().Be((byte)Instruction.GetVariable);
+                result.Code[5].Should().Be(0);
+                result.Code[6].Should().Be((byte)Instruction.Push);
+                result.Code[7].Should().Be(10);
+                result.Code[8].Should().Be((byte)Instruction.OperatorLessThan);
+                result.Code[9].Should().Be((byte)Instruction.GetVariable);
+                result.Code[10].Should().Be(0);
+                result.Code[11].Should().Be((byte)Instruction.Push);
+                result.Code[12].Should().Be(1);
+                result.Code[13].Should().Be((byte)Instruction.OperatorAdd);
+                result.Code[14].Should().Be((byte)Instruction.SetVariable);
+                result.Code[15].Should().Be(0);
+                result.Code[16].Should().Be((byte)Instruction.Push);
+                result.Code[17].Should().Be(3);
+                result.Code[18].Should().Be((byte)Instruction.Jump);
+                result.Code[19].Should().Be(-14);
+            }
+        }
+
+        [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {
             [TestMethod]

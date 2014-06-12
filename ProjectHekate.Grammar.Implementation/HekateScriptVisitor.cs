@@ -208,6 +208,38 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitForStatement(HekateParser.ForStatementContext context)
+        {
+            var code = new CodeBlock();
+            var forInitCtx = context.forControl().forInit();
+            var expressionCtx = context.forControl().expression();
+            var forUpdateCtx = context.forControl().forUpdate();
+            var bodyStatement = context.statement();
+
+            // For statement code
+            // Generate code for the initialization (if there is one)
+            // Generate code for the test expression (if there is one)
+            // Generate code for the increment expressions (if there are any)
+            // Generate code for the body statement
+            // Instruction.Jump
+            // the number of instructions backwards until we get to the test expression
+
+            if (forInitCtx != null) code.Add(Visit(forInitCtx));
+
+            var codeToLoop = new CodeBlock();
+            if (expressionCtx != null) codeToLoop.Add(Visit(expressionCtx));
+            if (forUpdateCtx != null) codeToLoop.Add(Visit(forUpdateCtx));
+            codeToLoop.Add(Visit(bodyStatement));
+
+            code.Add(codeToLoop);
+
+            var numInstructionsToJumpBack = codeToLoop.Size;
+            code.Add(Instruction.Jump);
+            code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
+
+            return code;
+        }
+
         #endregion
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
@@ -252,6 +284,13 @@ namespace ProjectHekate.Grammar.Implementation
             }
 
             return code;
+        }
+
+        public override CodeBlock VisitForInit(HekateParser.ForInitContext context)
+        {
+            var isVariableDeclaration = context.variableDeclaration() != null;
+
+            return isVariableDeclaration ? Visit(context.variableDeclaration()) : Visit(context.expressionList());
         }
 
         #endregion
