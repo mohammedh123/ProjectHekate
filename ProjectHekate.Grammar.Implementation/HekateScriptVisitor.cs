@@ -105,8 +105,12 @@ namespace ProjectHekate.Grammar.Implementation
         #region Statement constructs
         public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
-            return Visit(context.expression());
-            // TODO: pop after expression statement
+            var code = new CodeBlock();
+
+            code.Add(Visit(context.expression())); // all expressions should leave a single value on the stack
+            code.Add(Instruction.Pop);
+
+            return code;
         }
 
         public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)

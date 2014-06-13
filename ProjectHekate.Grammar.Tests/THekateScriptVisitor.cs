@@ -117,13 +117,14 @@ namespace ProjectHekate.Grammar.Tests
                 var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(6);
+                result.Code.Should().HaveCount(7);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[3].Should().Be(2);
+                result.Code[3].Should().Be(3);
                 result.Code[4].Should().Be((byte)Instruction.Push);
                 result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
             }
 
             [TestMethod]
@@ -141,17 +142,19 @@ else {
                 var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(10);
+                result.Code.Should().HaveCount(12);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[3].Should().Be(4);
+                result.Code[3].Should().Be(5);
                 result.Code[4].Should().Be((byte)Instruction.Push);
                 result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte)Instruction.Jump);
-                result.Code[7].Should().Be(2);
-                result.Code[8].Should().Be((byte)Instruction.Push);
-                result.Code[9].Should().Be(4);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
+                result.Code[7].Should().Be((byte)Instruction.Jump);
+                result.Code[8].Should().Be(3);
+                result.Code[9].Should().Be((byte)Instruction.Push);
+                result.Code[10].Should().Be(4);
+                result.Code[11].Should().Be((byte)Instruction.Pop);
             }
 
             [TestMethod]
@@ -172,25 +175,28 @@ else {
                 var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(18);
-                result.Code[ 0].Should().Be((byte)Instruction.Push);
-                result.Code[ 1].Should().Be(1);
-                result.Code[ 2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[ 3].Should().Be(4);
-                result.Code[ 4].Should().Be((byte)Instruction.Push);
-                result.Code[ 5].Should().Be(3);
-                result.Code[ 6].Should().Be((byte)Instruction.Jump);
-                result.Code[ 7].Should().Be(10);
-                result.Code[ 8].Should().Be((byte)Instruction.Push);
-                result.Code[ 9].Should().Be(2);
-                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[11].Should().Be(4);
-                result.Code[12].Should().Be((byte)Instruction.Push);
-                result.Code[13].Should().Be(4);
-                result.Code[14].Should().Be((byte)Instruction.Jump);
-                result.Code[15].Should().Be(2);
-                result.Code[16].Should().Be((byte)Instruction.Push);
-                result.Code[17].Should().Be(5);
+                result.Code.Should().HaveCount(21);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(5);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
+                result.Code[7].Should().Be((byte)Instruction.Jump);
+                result.Code[8].Should().Be(12);
+                result.Code[9].Should().Be((byte)Instruction.Push);
+                result.Code[10].Should().Be(2);
+                result.Code[11].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[12].Should().Be(5);
+                result.Code[13].Should().Be((byte)Instruction.Push);
+                result.Code[14].Should().Be(4);
+                result.Code[15].Should().Be((byte)Instruction.Pop);
+                result.Code[16].Should().Be((byte)Instruction.Jump);
+                result.Code[17].Should().Be(3);
+                result.Code[18].Should().Be((byte)Instruction.Push);
+                result.Code[19].Should().Be(5);
+                result.Code[20].Should().Be((byte)Instruction.Pop);
             }
         }
 
@@ -228,15 +234,16 @@ else {
                 var result = Subject.VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(8);
+                result.Code.Should().HaveCount(9);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[3].Should().Be(4);
+                result.Code[3].Should().Be(5);
                 result.Code[4].Should().Be((byte)Instruction.Push);
                 result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte)Instruction.Jump);
-                result.Code[7].Should().Be(-6);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
+                result.Code[7].Should().Be((byte)Instruction.Jump);
+                result.Code[8].Should().Be(-7);
             }
         }
 
@@ -348,7 +355,7 @@ else {
                 var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
 
                 // Verify
-                result.Code.Should().HaveCount(20);
+                result.Code.Should().HaveCount(21);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(5);
                 result.Code[2].Should().Be((byte)Instruction.SetVariable);
@@ -367,8 +374,9 @@ else {
                 result.Code[15].Should().Be(0);
                 result.Code[16].Should().Be((byte)Instruction.Push);
                 result.Code[17].Should().Be(3);
-                result.Code[18].Should().Be((byte)Instruction.Jump);
-                result.Code[19].Should().Be(-14);
+                result.Code[18].Should().Be((byte)Instruction.Pop);
+                result.Code[19].Should().Be((byte)Instruction.Jump);
+                result.Code[20].Should().Be(-15);
             }
         }
 
