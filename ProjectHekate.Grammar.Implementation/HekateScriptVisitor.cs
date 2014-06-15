@@ -156,15 +156,15 @@ namespace ProjectHekate.Grammar.Implementation
 
             // If statement code
             // Generate parExpression code
-            // Instruction.JumpIfZero
+            // Instruction.JumpOffsetIfZero
             // The offset to jump if the parExpression is 0 (size of statement)
             // Generate expression code for statement
-            // Instruction.Jump if needed
+            // Instruction.JumpOffset if needed
             // offset to jump if needed
             // Generate code for statement (if it exists)
 
             code.Add(Visit(context.parExpression()));
-            code.Add(Instruction.JumpIfZero);
+            code.Add(Instruction.JumpOffsetIfZero);
 
             var ifBodyCode = Visit(ifBodyStatement);
 
@@ -173,7 +173,7 @@ namespace ProjectHekate.Grammar.Implementation
                 code.Add(ifBodyCode);
 
                 var elseCode = Visit(elseStatement);
-                code.Add(Instruction.Jump);
+                code.Add(Instruction.JumpOffset);
                 code.Add(elseCode.Size);
                 code.Add(elseCode);
             }
@@ -198,7 +198,7 @@ namespace ProjectHekate.Grammar.Implementation
             // Generate code for the test expression (if there is one)
             // Generate code for the increment expressions (if there are any)
             // Generate code for the body statement
-            // Instruction.Jump
+            // Instruction.JumpOffset
             // the number of instructions backwards until we get to the test expression
 
             if (forInitCtx != null) code.Add(Visit(forInitCtx));
@@ -211,7 +211,7 @@ namespace ProjectHekate.Grammar.Implementation
             code.Add(codeToLoop);
 
             var numInstructionsToJumpBack = codeToLoop.Size;
-            code.Add(Instruction.Jump);
+            code.Add(Instruction.JumpOffset);
             code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
 
             return code;
@@ -224,21 +224,21 @@ namespace ProjectHekate.Grammar.Implementation
 
             // While statement code
             // Generate code for parExpression
-            // Instruction.JumpIfZero
+            // Instruction.JumpOffsetIfZero
             // The offset to jump if the parExpression is 0 (size of statement)
             // Generate expression code for statement
-            // Instruction.Jump
+            // Instruction.JumpOffset
             // offset to jump (should be negative, from the jump instruction back to the beginning of the codeblock
 
             code.Add(Visit(context.parExpression()));
-            code.Add(Instruction.JumpIfZero);
+            code.Add(Instruction.JumpOffsetIfZero);
 
             var bodyCode = Visit(whileBodyStatement);
             code.Add(bodyCode.Size + 2); // + 2 because of the jump statement
             code.Add(bodyCode);
 
             var numInstructionsToJumpBack = code.Size;
-            code.Add(Instruction.Jump);
+            code.Add(Instruction.JumpOffset);
             code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
 
             return code;
