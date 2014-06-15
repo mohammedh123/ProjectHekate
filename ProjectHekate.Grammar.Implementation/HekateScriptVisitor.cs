@@ -185,33 +185,6 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitWhileStatement(HekateParser.WhileStatementContext context)
-        {
-            var code = new CodeBlock();
-            var whileBodyStatement = context.statement();
-
-            // While statement code
-            // Generate code for parExpression
-            // Instruction.JumpIfZero
-            // The offset to jump if the parExpression is 0 (size of statement)
-            // Generate expression code for statement
-            // Instruction.Jump
-            // offset to jump (should be negative, from the jump instruction back to the beginning of the codeblock
-
-            code.Add(Visit(context.parExpression()));
-            code.Add(Instruction.JumpIfZero);
-
-            var bodyCode = Visit(whileBodyStatement);
-            code.Add(bodyCode.Size + 2); // + 2 because of the jump statement
-            code.Add(bodyCode);
-
-            var numInstructionsToJumpBack = code.Size;
-            code.Add(Instruction.Jump);
-            code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
-
-            return code;
-        }
-
         public override CodeBlock VisitForStatement(HekateParser.ForStatementContext context)
         {
             var code = new CodeBlock();
@@ -238,6 +211,33 @@ namespace ProjectHekate.Grammar.Implementation
             code.Add(codeToLoop);
 
             var numInstructionsToJumpBack = codeToLoop.Size;
+            code.Add(Instruction.Jump);
+            code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
+
+            return code;
+        }
+
+        public override CodeBlock VisitWhileStatement(HekateParser.WhileStatementContext context)
+        {
+            var code = new CodeBlock();
+            var whileBodyStatement = context.statement();
+
+            // While statement code
+            // Generate code for parExpression
+            // Instruction.JumpIfZero
+            // The offset to jump if the parExpression is 0 (size of statement)
+            // Generate expression code for statement
+            // Instruction.Jump
+            // offset to jump (should be negative, from the jump instruction back to the beginning of the codeblock
+
+            code.Add(Visit(context.parExpression()));
+            code.Add(Instruction.JumpIfZero);
+
+            var bodyCode = Visit(whileBodyStatement);
+            code.Add(bodyCode.Size + 2); // + 2 because of the jump statement
+            code.Add(bodyCode);
+
+            var numInstructionsToJumpBack = code.Size;
             code.Add(Instruction.Jump);
             code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
 
