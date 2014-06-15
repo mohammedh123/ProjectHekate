@@ -3,17 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
 
 namespace ProjectHekate.Grammar.Implementation
 {
-    public interface IScopeManager
-    {
-        void Add(CodeBlock scope);
-        void Remove();
-        CodeBlock GetCurrentScope();
-    }
-
     class StackScopeManager : IScopeManager
     {
         private readonly Stack<CodeBlock> _scopeStack;

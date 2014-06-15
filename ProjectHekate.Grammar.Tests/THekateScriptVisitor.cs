@@ -9,6 +9,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ProjectHekate.Grammar.Implementation;
+using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
 
 namespace ProjectHekate.Grammar.Tests
