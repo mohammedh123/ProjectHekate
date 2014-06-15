@@ -379,7 +379,26 @@ else {
                 result.Code[8].Should().Be(-7);
             }
         }
-        
+
+        [TestClass]
+        public class VisitBreakStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForBreakStatementBecauseOfDummyJumpValue()
+            {
+                // Setup: dummy data
+                const string expression = @"break;";
+
+                // Act
+                var result = Subject.VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression));
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.JumpOffset);
+                result.Code[1].Should().Be(0);
+            }
+        }
+
         [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {

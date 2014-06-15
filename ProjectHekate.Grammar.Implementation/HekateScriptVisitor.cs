@@ -244,6 +244,22 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
+        public override CodeBlock VisitBreakStatement(HekateParser.BreakStatementContext context)
+        {
+            var code = new CodeBlock();
+
+            // Break statement
+            // Instruction.JumpOffset
+            // {0}, used as a dummy value; the enclosing loop construct must take care of replacing 
+            //      the dummy value with the actual size of the construct's code block
+            // add a break to the list of breakStatements in the visitor
+
+            code.Add(Instruction.JumpOffset);
+            code.Add((byte)0);
+
+            return code;
+        }
+
         #endregion
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
