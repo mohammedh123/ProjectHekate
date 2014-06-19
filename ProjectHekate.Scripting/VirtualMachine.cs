@@ -51,7 +51,13 @@ namespace ProjectHekate.Scripting
         private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
 
         public int Size { get { return _code.Count; } }
-        
+
+        public float this[int idx]
+        {
+            get { return Code[idx]; }
+            set { _code[idx] = value; }
+        }
+
         public CodeBlock()
         {
             _code = new List<float>();
@@ -221,7 +227,8 @@ namespace ProjectHekate.Scripting
         IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; }
         IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; }
         IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; }
-        IReadOnlyList<IdentifierRecord> PropertyRecords { get; } 
+        IReadOnlyList<IdentifierRecord> PropertyRecords { get; }
+        CodeBlock CurrentCode { get; set; }
 
         /// <summary>
         /// Adds a function code block to the virtual machine.
@@ -305,6 +312,7 @@ namespace ProjectHekate.Scripting
         public IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; private set; }
         public IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; private set; }
         public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
+        public CodeBlock CurrentCode { get; set; }
 
         private readonly List<FunctionCodeBlock> _functionCodeBlocks;
         private readonly List<BulletUpdaterCodeBlock> _bulletUpdaterCodeBlocks;

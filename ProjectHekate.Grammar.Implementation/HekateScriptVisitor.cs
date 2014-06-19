@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Grammar.Implementation.Instructions.Expressions;
 using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
 
@@ -13,10 +14,22 @@ namespace ProjectHekate.Grammar.Implementation
         private readonly IVirtualMachine _virtualMachine;
         private readonly IScopeManager _scopeManager;
 
+        // These two stack's of lists are used to replace the dummy values for jumps/continues
+        //  with the actual size of the enclosing loop constructs they should be in
+        // When a loop construct 'begins', it should add an empty list to each of these
+        // When a loop construct completes adding its code in its entirety, it should:
+        //  1. Pop the top of the stack
+        //  2. Iterate over each list and replace code[location] with the appropriate jump offset
+        private readonly Stack<List<uint>> _breakLocations;
+        private readonly Stack<List<uint>> _continueLocations;
+
         public HekateScriptVisitor(IVirtualMachine virtualMachine, IScopeManager scopeManager)
         {
             _virtualMachine = virtualMachine;
             _scopeManager = scopeManager;
+
+            _breakLocations = new Stack<List<uint>>();
+            _continueLocations = new Stack<List<uint>>();
         }
 
         #region Top-level constructs
@@ -34,6 +47,18 @@ namespace ProjectHekate.Grammar.Implementation
             return null; // TODO: WHAT THE FUCK?
         }
 
+        private void AddNewScope(CodeBlock codeBlock)
+        {
+            _scopeManager.Add(codeBlock);
+            _virtualMachine.CurrentCode = codeBlock;
+        }
+
+        private void RemoveMostRecentScope()
+        {
+            _scopeManager.Remove();
+            _virtualMachine.CurrentCode = null;
+        }
+
         public override CodeBlock VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
@@ -43,11 +68,11 @@ namespace ProjectHekate.Grammar.Implementation
 
 
             var eUpdaterCodeBlock = new EmitterUpdaterCodeBlock(paramNames);
-            _scopeManager.Add(eUpdaterCodeBlock);
+            AddNewScope(eUpdaterCodeBlock);
             foreach (var child in context.children) {
                 eUpdaterCodeBlock.Add(Visit(child));
             }
-            _scopeManager.Remove();
+            RemoveMostRecentScope();
 
             // done, now add to the pool of emitter updater records
             _virtualMachine.AddEmitterUpdaterCodeBlock(name, eUpdaterCodeBlock);
@@ -64,12 +89,12 @@ namespace ProjectHekate.Grammar.Implementation
 
 
             var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
-            _scopeManager.Add(bUpdaterCodeBlock);
+            AddNewScope(bUpdaterCodeBlock);
             foreach (var child in context.children)
             {
                 bUpdaterCodeBlock.Add(Visit(child));
             }
-            _scopeManager.Remove();
+            RemoveMostRecentScope();
 
             // done, now add to the pool of bullet updater records
             _virtualMachine.AddBulletUpdaterCodeBlock(name, bUpdaterCodeBlock);
@@ -86,12 +111,12 @@ namespace ProjectHekate.Grammar.Implementation
 
 
             var funcCodeBlock = new FunctionCodeBlock(paramNames);
-            _scopeManager.Add(funcCodeBlock);
+            AddNewScope(funcCodeBlock);
             foreach (var child in context.children)
             {
                 funcCodeBlock.Add(Visit(child));
             }
-            _scopeManager.Remove();
+            RemoveMostRecentScope();
 
             // done, now add to the pool of function records
             _virtualMachine.AddFunctionCodeBlock(name, funcCodeBlock);
@@ -223,6 +248,9 @@ namespace ProjectHekate.Grammar.Implementation
             var code = new CodeBlock();
             var whileBodyStatement = context.statement();
 
+            _breakLocations.Push(new List<uint>());
+            _continueLocations.Push(new List<uint>());
+
             // While statement code
             // Generate code for parExpression
             // Instruction.JumpOffsetIfZero
@@ -241,7 +269,7 @@ namespace ProjectHekate.Grammar.Implementation
             var numInstructionsToJumpBack = code.Size;
             code.Add(Instruction.JumpOffset);
             code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
-
+            
             return code;
         }
 
@@ -257,6 +285,8 @@ namespace ProjectHekate.Grammar.Implementation
 
             code.Add(Instruction.JumpOffset);
             code.Add((byte)0);
+
+            _breakLocations.Peek().Add();
 
             return code;
         }
@@ -321,14 +351,12 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override CodeBlock VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
         {
-            var code = new CodeBlock();
             var text = context.GetText();
             var value = float.Parse(text);
 
-            code.Add(Instruction.Push);
-            code.Add(value);
+            new LiteralExpressionInstruction(value).EmitOn(_virtualMachine, _scopeManager);
 
-            return code;
+            return _virtualMachine.CurrentCode;
         }
 
         public override CodeBlock VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
