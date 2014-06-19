@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Antlr4.Runtime.Tree;
 using ProjectHekate.Grammar.Implementation.Instructions.Expressions;
 using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
@@ -62,15 +63,13 @@ namespace ProjectHekate.Grammar.Implementation
         public override CodeBlock VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
-
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-
-
             var eUpdaterCodeBlock = new EmitterUpdaterCodeBlock(paramNames);
+
             AddNewScope(eUpdaterCodeBlock);
             foreach (var child in context.children) {
-                eUpdaterCodeBlock.Add(Visit(child));
+                Visit(child);
             }
             RemoveMostRecentScope();
 
@@ -83,16 +82,13 @@ namespace ProjectHekate.Grammar.Implementation
         public override CodeBlock VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
-
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-
-
             var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
+
             AddNewScope(bUpdaterCodeBlock);
-            foreach (var child in context.children)
-            {
-                bUpdaterCodeBlock.Add(Visit(child));
+            foreach (var child in context.children) {
+                Visit(child);
             }
             RemoveMostRecentScope();
 
@@ -105,16 +101,13 @@ namespace ProjectHekate.Grammar.Implementation
         public override CodeBlock VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
-
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-
-
             var funcCodeBlock = new FunctionCodeBlock(paramNames);
+
             AddNewScope(funcCodeBlock);
-            foreach (var child in context.children)
-            {
-                funcCodeBlock.Add(Visit(child));
+            foreach (var child in context.children) {
+                Visit(child);
             }
             RemoveMostRecentScope();
 
@@ -126,8 +119,8 @@ namespace ProjectHekate.Grammar.Implementation
 
 
         #endregion
-
-
+      
+  
         #region Statement constructs
         public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
@@ -292,6 +285,7 @@ namespace ProjectHekate.Grammar.Implementation
         }
 
         #endregion
+
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
         
@@ -595,6 +589,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         #endregion
 
+
+        #region Miscellaneous helper functions
+
         private CodeBlock GenerateCodeForValueOfVariable(string name)
         {
             var scope = _scopeManager.GetCurrentScope();
@@ -617,5 +614,7 @@ namespace ProjectHekate.Grammar.Implementation
 
             return code;
         }
+
+        #endregion
     }
 }
