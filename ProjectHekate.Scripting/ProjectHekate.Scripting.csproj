@@ -59,6 +59,10 @@
   <ItemGroup>
     <Compile Include="InstructionEnum.cs" />
     <Compile Include="EmitterScriptState.cs" />
+    <Compile Include="Instructions\Expressions\LiteralExpressionInstruction.cs" />
+    <Compile Include="Interfaces\IInstruction.cs" />
+    <Compile Include="Interfaces\IScopeManager.cs" />
+    <Compile Include="StackScopeManager.cs" />
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

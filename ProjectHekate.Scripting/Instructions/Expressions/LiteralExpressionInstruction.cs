@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ProjectHekate.Grammar.Implementation.Interfaces;
-using ProjectHekate.Scripting;
+﻿using ProjectHekate.Scripting.Interfaces;
 
-namespace ProjectHekate.Grammar.Implementation.Instructions.Expressions
+namespace ProjectHekate.Scripting.Instructions.Expressions
 {
     class LiteralExpressionInstruction : IInstruction
     {

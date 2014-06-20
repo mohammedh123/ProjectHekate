@@ -1,6 +1,4 @@
-using ProjectHekate.Scripting;
-
-namespace ProjectHekate.Grammar.Implementation.Interfaces
+namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IScopeManager
     {

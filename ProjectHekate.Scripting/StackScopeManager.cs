@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ProjectHekate.Grammar.Implementation.Interfaces;
-using ProjectHekate.Scripting;
+﻿using System.Collections.Generic;
+using ProjectHekate.Scripting.Interfaces;
 
-namespace ProjectHekate.Grammar.Implementation
+namespace ProjectHekate.Scripting
 {
     class StackScopeManager : IScopeManager
     {

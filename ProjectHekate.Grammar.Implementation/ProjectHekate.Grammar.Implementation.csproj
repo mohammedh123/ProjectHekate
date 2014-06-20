@@ -84,11 +84,7 @@
     </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="HekateScriptVisitor.cs" />
-    <Compile Include="Instructions\Expressions\LiteralExpressionInstruction.cs" />
-    <Compile Include="Interfaces\IInstruction.cs" />
-    <Compile Include="Interfaces\IScopeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StackScopeManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
