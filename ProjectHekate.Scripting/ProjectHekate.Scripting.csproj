@@ -57,6 +57,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BulletUpdaterCodeScope.cs" />
+    <Compile Include="CodeScope.cs" />
+    <Compile Include="EmitterUpdaterCodeScope.cs" />
+    <Compile Include="FunctionCodeScope.cs" />
+    <Compile Include="IdentifierRecord.cs" />
+    <Compile Include="IdentifierTypeEnum.cs" />
     <Compile Include="InstructionEnum.cs" />
     <Compile Include="EmitterScriptState.cs" />
     <Compile Include="Instructions\Expressions\LiteralExpressionBytecodeGenerator.cs" />
