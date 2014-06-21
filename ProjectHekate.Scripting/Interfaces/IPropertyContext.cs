@@ -20,7 +20,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// </summary>
         /// <param name="name"></param>
         /// <returns>Returns the identifier record of the property with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a property with that name does not exist</exception>
+        /// <exception cref="System.ArgumentException">Thrown when a property with that name does not exist</exception>
         IdentifierRecord GetProperty(string name);
     }
 }
