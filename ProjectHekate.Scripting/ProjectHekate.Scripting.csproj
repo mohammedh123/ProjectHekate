@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractBytecodeEmitter.cs" />
     <Compile Include="BulletUpdaterCodeScope.cs" />
     <Compile Include="CodeScope.cs" />
     <Compile Include="EmitterUpdaterCodeScope.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="InstructionEnum.cs" />
     <Compile Include="EmitterScriptState.cs" />
     <Compile Include="Instructions\Expressions\LiteralExpressionBytecodeGenerator.cs" />
+    <Compile Include="Interfaces\IBytecodeEmitter.cs" />
     <Compile Include="Interfaces\IBytecodeGenerator.cs" />
     <Compile Include="Interfaces\ICodeBlock.cs" />
     <Compile Include="Interfaces\IPropertyContext.cs" />
