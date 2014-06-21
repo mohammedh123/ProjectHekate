@@ -7,8 +7,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <summary>
         /// The index of the codeblock in its enclosed collection.
         /// </summary>
-        int Index { get; }
-
+        int Index { get; set; }
         int Size { get; }
         IReadOnlyList<float> Code { get; }
         float this[int idx] { get; set; }
