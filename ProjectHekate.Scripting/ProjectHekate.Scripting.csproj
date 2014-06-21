@@ -62,7 +62,7 @@
     <Compile Include="Instructions\Expressions\LiteralExpressionBytecodeGenerator.cs" />
     <Compile Include="Interfaces\IBytecodeGenerator.cs" />
     <Compile Include="Interfaces\ICodeBlock.cs" />
-    <Compile Include="Interfaces\IPropertyManager.cs" />
+    <Compile Include="Interfaces\IPropertyContext.cs" />
     <Compile Include="Interfaces\IScopeManager.cs" />
     <Compile Include="Interfaces\IVariableContext.cs" />
     <Compile Include="Interfaces\IVirtualMachine.cs" />

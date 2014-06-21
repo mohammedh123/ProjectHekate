@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
-    public interface IPropertyManager
+    public interface IPropertyContext
     {
         IReadOnlyList<IdentifierRecord> PropertyRecords { get; }
 

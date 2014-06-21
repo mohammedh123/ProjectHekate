@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
-    public interface IVirtualMachine : IPropertyManager
+    public interface IVirtualMachine : IPropertyContext
     {
         IReadOnlyList<FunctionCodeScope> FunctionCodeBlocks { get; }
         IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeBlocks { get; }
