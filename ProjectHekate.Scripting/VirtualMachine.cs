@@ -35,9 +35,65 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    public class CodeBlock
+    public interface ICodeBlock
     {
-        public int Index { get; set;  }
+        /// <summary>
+        /// The index of the codeblock in its enclosed collection.
+        /// </summary>
+        int Index { get; }
+
+        int Size { get; }
+        IReadOnlyList<float> Code { get; }
+        float this[int idx] { get; set; }
+
+        void Add(Instruction inst);
+        void Add(byte b);
+        void Add(ICodeBlock block);
+        void Add(float f);
+    }
+
+    public interface IVariableContext
+    {
+        IReadOnlyList<IdentifierRecord> NumericalVariables { get; }
+        IReadOnlyList<IdentifierRecord> EmitterVariables { get; }
+
+        /// <summary>
+        /// Adds a numerical variable to the code record.
+        /// </summary>
+        /// <param name="name">The name of the variable</param>
+        /// <returns>Returns the index of the identifier</returns>
+        /// <exception cref="System.ArgumentException">Thrown when an identifier with that name already exists</exception>
+        int AddNumericalVariable(string name);
+
+        /// <summary>
+        /// Gets the numerical variable with a given name.
+        /// </summary>
+        /// <param name="name">The name of the variable</param>
+        /// <returns>Returns the identifier record belong to the numerical variable with the given name</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a variable with that name does not exist</exception>
+        IdentifierRecord GetNumericalVariable(string name);
+
+        /// <summary>
+        /// Adds a emitter variable to the code record.
+        /// </summary>
+        /// <param name="name">The name of the variable</param>
+        /// <returns>Returns the index of the variable</returns>
+        /// <exception cref="System.ArgumentException">Thrown when an variable with that name already exists</exception>
+        int AddEmitterVariable(string name);
+
+        /// <summary>
+        /// Gets the emitter variable with a given name.
+        /// </summary>
+        /// <param name="name">The name of the variable</param>
+        /// <returns>Returns the identifier record belonging to the emitter with the given name</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a variable with that name does not exist</exception>
+        IdentifierRecord GetEmitterVariable(string name);
+    }
+
+    public class CodeScope : ICodeBlock, IVariableContext
+    {
+        public int Index { get; set; }
+        public int Size { get { return _code.Count; } }
 
         public IReadOnlyList<float> Code { get; private set; }
         private readonly List<float> _code;
@@ -50,7 +106,6 @@ namespace ProjectHekate.Scripting
         private readonly List<IdentifierRecord> _emitterVariables;
         private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
 
-        public int Size { get { return _code.Count; } }
 
         public float this[int idx]
         {
@@ -58,7 +113,7 @@ namespace ProjectHekate.Scripting
             set { _code[idx] = value; }
         }
 
-        public CodeBlock()
+        public CodeScope()
         {
             _code = new List<float>();
             Code = _code.AsReadOnly();
@@ -83,7 +138,7 @@ namespace ProjectHekate.Scripting
             _code.Add(b);
         }
 
-        public void Add(CodeBlock block)
+        public void Add(ICodeBlock block)
         {
             if(block == null) throw new ArgumentNullException("block");
 
@@ -95,45 +150,21 @@ namespace ProjectHekate.Scripting
             _code.Add(f);
         }
 
-        /// <summary>
-        /// Adds a numerical variable to the code record.
-        /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <returns>Returns the index of the identifier</returns>
-        /// <exception cref="System.ArgumentException">Thrown when an identifier with that name already exists</exception>
         public int AddNumericalVariable(string name)
         {
             return AddIdentifierToList(name, _numericalVariables, _numericalVariablesNameToIndex);
         }
 
-        /// <summary>
-        /// Gets the numerical variable with a given name.
-        /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <returns>Returns the identifier record belong to the numerical variable with the given name</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a variable with that name does not exist</exception>
         public IdentifierRecord GetNumericalVariable(string name)
         {
             return GetSpecificIdentifier(name, _numericalVariables, _numericalVariablesNameToIndex);
         }
 
-        /// <summary>
-        /// Adds a emitter variable to the code record.
-        /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <returns>Returns the index of the variable</returns>
-        /// <exception cref="System.ArgumentException">Thrown when an variable with that name already exists</exception>
         public int AddEmitterVariable(string name)
         {
             return AddIdentifierToList(name, _emitterVariables, _emitterVariablesNameToIndex);
         }
 
-        /// <summary>
-        /// Gets the emitter variable with a given name.
-        /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <returns>Returns the identifier record belonging to the emitter with the given name</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a variable with that name does not exist</exception>
         public IdentifierRecord GetEmitterVariable(string name)
         {
             return GetSpecificIdentifier(name, _emitterVariables, _emitterVariablesNameToIndex);
@@ -164,9 +195,9 @@ namespace ProjectHekate.Scripting
         }
     }
     
-    public class FunctionCodeBlock : CodeBlock
+    public class FunctionCodeScope : CodeScope
     {
-        public FunctionCodeBlock(IEnumerable<string> paramNames)
+        public FunctionCodeScope(IEnumerable<string> paramNames)
         {
             // the parameters are added as local variables
             foreach(var paramName in paramNames) {
@@ -175,9 +206,9 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    public class BulletUpdaterCodeBlock : CodeBlock
+    public class BulletUpdaterCodeScope : CodeScope
     {
-        public BulletUpdaterCodeBlock(IEnumerable<string> paramNames)
+        public BulletUpdaterCodeScope(IEnumerable<string> paramNames)
         {
             // the parameters are added as local variables
             foreach(var paramName in paramNames) {
@@ -186,119 +217,15 @@ namespace ProjectHekate.Scripting
         }
     }
 
-    public class EmitterUpdaterCodeBlock : CodeBlock
+    public class EmitterUpdaterCodeScope : CodeScope
     {
-        public EmitterUpdaterCodeBlock(IEnumerable<string> paramNames)
+        public EmitterUpdaterCodeScope(IEnumerable<string> paramNames)
         {
             // the parameters are added as local variables
             foreach(var paramName in paramNames) {
                 AddNumericalVariable(paramName);
             }
         }
-    }
-
-    public class ScriptState
-    {
-        public int CurrentInstructionIndex { get; set; }
-        public int CodeBlockIndex { get; set; }
-
-        public IReadOnlyList<float> NumericalVariables { get; set; }
-        public IReadOnlyList<object> EmitterVariables { get; set; } // TODO: change this to SOMETHING else
-        public IReadOnlyList<float> Properties { get; set; }  
-
-        private float[] _numericalVariables;
-        private object[] _emitterVariables; // TODO: change this to SOMETHING else
-        private float[] _properties;
-
-        public ScriptState()
-        {
-            _numericalVariables = new float[VirtualMachine.MaxNumericalVariables];
-            _emitterVariables = new object[VirtualMachine.MaxEmitterVariables];
-            _properties = new float[VirtualMachine.MaxProperties];
-
-            NumericalVariables = Array.AsReadOnly(_numericalVariables);
-            EmitterVariables = Array.AsReadOnly(_emitterVariables);
-            Properties = Array.AsReadOnly(_properties);
-        }
-    }
-
-    public interface IVirtualMachine
-    {
-        IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; }
-        IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; }
-        IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; }
-        IReadOnlyList<IdentifierRecord> PropertyRecords { get; }
-        CodeBlock CurrentCode { get; set; }
-
-        /// <summary>
-        /// Adds a function code block to the virtual machine.
-        /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
-        /// <param name="codeBlock">The function code block</param>
-        /// <returns>Returns the index of the function code block (also populates the Index property of the code block)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a function with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the function has already been added, but with a different name</exception>
-        int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock);
-
-        /// <summary>
-        /// Gets a function code block by name if it exists.
-        /// </summary>
-        /// <param name="name">The name of the function code block</param>
-        /// <returns>The function code block mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a function with that name does not exist</exception>
-        FunctionCodeBlock GetFunctionCodeBlock(string name);
-
-        /// <summary>
-        /// Adds a bullet updater code block to the virtual machine.
-        /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
-        /// <param name="codeBlock">The bullet updater code block</param>
-        /// <returns>Returns the index of the bullet updater code block (also populates the Index property of the code block)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
-        int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock);
-
-        /// <summary>
-        /// Gets a bullet updater code block by name if it exists.
-        /// </summary>
-        /// <param name="name">The name of the bullet updater code block</param>
-        /// <returns>The bullet updater code block mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a bullet updater with that name does not exist</exception>
-        BulletUpdaterCodeBlock GetBulletUpdaterCodeBlock(string name);
-
-        /// <summary>
-        /// Adds an emitter updater code block to the program code block.
-        /// </summary>
-        /// <param name="name">The name of the emitter updater</param>
-        /// <param name="codeBlock">The code block for the emitter updater</param>
-        /// <returns>Returns the index of the emitter updater code block (also populates the Index property of the codeBlock)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the emitter updater has already been added, but with a different name</exception>
-        int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock);
-
-        /// <summary>
-        /// Gets a emitter updater code block by name if it exists.
-        /// </summary>
-        /// <param name="name">The name of the emitter updater code block</param>
-        /// <returns>The emitter updater code block mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
-        EmitterUpdaterCodeBlock GetEmitterUpdaterCodeBlock(string name);
-
-        /// <summary>
-        /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
-        /// </summary>
-        /// <param name="name">The name of the property</param>
-        /// <returns>Returns the index of the property</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
-        int AddProperty(string name);
-
-        /// <summary>
-        /// Gets a property.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns>Returns the identifier record of the property with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a property with that name does not exist</exception>
-        IdentifierRecord GetProperty(string name);
     }
 
     public class VirtualMachine : IVirtualMachine
@@ -308,15 +235,15 @@ namespace ProjectHekate.Scripting
         public const int MaxProperties = 32;
 
 
-        public IReadOnlyList<FunctionCodeBlock> FunctionCodeBlocks { get; private set; }
-        public IReadOnlyList<BulletUpdaterCodeBlock> BulletUpdaterCodeBlocks { get; private set; }
-        public IReadOnlyList<EmitterUpdaterCodeBlock> EmitterUpdaterCodeBlocks { get; private set; }
+        public IReadOnlyList<FunctionCodeScope> FunctionCodeBlocks { get; private set; }
+        public IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeBlocks { get; private set; }
+        public IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeBlocks { get; private set; }
         public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
-        public CodeBlock CurrentCode { get; set; }
+        public CodeScope CurrentCode { get; set; }
 
-        private readonly List<FunctionCodeBlock> _functionCodeBlocks;
-        private readonly List<BulletUpdaterCodeBlock> _bulletUpdaterCodeBlocks;
-        private readonly List<EmitterUpdaterCodeBlock> _emitterUpdaterCodeBlocks;
+        private readonly List<FunctionCodeScope> _functionCodeBlocks;
+        private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeBlocks;
+        private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeBlocks;
         private readonly List<IdentifierRecord> _propertyRecords;
         private readonly Dictionary<string, int> _functionCodeBlockNameToIndex;
         private readonly Dictionary<string, int> _bulletUpdaterCodeBlockNameToIndex;
@@ -325,13 +252,13 @@ namespace ProjectHekate.Scripting
 
         public VirtualMachine()
         {
-            _functionCodeBlocks = new List<FunctionCodeBlock>();
+            _functionCodeBlocks = new List<FunctionCodeScope>();
             _functionCodeBlockNameToIndex = new Dictionary<string, int>();
 
-            _bulletUpdaterCodeBlocks = new List<BulletUpdaterCodeBlock>();
+            _bulletUpdaterCodeBlocks = new List<BulletUpdaterCodeScope>();
             _bulletUpdaterCodeBlockNameToIndex = new Dictionary<string, int>();
 
-            _emitterUpdaterCodeBlocks = new List<EmitterUpdaterCodeBlock>();
+            _emitterUpdaterCodeBlocks = new List<EmitterUpdaterCodeScope>();
             _emitterUpdaterCodeBlockNameToIndex = new Dictionary<string, int>();
 
             _propertyRecords = new List<IdentifierRecord>();
@@ -343,32 +270,32 @@ namespace ProjectHekate.Scripting
             PropertyRecords = _propertyRecords.AsReadOnly();
         }
 
-        public int AddFunctionCodeBlock(string name, FunctionCodeBlock codeBlock)
+        public int AddFunctionCodeBlock(string name, FunctionCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _functionCodeBlocks, _functionCodeBlockNameToIndex, codeBlock);
+            return AddSpecializedCodeBlock(name, _functionCodeBlocks, _functionCodeBlockNameToIndex, codeScope);
         }
 
-        public FunctionCodeBlock GetFunctionCodeBlock(string name)
+        public FunctionCodeScope GetFunctionCodeBlock(string name)
         {
             return GetSpecializedCodeBlock(name, "function", _functionCodeBlocks, _functionCodeBlockNameToIndex);
         }
 
-        public int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeBlock codeBlock)
+        public int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex, codeBlock);
+            return AddSpecializedCodeBlock(name, _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex, codeScope);
         }
 
-        public BulletUpdaterCodeBlock GetBulletUpdaterCodeBlock(string name)
+        public BulletUpdaterCodeScope GetBulletUpdaterCodeBlock(string name)
         {
             return GetSpecializedCodeBlock(name, "bullet updater", _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex);
         }
 
-        public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeBlock codeBlock)
+        public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeBlock);
+            return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeScope);
         }
 
-        public EmitterUpdaterCodeBlock GetEmitterUpdaterCodeBlock(string name)
+        public EmitterUpdaterCodeScope GetEmitterUpdaterCodeBlock(string name)
         {
             return GetSpecializedCodeBlock(name, "emitter updater", _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex);
         }
@@ -391,7 +318,7 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeBlock(name, "property", _propertyRecords, _propertyNameToIndex);
         }
 
-        private int AddSpecializedCodeBlock<TCodeBlockType>(string name, ICollection<TCodeBlockType> codeBlockList, IDictionary<string,int> codeBlockNameToIndexMap, TCodeBlockType codeBlock) where TCodeBlockType : CodeBlock
+        private int AddSpecializedCodeBlock<TCodeBlockType>(string name, ICollection<TCodeBlockType> codeBlockList, IDictionary<string,int> codeBlockNameToIndexMap, TCodeBlockType codeBlock) where TCodeBlockType : CodeScope
         {
             // TODO: make method thread-safe
             ThrowIfCodeBlockWithNameAlreadyExists(name);
@@ -422,14 +349,14 @@ namespace ProjectHekate.Scripting
                 throw new ArgumentException("An emitter updater with the name \"" + name + "\" already exists in this script.", "name");
         }
 
-        private void ThrowIfCodeBlockAlreadyExists(CodeBlock codeBlock)
+        private void ThrowIfCodeBlockAlreadyExists(CodeScope codeScope)
         {
-            if (_functionCodeBlocks.Contains(codeBlock))
-                throw new ArgumentException("This code block has already been added, but with a different name (as a function).", "codeBlock");
-            if (_bulletUpdaterCodeBlocks.Contains(codeBlock))
-                throw new ArgumentException("This code block has already been added, but with a different name (as a bullet updater).", "codeBlock");
-            if (_emitterUpdaterCodeBlocks.Contains(codeBlock))
-                throw new ArgumentException("This code block has already been added, but with a different name (as an emitter updater).", "codeBlock");
+            if (_functionCodeBlocks.Contains(codeScope))
+                throw new ArgumentException("This code scope has already been added, but with a different name (as a function).", "codeScope");
+            if (_bulletUpdaterCodeBlocks.Contains(codeScope))
+                throw new ArgumentException("This code scope has already been added, but with a different name (as a bullet updater).", "codeScope");
+            if (_emitterUpdaterCodeBlocks.Contains(codeScope))
+                throw new ArgumentException("This code scope has already been added, but with a different name (as an emitter updater).", "codeScope");
         }
     }
 }

@@ -2,8 +2,8 @@ namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IScopeManager
     {
-        void Add(CodeBlock scope);
+        void Add(CodeScope scope);
         void Remove();
-        CodeBlock GetCurrentScope();
+        CodeScope GetCurrentScope();
     }
 }

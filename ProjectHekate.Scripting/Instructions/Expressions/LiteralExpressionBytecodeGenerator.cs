@@ -2,11 +2,11 @@
 
 namespace ProjectHekate.Scripting.Instructions.Expressions
 {
-    class LiteralExpressionInstruction : IInstruction
+    class LiteralExpressionBytecodeGenerator : IBytecodeGenerator
     {
         private readonly float _value;
 
-        public LiteralExpressionInstruction(float value)
+        public LiteralExpressionBytecodeGenerator(float value)
         {
             _value = value;
         }

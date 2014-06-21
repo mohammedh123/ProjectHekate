@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Antlr4.Runtime.Tree;
-using ProjectHekate.Grammar.Implementation.Instructions.Expressions;
-using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
+using ProjectHekate.Scripting.Instructions.Expressions;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Grammar.Implementation
 {
-    public class HekateScriptVisitor : HekateBaseVisitor<CodeBlock>
+    public class HekateScriptVisitor : HekateBaseVisitor<CodeScope>
     {
         private readonly IVirtualMachine _virtualMachine;
         private readonly IScopeManager _scopeManager;
@@ -36,7 +36,7 @@ namespace ProjectHekate.Grammar.Implementation
         #region Top-level constructs
 
 
-        public override CodeBlock VisitScript(HekateParser.ScriptContext context)
+        public override CodeScope VisitScript(HekateParser.ScriptContext context)
         {
             foreach (var child in context.children)
             {
@@ -48,10 +48,10 @@ namespace ProjectHekate.Grammar.Implementation
             return null; // TODO: WHAT THE FUCK?
         }
 
-        private void AddNewScope(CodeBlock codeBlock)
+        private void AddNewScope(CodeScope codeScope)
         {
-            _scopeManager.Add(codeBlock);
-            _virtualMachine.CurrentCode = codeBlock;
+            _scopeManager.Add(codeScope);
+            _virtualMachine.CurrentCode = codeScope;
         }
 
         private void RemoveMostRecentScope()
@@ -60,12 +60,12 @@ namespace ProjectHekate.Grammar.Implementation
             _virtualMachine.CurrentCode = null;
         }
 
-        public override CodeBlock VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
+        public override CodeScope VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-            var eUpdaterCodeBlock = new EmitterUpdaterCodeBlock(paramNames);
+            var eUpdaterCodeBlock = new EmitterUpdaterCodeScope(paramNames);
 
             AddNewScope(eUpdaterCodeBlock);
             foreach (var child in context.children) {
@@ -79,12 +79,12 @@ namespace ProjectHekate.Grammar.Implementation
             return eUpdaterCodeBlock;
         }
 
-        public override CodeBlock VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
+        public override CodeScope VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-            var bUpdaterCodeBlock = new BulletUpdaterCodeBlock(paramNames);
+            var bUpdaterCodeBlock = new BulletUpdaterCodeScope(paramNames);
 
             AddNewScope(bUpdaterCodeBlock);
             foreach (var child in context.children) {
@@ -98,12 +98,12 @@ namespace ProjectHekate.Grammar.Implementation
             return bUpdaterCodeBlock;
         }
 
-        public override CodeBlock VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
+        public override CodeScope VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
         {
             var paramContexts = context.formalParameters().formalParameterList().formalParameter();
             var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
             var name = context.NormalIdentifier().GetText();
-            var funcCodeBlock = new FunctionCodeBlock(paramNames);
+            var funcCodeBlock = new FunctionCodeScope(paramNames);
 
             AddNewScope(funcCodeBlock);
             foreach (var child in context.children) {
@@ -122,19 +122,19 @@ namespace ProjectHekate.Grammar.Implementation
       
   
         #region Statement constructs
-        public override CodeBlock VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
+        public override CodeScope VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
-            code.Add(Visit(context.expression())); // all expressions should leave a single value on the stack
+            Visit(context.expression()); // all expressions should leave a single value on the stack
             code.Add(Instruction.Pop);
 
             return code;
         }
 
-        public override CodeBlock VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
+        public override CodeScope VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
             var scope = _scopeManager.GetCurrentScope();
 
             var variableName = context.NormalIdentifier().GetText();
@@ -153,9 +153,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitReturnStatement(HekateParser.ReturnStatementContext context)
+        public override CodeScope VisitReturnStatement(HekateParser.ReturnStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             // Return statement code:
             // Generate code for expression
@@ -167,9 +167,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitIfStatement(HekateParser.IfStatementContext context)
+        public override CodeScope VisitIfStatement(HekateParser.IfStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
             var ifBodyStatement = context.statement(0);
             var elseStatement = context.statement(1);
 
@@ -204,9 +204,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitForStatement(HekateParser.ForStatementContext context)
+        public override CodeScope VisitForStatement(HekateParser.ForStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
             var forInitCtx = context.forControl().forInit();
             var expressionCtx = context.forControl().expression();
             var forUpdateCtx = context.forControl().forUpdate();
@@ -222,7 +222,7 @@ namespace ProjectHekate.Grammar.Implementation
 
             if (forInitCtx != null) code.Add(Visit(forInitCtx));
 
-            var codeToLoop = new CodeBlock();
+            var codeToLoop = new CodeScope();
             if (expressionCtx != null) codeToLoop.Add(Visit(expressionCtx));
             if (forUpdateCtx != null) codeToLoop.Add(Visit(forUpdateCtx));
             codeToLoop.Add(Visit(bodyStatement));
@@ -236,9 +236,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitWhileStatement(HekateParser.WhileStatementContext context)
+        public override CodeScope VisitWhileStatement(HekateParser.WhileStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
             var whileBodyStatement = context.statement();
 
             _breakLocations.Push(new List<uint>());
@@ -266,20 +266,20 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitBreakStatement(HekateParser.BreakStatementContext context)
+        public override CodeScope VisitBreakStatement(HekateParser.BreakStatementContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             // Break statement
             // Instruction.JumpOffset
             // {0}, used as a dummy value; the enclosing loop construct must take care of replacing 
-            //      the dummy value with the actual size of the construct's code block
+            //      the dummy value with the actual size of the construct's code scope
             // add a break to the list of breakStatements in the visitor
 
             code.Add(Instruction.JumpOffset);
             code.Add((byte)0);
 
-            _breakLocations.Peek().Add();
+            //_breakLocations.Peek().Add();
 
             return code;
         }
@@ -289,24 +289,24 @@ namespace ProjectHekate.Grammar.Implementation
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
         
-        public override CodeBlock VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
+        public override CodeScope VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
         {
             return Visit(context.expression());
         }
 
-        public override CodeBlock VisitParExpression(HekateParser.ParExpressionContext context)
+        public override CodeScope VisitParExpression(HekateParser.ParExpressionContext context)
         {
             return Visit(context.expression());
         }
 
-        public override CodeBlock VisitParExpressionList(HekateParser.ParExpressionListContext context)
+        public override CodeScope VisitParExpressionList(HekateParser.ParExpressionListContext context)
         {
-            return context.expressionList() == null ? new CodeBlock() : Visit(context.expressionList());
+            return context.expressionList() == null ? new CodeScope() : Visit(context.expressionList());
         }
 
-        public override CodeBlock VisitExpressionList(HekateParser.ExpressionListContext context)
+        public override CodeScope VisitExpressionList(HekateParser.ExpressionListContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
             
             foreach (var expressionContext in context.expression()) {
                 code.Add(Visit(expressionContext));
@@ -315,14 +315,14 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitBlockStatement(HekateParser.BlockStatementContext context)
+        public override CodeScope VisitBlockStatement(HekateParser.BlockStatementContext context)
         {
             return Visit(context.block());
         }
 
-        public override CodeBlock VisitBlock(HekateParser.BlockContext context)
+        public override CodeScope VisitBlock(HekateParser.BlockContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             foreach (var statementContext in context.statement()) {
                 code.Add(Visit(statementContext));
@@ -331,7 +331,7 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitForInit(HekateParser.ForInitContext context)
+        public override CodeScope VisitForInit(HekateParser.ForInitContext context)
         {
             var isVariableDeclaration = context.variableDeclaration() != null;
 
@@ -343,17 +343,17 @@ namespace ProjectHekate.Grammar.Implementation
 
         #region Expression constructs
 
-        public override CodeBlock VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
+        public override CodeScope VisitLiteralExpression(HekateParser.LiteralExpressionContext context)
         {
             var text = context.GetText();
             var value = float.Parse(text);
 
-            new LiteralExpressionInstruction(value).EmitOn(_virtualMachine, _scopeManager);
+            //new LiteralExpressionInstruction(value).EmitOn(_virtualMachine, _scopeManager);
 
             return _virtualMachine.CurrentCode;
         }
 
-        public override CodeBlock VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
+        public override CodeScope VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
         {
             // Normal identifier expression code:
             // Instructions.Push
@@ -361,7 +361,7 @@ namespace ProjectHekate.Grammar.Implementation
             return GenerateCodeForValueOfVariable(context.NormalIdentifier().GetText());
         }
 
-        public override CodeBlock VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
+        public override CodeScope VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
         {
             // Property identifier expression code:
             // Instructions.Push
@@ -369,9 +369,9 @@ namespace ProjectHekate.Grammar.Implementation
             return GenerateCodeForValueOfProperty(context.PropertyIdentifier().GetText());
         }
 
-        public override CodeBlock VisitPostIncDecExpression(HekateParser.PostIncDecExpressionContext context)
+        public override CodeScope VisitPostIncDecExpression(HekateParser.PostIncDecExpressionContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             // TODO: heavily reuses code from VisitAssignmentExpression - figure out a way to de-duplicate code
 
@@ -390,7 +390,7 @@ namespace ProjectHekate.Grammar.Implementation
             // determine whether its a variable or a property
             int index;
             Instruction assignmentOp;
-            CodeBlock codeForValueOfLeftSide; // to make sure redundant checks arent done later on)
+            CodeScope codeForValueOfLeftSide; // to make sure redundant checks arent done later on)
             if (isNormalIdentifier)
             {
                 var scope = _scopeManager.GetCurrentScope();
@@ -432,9 +432,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
+        public override CodeScope VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             var isNormalIdentifier = context.NormalIdentifier() != null;
             var isPropertyIdentifier = context.PropertyIdentifier() != null;
@@ -454,7 +454,7 @@ namespace ProjectHekate.Grammar.Implementation
             // determine whether its a variable or a property
             int index;
             Instruction assignmentOp;
-            CodeBlock codeToAdd; // to make sure redundant checks arent done later on)
+            CodeScope codeToAdd; // to make sure redundant checks arent done later on)
             if (isNormalIdentifier)
             {
                 var scope = _scopeManager.GetCurrentScope();
@@ -494,9 +494,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitFunctionCallExpression(HekateParser.FunctionCallExpressionContext context)
+        public override CodeScope VisitFunctionCallExpression(HekateParser.FunctionCallExpressionContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             var functionName = context.NormalIdentifier().GetText();
             var functionIndex = _virtualMachine.GetFunctionCodeBlock(functionName).Index;
@@ -504,7 +504,7 @@ namespace ProjectHekate.Grammar.Implementation
             // Function call expression code:
             // Generate code for each parameter value (each should push a value onto the stack)
             // Instruction.FunctionCall
-            // {function code block's index}
+            // {function code scope's index}
 
             code.Add(Visit(context.parExpressionList()));
             code.Add(Instruction.FunctionCall);
@@ -513,9 +513,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
+        public override CodeScope VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             // Unary expression code:
             // Generate code for expression (should push onto stack)
@@ -526,9 +526,9 @@ namespace ProjectHekate.Grammar.Implementation
             return code;
         }
 
-        public override CodeBlock VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
+        public override CodeScope VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
         {
-            var code = new CodeBlock();
+            var code = new CodeScope();
 
             // Binary expression code:
             // Generate code for left expression (should push onto stack)
@@ -592,23 +592,23 @@ namespace ProjectHekate.Grammar.Implementation
 
         #region Miscellaneous helper functions
 
-        private CodeBlock GenerateCodeForValueOfVariable(string name)
+        private CodeScope GenerateCodeForValueOfVariable(string name)
         {
             var scope = _scopeManager.GetCurrentScope();
             var index = scope.GetNumericalVariable(name).Index;
 
-            var code = new CodeBlock();
+            var code = new CodeScope();
             code.Add(Instruction.GetVariable);
             code.Add(index);
 
             return code;
         }
 
-        private CodeBlock GenerateCodeForValueOfProperty(string name)
+        private CodeScope GenerateCodeForValueOfProperty(string name)
         {
             var index = _virtualMachine.GetProperty(name).Index;
 
-            var code = new CodeBlock();
+            var code = new CodeScope();
             code.Add(Instruction.GetProperty);
             code.Add(index);
 

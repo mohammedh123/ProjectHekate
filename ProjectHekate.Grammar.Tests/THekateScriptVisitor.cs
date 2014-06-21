@@ -9,8 +9,8 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ProjectHekate.Grammar.Implementation;
-using ProjectHekate.Grammar.Implementation.Interfaces;
 using ProjectHekate.Scripting;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Grammar.Tests
 {
@@ -30,11 +30,11 @@ namespace ProjectHekate.Grammar.Tests
             return tree.GetFirstDescendantOfType<TContextType>();
         }
 
-        protected virtual void SetUpGetCurrentScope(CodeBlock block)
+        protected virtual void SetUpGetCurrentScope(CodeScope scope)
         {
             Mocker.GetMock<IScopeManager>()
                 .Setup(ism => ism.GetCurrentScope())
-                .Returns(block);
+                .Returns(scope);
         }
 
         [TestInitialize]
@@ -52,7 +52,7 @@ namespace ProjectHekate.Grammar.Tests
                 // Setup: dummy data
                 const string expression = "var someIdentifier = 1.35";
                 
-                SetUpGetCurrentScope(new CodeBlock());
+                SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 var result = Subject.VisitVariableDeclaration(GenerateContext<HekateParser.VariableDeclarationContext>(expression));
@@ -224,7 +224,7 @@ else {
             {
                 // Setup: dummy data
                 const string expression = @"for(var i = 23;;) {}";
-                SetUpGetCurrentScope(new CodeBlock());
+                SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
@@ -244,7 +244,7 @@ else {
             {
                 // Setup: dummy data
                 const string expression = @"for(var i = 5; i < 10;) {}";
-                SetUpGetCurrentScope(new CodeBlock());
+                SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
@@ -269,7 +269,7 @@ else {
             {
                 // Setup: dummy data
                 const string expression = @"for(var i = 5; i < 10; i++) {}";
-                SetUpGetCurrentScope(new CodeBlock());
+                SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
@@ -303,7 +303,7 @@ else {
                 const string expression = @"for(var i = 5; i < 10; i++) {
     3;
 }";
-                SetUpGetCurrentScope(new CodeBlock());
+                SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression));
@@ -469,7 +469,7 @@ else {
                 // Setup: create codeblock with existing numerical variable, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 var idx = codeBlock.AddNumericalVariable(identifier);
                 SetUpGetCurrentScope(codeBlock);
 
@@ -487,7 +487,7 @@ else {
                 // Setup: create codeblock, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 SetUpGetCurrentScope(codeBlock);
 
                 // Act + Verify
@@ -680,7 +680,7 @@ else {
 
                 var idx = -1;
                 if (type == IdentifierType.Variable) {
-                    var codeBlock = new CodeBlock();
+                    var codeBlock = new CodeScope();
                     idx = codeBlock.AddNumericalVariable(identifier);
                     SetUpGetCurrentScope(codeBlock);
                 }
@@ -746,7 +746,7 @@ else {
                 // Setup: create codeblock with existing numerical variable, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 var idx = codeBlock.AddNumericalVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
@@ -806,7 +806,7 @@ else {
                 // Setup: create codeblock, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 codeBlock.AddEmitterVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
@@ -823,7 +823,7 @@ else {
                 // Setup: create codeblock with existing emitter variable, mock scope out
                 const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 codeBlock.AddEmitterVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
@@ -841,7 +841,7 @@ else {
                 // Setup: create codeblock with existing numerical variable, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
-                var codeBlock = new CodeBlock();
+                var codeBlock = new CodeScope();
                 var idx = codeBlock.AddNumericalVariable(variableName);
                 SetUpGetCurrentScope(codeBlock);
 
@@ -895,7 +895,7 @@ else {
                 var expression = String.Format("{0}({1})", functionName, String.Join(",", variableValues.Select(v => v.ToString())));
 
                 var parameterValues = variableValues.Select(v => "param" + v);
-                var funcCodeBlock = new FunctionCodeBlock(parameterValues) { Index = 0 };
+                var funcCodeBlock = new FunctionCodeScope(parameterValues) { Index = 0 };
                 Mocker.GetMock<IVirtualMachine>()
                     .Setup(ivm => ivm.GetFunctionCodeBlock(functionName))
                     .Returns(funcCodeBlock);

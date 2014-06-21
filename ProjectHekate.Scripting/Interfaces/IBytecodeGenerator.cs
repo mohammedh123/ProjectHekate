@@ -1,9 +1,9 @@
 ﻿namespace ProjectHekate.Scripting.Interfaces
 {
     /// <summary>
-    /// An interface for an instruction that generates bytecode.
+    /// An interface for a class generates bytecode.
     /// </summary>
-    interface IInstruction
+    interface IBytecodeGenerator
     {
         /// <summary>
         /// Emits code for this instruction on this virtual machine.

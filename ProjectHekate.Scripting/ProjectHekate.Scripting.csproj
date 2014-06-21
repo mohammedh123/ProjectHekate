@@ -59,12 +59,18 @@
   <ItemGroup>
     <Compile Include="InstructionEnum.cs" />
     <Compile Include="EmitterScriptState.cs" />
-    <Compile Include="Instructions\Expressions\LiteralExpressionInstruction.cs" />
-    <Compile Include="Interfaces\IInstruction.cs" />
+    <Compile Include="Instructions\Expressions\LiteralExpressionBytecodeGenerator.cs" />
+    <Compile Include="Interfaces\IBytecodeGenerator.cs" />
     <Compile Include="Interfaces\IScopeManager.cs" />
+    <Compile Include="IPropertyManager.cs" />
+    <Compile Include="IVirtualMachine.cs" />
+    <Compile Include="ScriptState.cs" />
     <Compile Include="StackScopeManager.cs" />
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Instructions\Statements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
