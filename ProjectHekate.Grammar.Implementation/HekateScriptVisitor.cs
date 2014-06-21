@@ -74,7 +74,7 @@ namespace ProjectHekate.Grammar.Implementation
             RemoveMostRecentScope();
 
             // done, now add to the pool of emitter updater records
-            _virtualMachine.AddEmitterUpdaterCodeBlock(name, eUpdaterCodeBlock);
+            _virtualMachine.AddEmitterUpdaterCodeScope(name, eUpdaterCodeBlock);
             
             return eUpdaterCodeBlock;
         }
@@ -93,7 +93,7 @@ namespace ProjectHekate.Grammar.Implementation
             RemoveMostRecentScope();
 
             // done, now add to the pool of bullet updater records
-            _virtualMachine.AddBulletUpdaterCodeBlock(name, bUpdaterCodeBlock);
+            _virtualMachine.AddBulletUpdaterCodeScope(name, bUpdaterCodeBlock);
 
             return bUpdaterCodeBlock;
         }
@@ -112,7 +112,7 @@ namespace ProjectHekate.Grammar.Implementation
             RemoveMostRecentScope();
 
             // done, now add to the pool of function records
-            _virtualMachine.AddFunctionCodeBlock(name, funcCodeBlock);
+            _virtualMachine.AddFunctionCodeScope(name, funcCodeBlock);
 
             return funcCodeBlock;
         }
@@ -499,7 +499,7 @@ namespace ProjectHekate.Grammar.Implementation
             var code = new CodeScope();
 
             var functionName = context.NormalIdentifier().GetText();
-            var functionIndex = _virtualMachine.GetFunctionCodeBlock(functionName).Index;
+            var functionIndex = _virtualMachine.GetFunctionCodeScope(functionName).Index;
 
             // Function call expression code:
             // Generate code for each parameter value (each should push a value onto the stack)

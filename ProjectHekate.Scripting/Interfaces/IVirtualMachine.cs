@@ -18,7 +18,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the index of the function code scope (also populates the Index property of the code scope)</returns>
         /// <exception cref="System.ArgumentException">Thrown when a function with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the function has already been added, but with a different name</exception>
-        int AddFunctionCodeBlock(string name, FunctionCodeScope codeScope);
+        int AddFunctionCodeScope(string name, FunctionCodeScope codeScope);
 
         /// <summary>
         /// Gets a function code scope by name if it exists.
@@ -26,7 +26,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="name">The name of the function code scope</param>
         /// <returns>The function code scope mapped with the given name</returns>
         /// <exception cref="ArgumentException">Thrown when a function with that name does not exist</exception>
-        FunctionCodeScope GetFunctionCodeBlock(string name);
+        FunctionCodeScope GetFunctionCodeScope(string name);
 
         /// <summary>
         /// Adds a bullet updater code scope to the virtual machine.
@@ -36,7 +36,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the index of the bullet updater code scope (also populates the Index property of the code scope)</returns>
         /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
-        int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeScope codeScope);
+        int AddBulletUpdaterCodeScope(string name, BulletUpdaterCodeScope codeScope);
 
         /// <summary>
         /// Gets a bullet updater code scope by name if it exists.
@@ -44,7 +44,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="name">The name of the bullet updater code scope</param>
         /// <returns>The bullet updater code scope mapped with the given name</returns>
         /// <exception cref="ArgumentException">Thrown when a bullet updater with that name does not exist</exception>
-        BulletUpdaterCodeScope GetBulletUpdaterCodeBlock(string name);
+        BulletUpdaterCodeScope GetBulletUpdaterCodeScope(string name);
 
         /// <summary>
         /// Adds an emitter updater code scope to the program code scope.
@@ -54,7 +54,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the index of the emitter updater code scope (also populates the Index property of the CodeScope)</returns>
         /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the emitter updater has already been added, but with a different name</exception>
-        int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeScope codeScope);
+        int AddEmitterUpdaterCodeScope(string name, EmitterUpdaterCodeScope codeScope);
 
         /// <summary>
         /// Gets a emitter updater code scope by name if it exists.
@@ -62,6 +62,6 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="name">The name of the emitter updater code scope</param>
         /// <returns>The emitter updater code scope mapped with the given name</returns>
         /// <exception cref="ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
-        EmitterUpdaterCodeScope GetEmitterUpdaterCodeBlock(string name);
+        EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name);
     }
 }

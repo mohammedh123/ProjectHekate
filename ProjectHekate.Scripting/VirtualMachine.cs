@@ -187,63 +187,63 @@ namespace ProjectHekate.Scripting
         public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
         public CodeScope CurrentCode { get; set; }
 
-        private readonly List<FunctionCodeScope> _functionCodeBlocks;
-        private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeBlocks;
-        private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeBlocks;
+        private readonly List<FunctionCodeScope> _functionCodeScopes;
+        private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeScopes;
+        private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeScopes;
         private readonly List<IdentifierRecord> _propertyRecords;
-        private readonly Dictionary<string, int> _functionCodeBlockNameToIndex;
-        private readonly Dictionary<string, int> _bulletUpdaterCodeBlockNameToIndex;
-        private readonly Dictionary<string, int> _emitterUpdaterCodeBlockNameToIndex;
+        private readonly Dictionary<string, int> _functionCodeScopeNameToIndex;
+        private readonly Dictionary<string, int> _bulletUpdaterCodeScopeNameToIndex;
+        private readonly Dictionary<string, int> _emitterUpdaterCodeScopeNameToIndex;
         private readonly Dictionary<string, int> _propertyNameToIndex;
 
         public VirtualMachine()
         {
-            _functionCodeBlocks = new List<FunctionCodeScope>();
-            _functionCodeBlockNameToIndex = new Dictionary<string, int>();
+            _functionCodeScopes = new List<FunctionCodeScope>();
+            _functionCodeScopeNameToIndex = new Dictionary<string, int>();
 
-            _bulletUpdaterCodeBlocks = new List<BulletUpdaterCodeScope>();
-            _bulletUpdaterCodeBlockNameToIndex = new Dictionary<string, int>();
+            _bulletUpdaterCodeScopes = new List<BulletUpdaterCodeScope>();
+            _bulletUpdaterCodeScopeNameToIndex = new Dictionary<string, int>();
 
-            _emitterUpdaterCodeBlocks = new List<EmitterUpdaterCodeScope>();
-            _emitterUpdaterCodeBlockNameToIndex = new Dictionary<string, int>();
+            _emitterUpdaterCodeScopes = new List<EmitterUpdaterCodeScope>();
+            _emitterUpdaterCodeScopeNameToIndex = new Dictionary<string, int>();
 
             _propertyRecords = new List<IdentifierRecord>();
             _propertyNameToIndex = new Dictionary<string, int>();
 
-            FunctionCodeBlocks = _functionCodeBlocks.AsReadOnly();
-            BulletUpdaterCodeBlocks = _bulletUpdaterCodeBlocks.AsReadOnly();
-            EmitterUpdaterCodeBlocks = _emitterUpdaterCodeBlocks.AsReadOnly();
+            FunctionCodeBlocks = _functionCodeScopes.AsReadOnly();
+            BulletUpdaterCodeBlocks = _bulletUpdaterCodeScopes.AsReadOnly();
+            EmitterUpdaterCodeBlocks = _emitterUpdaterCodeScopes.AsReadOnly();
             PropertyRecords = _propertyRecords.AsReadOnly();
         }
 
-        public int AddFunctionCodeBlock(string name, FunctionCodeScope codeScope)
+        public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _functionCodeBlocks, _functionCodeBlockNameToIndex, codeScope);
+            return AddSpecializedCodeScope(name, _functionCodeScopes, _functionCodeScopeNameToIndex, codeScope);
         }
 
-        public FunctionCodeScope GetFunctionCodeBlock(string name)
+        public FunctionCodeScope GetFunctionCodeScope(string name)
         {
-            return GetSpecializedCodeBlock(name, "function", _functionCodeBlocks, _functionCodeBlockNameToIndex);
+            return GetSpecializedCodeScope(name, "function", _functionCodeScopes, _functionCodeScopeNameToIndex);
         }
 
-        public int AddBulletUpdaterCodeBlock(string name, BulletUpdaterCodeScope codeScope)
+        public int AddBulletUpdaterCodeScope(string name, BulletUpdaterCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex, codeScope);
+            return AddSpecializedCodeScope(name, _bulletUpdaterCodeScopes, _bulletUpdaterCodeScopeNameToIndex, codeScope);
         }
 
-        public BulletUpdaterCodeScope GetBulletUpdaterCodeBlock(string name)
+        public BulletUpdaterCodeScope GetBulletUpdaterCodeScope(string name)
         {
-            return GetSpecializedCodeBlock(name, "bullet updater", _bulletUpdaterCodeBlocks, _bulletUpdaterCodeBlockNameToIndex);
+            return GetSpecializedCodeScope(name, "bullet updater", _bulletUpdaterCodeScopes, _bulletUpdaterCodeScopeNameToIndex);
         }
 
-        public int AddEmitterUpdaterCodeBlock(string name, EmitterUpdaterCodeScope codeScope)
+        public int AddEmitterUpdaterCodeScope(string name, EmitterUpdaterCodeScope codeScope)
         {
-            return AddSpecializedCodeBlock(name, _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex, codeScope);
+            return AddSpecializedCodeScope(name, _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex, codeScope);
         }
 
-        public EmitterUpdaterCodeScope GetEmitterUpdaterCodeBlock(string name)
+        public EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name)
         {
-            return GetSpecializedCodeBlock(name, "emitter updater", _emitterUpdaterCodeBlocks, _emitterUpdaterCodeBlockNameToIndex);
+            return GetSpecializedCodeScope(name, "emitter updater", _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex);
         }
 
         public int AddProperty(string name)
@@ -261,47 +261,47 @@ namespace ProjectHekate.Scripting
 
         public IdentifierRecord GetProperty(string name)
         {
-            return GetSpecializedCodeBlock(name, "property", _propertyRecords, _propertyNameToIndex);
+            return GetSpecializedCodeScope(name, "property", _propertyRecords, _propertyNameToIndex);
         }
 
-        private int AddSpecializedCodeBlock<TCodeBlockType>(string name, ICollection<TCodeBlockType> codeBlockList, IDictionary<string,int> codeBlockNameToIndexMap, TCodeBlockType codeBlock) where TCodeBlockType : CodeScope
+        private int AddSpecializedCodeScope<TCodeScopeType>(string name, ICollection<TCodeScopeType> codeScopeList, IDictionary<string,int> codeScopeNameToIndexMap, TCodeScopeType codeScope) where TCodeScopeType : CodeScope
         {
             // TODO: make method thread-safe
-            ThrowIfCodeBlockWithNameAlreadyExists(name);
-            ThrowIfCodeBlockAlreadyExists(codeBlock);
+            ThrowIfCodeScopeWithNameAlreadyExists(name);
+            ThrowIfCodeScopeAlreadyExists(codeScope);
 
-            codeBlockList.Add(codeBlock);
-            codeBlock.Index = codeBlockList.Count;
-            codeBlockNameToIndexMap[name] = codeBlock.Index;
+            codeScopeList.Add(codeScope);
+            codeScope.Index = codeScopeList.Count;
+            codeScopeNameToIndexMap[name] = codeScope.Index;
 
-            return codeBlock.Index;
+            return codeScope.Index;
         }
 
-        private TCodeBlockType GetSpecializedCodeBlock<TCodeBlockType>(string name, string nameOfCodeBlockForExceptionMessage, IReadOnlyList<TCodeBlockType> specializedCodeBlocks, Dictionary<string, int> specializedCodeBlockNameToIndex)
+        private TCodeScopeType GetSpecializedCodeScope<TCodeScopeType>(string name, string nameOfCodeScopeForExceptionMessage, IReadOnlyList<TCodeScopeType> specializedCodeScopes, Dictionary<string, int> specializedCodeScopeNameToIndex)
         {
-            if(!specializedCodeBlockNameToIndex.ContainsKey(name))
-                throw new ArgumentException("A " + nameOfCodeBlockForExceptionMessage + " with the name \"" + name + "\" could not be found.", name);
+            if(!specializedCodeScopeNameToIndex.ContainsKey(name))
+                throw new ArgumentException("A " + nameOfCodeScopeForExceptionMessage + " with the name \"" + name + "\" could not be found.", name);
 
-            return specializedCodeBlocks[specializedCodeBlockNameToIndex[name]];
+            return specializedCodeScopes[specializedCodeScopeNameToIndex[name]];
         }
 
-        private void ThrowIfCodeBlockWithNameAlreadyExists(string name)
+        private void ThrowIfCodeScopeWithNameAlreadyExists(string name)
         {
-            if (_functionCodeBlockNameToIndex.ContainsKey(name))
+            if (_functionCodeScopeNameToIndex.ContainsKey(name))
                 throw new ArgumentException("A function with the name \"" + name + "\" already exists in this script.", "name");
-            if (_bulletUpdaterCodeBlockNameToIndex.ContainsKey(name))
+            if (_bulletUpdaterCodeScopeNameToIndex.ContainsKey(name))
                 throw new ArgumentException("A bullet updater with the name \"" + name + "\" already exists in this script.", "name");
-            if (_emitterUpdaterCodeBlockNameToIndex.ContainsKey(name))
+            if (_emitterUpdaterCodeScopeNameToIndex.ContainsKey(name))
                 throw new ArgumentException("An emitter updater with the name \"" + name + "\" already exists in this script.", "name");
         }
 
-        private void ThrowIfCodeBlockAlreadyExists(CodeScope codeScope)
+        private void ThrowIfCodeScopeAlreadyExists(CodeScope codeScope)
         {
-            if (_functionCodeBlocks.Contains(codeScope))
+            if (_functionCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as a function).", "codeScope");
-            if (_bulletUpdaterCodeBlocks.Contains(codeScope))
+            if (_bulletUpdaterCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as a bullet updater).", "codeScope");
-            if (_emitterUpdaterCodeBlocks.Contains(codeScope))
+            if (_emitterUpdaterCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as an emitter updater).", "codeScope");
         }
     }

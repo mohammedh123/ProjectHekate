@@ -466,12 +466,12 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForMatchingVariable()
             {
-                // Setup: create codeblock with existing numerical variable, mock scope out
+                // Setup: create code scope with existing numerical variable, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
-                var codeBlock = new CodeScope();
-                var idx = codeBlock.AddNumericalVariable(identifier);
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                var idx = codeScope.AddNumericalVariable(identifier);
+                SetUpGetCurrentScope(codeScope);
 
                 // Act
                 var result = Subject.VisitNormalIdentifierExpression(GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression));
@@ -484,11 +484,11 @@ else {
             [TestMethod]
             public void ShouldThrowArgumentExceptionForNonMatchingVariable()
             {
-                // Setup: create codeblock, mock scope out
+                // Setup: create code scope, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
-                var codeBlock = new CodeScope();
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
                 Subject.Invoking(
@@ -503,7 +503,7 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForMatchingProperty()
             {
-                // Setup: create codeblock with existing property, mock vm out
+                // Setup: create code scope with existing property, mock vm out
                 const string identifier = "$SomeIdentifier";
                 var expression = String.Format("{0}", identifier);
                 var dummyRecord = new IdentifierRecord(identifier, 0);
@@ -522,7 +522,7 @@ else {
             [TestMethod]
             public void ShouldThrowArgumentExceptionForNonMatchingVariable()
             {
-                // Setup: create codeblock, mock vm out
+                // Setup: create code scope, mock vm out
                 const string identifier = "$SomeIdentifier";
                 var expression = String.Format("{0}", identifier);
                 Mocker.GetMock<IVirtualMachine>()
@@ -674,15 +674,15 @@ else {
         {
             private void TestIncDecWithExistingVariableOrProperty(bool isIncrementing, IdentifierType type)
             {
-                // Setup: create codeblock with existing numerical variable/property, mock scope out
+                // Setup: create code scope with existing numerical variable/property, mock scope out
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}{1}{2}", type == IdentifierType.Property ? "$" : "", identifier, isIncrementing ? "++" : "--");
 
                 var idx = -1;
                 if (type == IdentifierType.Variable) {
-                    var codeBlock = new CodeScope();
-                    idx = codeBlock.AddNumericalVariable(identifier);
-                    SetUpGetCurrentScope(codeBlock);
+                    var codeScope = new CodeScope();
+                    idx = codeScope.AddNumericalVariable(identifier);
+                    SetUpGetCurrentScope(codeScope);
                 }
                 else if(type == IdentifierType.Property) {
                     var dummyRecord = new IdentifierRecord(identifier, 0);
@@ -743,12 +743,12 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForAssigningToExistingNumericalVariable()
             {
-                // Setup: create codeblock with existing numerical variable, mock scope out
+                // Setup: create code scope with existing numerical variable, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeScope();
-                var idx = codeBlock.AddNumericalVariable(variableName);
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                var idx = codeScope.AddNumericalVariable(variableName);
+                SetUpGetCurrentScope(codeScope);
 
                 // Act
                 var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression));
@@ -803,12 +803,12 @@ else {
             [TestMethod]
             public void ShouldThrowExceptionForAssigningToNonexistentNumericalVariable()
             {
-                // Setup: create codeblock, mock scope out
+                // Setup: create code scope, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeScope();
-                codeBlock.AddEmitterVariable(variableName);
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                codeScope.AddEmitterVariable(variableName);
+                SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
                 var result =
@@ -820,12 +820,12 @@ else {
             [TestMethod]
             public void ShouldThrowExceptionForAssigningToExistingEmitterVariable()
             {
-                // Setup: create codeblock with existing emitter variable, mock scope out
+                // Setup: create code scope with existing emitter variable, mock scope out
                 const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
-                var codeBlock = new CodeScope();
-                codeBlock.AddEmitterVariable(variableName);
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                codeScope.AddEmitterVariable(variableName);
+                SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
                 var result =
@@ -838,12 +838,12 @@ else {
 
             private void TestCompoundAssignmentWithExistingNumericalVariable(string opStr, Instruction op)
             {
-                // Setup: create codeblock with existing numerical variable, mock scope out
+                // Setup: create code scope with existing numerical variable, mock scope out
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
-                var codeBlock = new CodeScope();
-                var idx = codeBlock.AddNumericalVariable(variableName);
-                SetUpGetCurrentScope(codeBlock);
+                var codeScope = new CodeScope();
+                var idx = codeScope.AddNumericalVariable(variableName);
+                SetUpGetCurrentScope(codeScope);
 
                 // Act
                 var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression));
@@ -897,7 +897,7 @@ else {
                 var parameterValues = variableValues.Select(v => "param" + v);
                 var funcCodeBlock = new FunctionCodeScope(parameterValues) { Index = 0 };
                 Mocker.GetMock<IVirtualMachine>()
-                    .Setup(ivm => ivm.GetFunctionCodeBlock(functionName))
+                    .Setup(ivm => ivm.GetFunctionCodeScope(functionName))
                     .Returns(funcCodeBlock);
 
                 // Act
