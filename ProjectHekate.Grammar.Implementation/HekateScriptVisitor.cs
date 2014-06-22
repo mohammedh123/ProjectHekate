@@ -365,65 +365,28 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitPostIncDecExpression(HekateParser.PostIncDecExpressionContext context)
         {
-            var code = new CodeScope();
-
-            // TODO: heavily reuses code from VisitAssignmentExpression - figure out a way to de-duplicate code
-
             var isNormalIdentifier = context.NormalIdentifier() != null;
             var isPropertyIdentifier = context.PropertyIdentifier() != null;
 
-            // Post-inc/decrement expression code:
-            // Instruction.GetVariable/Property
-            // {index of variable/property}
-            // Instructions.Push
-            // {1}
-            // Instruction.OperatorAdd/Subtract
-            // Instruction.SetVariable/Property
-            // {index of variable/property}
-
-            // determine whether its a variable or a property
-            int index;
-            Instruction assignmentOp;
-            CodeScope codeForValueOfLeftSide; // to make sure redundant checks arent done later on)
+            IdentifierType identifierType;
+            string identifierName;
             if (isNormalIdentifier)
             {
-                var scope = _scopeManager.GetCurrentScope();
-                var identifierName = context.NormalIdentifier().GetText();
-                index = scope.GetNumericalVariable(identifierName).Index;
-                assignmentOp = Instruction.SetVariable;
-
-                codeForValueOfLeftSide = GenerateCodeForValueOfVariable(identifierName);
+                identifierType = IdentifierType.Variable;
+                identifierName = context.NormalIdentifier().GetText();
             }
             else if (isPropertyIdentifier)
             {
-                var identifierName = context.PropertyIdentifier().GetText();
-                index = _virtualMachine.GetProperty(identifierName).Index;
-                assignmentOp = Instruction.SetProperty;
-
-                codeForValueOfLeftSide = GenerateCodeForValueOfProperty(identifierName);
+                identifierType = IdentifierType.Property;
+                identifierName = context.PropertyIdentifier().GetText();
             }
-            else
-            {
-                throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitPostIncDecExpression.");
+            else {
+                throw new InvalidOperationException(
+                    "You forgot to add a case for another identifier type! Check the code for VisitPostIncDecExpression.");
             }
 
-            code.Add(codeForValueOfLeftSide);
-            code.Add(Instruction.Push);
-            code.Add(1);
-
-            Instruction instToAdd;
-            switch (context.Operator.Type) {
-                case HekateParser.INC:  instToAdd = Instruction.OperatorAdd; break;
-                case HekateParser.DEC:  instToAdd = Instruction.OperatorSubtract; break;
-                default:
-                    throw new InvalidOperationException("The post-increment/decrement expression had an operator that was neither increment nor decrement. Check VisitPostIncDecExpression code.");
-            }
-
-            code.Add(instToAdd);
-            code.Add(assignmentOp);
-            code.Add(index);
-
-            return code;
+            var op = GetIncOrDecOperatorFromContext(context);
+            return new PostIncDecExpressionGenerator(identifierType, identifierName, op);
         }
 
         public override AbstractBytecodeEmitter VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
@@ -498,6 +461,16 @@ namespace ProjectHekate.Grammar.Implementation
             var op = GetBinaryOperatorFromContext(context);
 
             return new BinaryExpressionGenerator(leftExprGen, rightExprGen, op);
+        }
+
+        private Instruction GetIncOrDecOperatorFromContext(HekateParser.PostIncDecExpressionContext context)
+        {
+            switch (context.Operator.Type)
+            {
+                case HekateParser.INC: return Instruction.OperatorAdd;
+                case HekateParser.DEC: return Instruction.OperatorSubtract;
+                default: throw new InvalidOperationException("Invalid operator type found for this PostIncDecExpressionContext (" + context.Operator.Text + ").");
+            }
         }
 
         private Instruction GetUnaryOperatorFromContext(HekateParser.UnaryExpressionContext context)

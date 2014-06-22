@@ -65,6 +65,7 @@
     <Compile Include="Bytecode.Generators\BinaryExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\LiteralExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\NormalIdentifierExpressionGenerator.cs" />
+    <Compile Include="Bytecode.Generators\PostIncDecExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\PropertyIdentifierExpressionGenerator.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeScope.cs" />
