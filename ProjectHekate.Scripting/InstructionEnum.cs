@@ -26,6 +26,7 @@ namespace ProjectHekate.Scripting
         OperatorOr,
         OperatorNot,
         Jump,
+        JumpIfZero,
         JumpOffset,
         JumpOffsetIfZero,
         Compare,
