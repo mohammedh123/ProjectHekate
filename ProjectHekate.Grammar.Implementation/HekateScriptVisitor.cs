@@ -140,16 +140,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitReturnStatement(HekateParser.ReturnStatementContext context)
         {
-            var code = new CodeScope();
-
-            // Return statement code:
-            // Generate code for expression
-            // Instruction.Return
-
-            code.Add(Visit(context.expression()));
-            code.Add(Instruction.Return);
-
-            return code;
+            var expressionGen = Visit(context.expression());
+            
+            return new ReturnStatementEmitter(expressionGen);
         }
 
         public override AbstractBytecodeEmitter VisitIfStatement(HekateParser.IfStatementContext context)
