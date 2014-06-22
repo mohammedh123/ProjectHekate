@@ -6,18 +6,6 @@ namespace ProjectHekate.Scripting
 {
     public class CodeScope : CodeBlock, IVariableContext
     {
-        public int Index { get; set; }
-        public int Size { get { return _code.Count; } }
-
-        public IReadOnlyList<float> Code { get; private set; }
-        private readonly List<float> _code;
-
-        public float this[int idx]
-        {
-            get { return Code[idx]; }
-            set { _code[idx] = value; }
-        }
-
         public IReadOnlyList<IdentifierRecord> NumericalVariables { get; private set; }
         private readonly List<IdentifierRecord> _numericalVariables;
         private readonly Dictionary<string, int> _numericalVariablesNameToIndex;
@@ -26,12 +14,8 @@ namespace ProjectHekate.Scripting
         private readonly List<IdentifierRecord> _emitterVariables;
         private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
         
-
         public CodeScope()
         {
-            _code = new List<float>();
-            Code = _code.AsReadOnly();
-
             _numericalVariables = new List<IdentifierRecord>();
             _numericalVariablesNameToIndex = new Dictionary<string, int>();
 
