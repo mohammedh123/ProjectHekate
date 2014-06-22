@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectHekate.Scripting.Bytecode.Emitters;
 using ProjectHekate.Scripting.Helpers;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class CompoundAssignmentExpressionGenerator : AbstractBytecodeEmitter
+    public class CompoundAssignmentExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly IBytecodeGenerator _valueExpression;
         private readonly IdentifierType _identifierType;

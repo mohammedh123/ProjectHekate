@@ -1,8 +1,9 @@
-﻿using ProjectHekate.Scripting.Interfaces;
+﻿using ProjectHekate.Scripting.Bytecode.Emitters;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class LiteralExpressionGenerator : AbstractBytecodeEmitter
+    public class LiteralExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly float _value;
         

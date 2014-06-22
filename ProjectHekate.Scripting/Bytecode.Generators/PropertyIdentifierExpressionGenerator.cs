@@ -1,9 +1,10 @@
-﻿using ProjectHekate.Scripting.Helpers;
+﻿using ProjectHekate.Scripting.Bytecode.Emitters;
+using ProjectHekate.Scripting.Helpers;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class PropertyIdentifierExpressionGenerator : AbstractBytecodeEmitter
+    public class PropertyIdentifierExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly string _propertyIdentifier;
 

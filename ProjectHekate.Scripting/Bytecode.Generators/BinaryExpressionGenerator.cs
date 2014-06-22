@@ -1,9 +1,10 @@
 ﻿using System;
+using ProjectHekate.Scripting.Bytecode.Emitters;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class BinaryExpressionGenerator : AbstractBytecodeEmitter
+    public class BinaryExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly IBytecodeGenerator _leftExpression, _rightExpression;
         private readonly Instruction _op;

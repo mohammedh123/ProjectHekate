@@ -1,9 +1,10 @@
-﻿using ProjectHekate.Scripting.Helpers;
+﻿using ProjectHekate.Scripting.Bytecode.Emitters;
+using ProjectHekate.Scripting.Helpers;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class NormalIdentifierExpressionGenerator : AbstractBytecodeEmitter
+    public class NormalIdentifierExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly string _identifierName;
 

@@ -1,9 +1,10 @@
 ﻿using System;
+using ProjectHekate.Scripting.Bytecode.Emitters;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class PostIncDecExpressionGenerator : AbstractBytecodeEmitter
+    public class PostIncDecExpressionGenerator : EmptyBytecodeEmitter
     {
         private readonly IdentifierType _identifierType;
         private readonly string _identifierName;

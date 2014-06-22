@@ -2,7 +2,7 @@
 
 namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
-    public class ExpressionStatementEmitter : AbstractBytecodeEmitter
+    public class ExpressionStatementEmitter : EmptyBytecodeEmitter
     {
         private readonly IBytecodeGenerator _expressionCodeGenerator;
 
