@@ -171,32 +171,10 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitWhileStatement(HekateParser.WhileStatementContext context)
         {
-            var code = new CodeScope();
-            var whileBodyStatement = context.statement();
-
-            _breakLocations.Push(new List<uint>());
-            _continueLocations.Push(new List<uint>());
-
-            // While statement code
-            // Generate code for parExpression
-            // Instruction.JumpOffsetIfZero
-            // The offset to jump if the parExpression is 0 (size of statement)
-            // Generate expression code for statement
-            // Instruction.JumpOffset
-            // offset to jump (should be negative, from the jump instruction back to the beginning of the codeblock
-
-            code.Add(Visit(context.parExpression()));
-            code.Add(Instruction.JumpOffsetIfZero);
-
-            var bodyCode = Visit(whileBodyStatement);
-            code.Add(bodyCode.Size + 2); // + 2 because of the jump statement
-            code.Add(bodyCode);
-
-            var numInstructionsToJumpBack = code.Size;
-            code.Add(Instruction.JumpOffset);
-            code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
+            var conditionExpressionGen = Visit(context.parExpression());
+            var whileBodyStatementGen = Visit(context.statement());
             
-            return code;
+            return new WhileStatementEmitter(conditionExpressionGen, whileBodyStatementGen);
         }
 
         public override AbstractBytecodeEmitter VisitBreakStatement(HekateParser.BreakStatementContext context)

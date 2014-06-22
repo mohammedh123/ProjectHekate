@@ -66,6 +66,7 @@
     <Compile Include="Bytecode.Emitters\IfStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ReturnStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\VariableDeclarationStatementEmitter.cs" />
+    <Compile Include="Bytecode.Emitters\WhileStatementEmitter.cs" />
     <Compile Include="Bytecode.Generators\CompoundAssignmentExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\ExpressionListGenerator.cs" />
     <Compile Include="Bytecode.Generators\FunctionCallExpressionGenerator.cs" />
