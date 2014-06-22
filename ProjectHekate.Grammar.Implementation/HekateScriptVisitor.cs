@@ -522,18 +522,11 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
         {
-            var code = new CodeScope();
+            var leftExprGen = Visit(context.expression(0));
+            var rightExprGen = Visit(context.expression(1));
+            var op = GetBinaryOperatorFromContext(context);
 
-            // Binary expression code:
-            // Generate code for left expression (should push onto stack)
-            // Generate code for right expression (should push onto stack)
-            // Instruction.{depends on context.Operator.Type}
-
-            code.Add(Visit(context.expression(0)));
-            code.Add(Visit(context.expression(1)));
-            code.Add(GetBinaryOperatorFromContext(context));
-
-            return code;
+            return new BinaryExpressionGenerator(leftExprGen, rightExprGen, op);
         }
 
         private Instruction GetUnaryOperatorFromContext(HekateParser.UnaryExpressionContext context)

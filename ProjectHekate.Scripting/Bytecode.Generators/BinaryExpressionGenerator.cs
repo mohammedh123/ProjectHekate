@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ProjectHekate.Scripting.Interfaces;
+
+namespace ProjectHekate.Scripting.Bytecode.Generators
+{
+    public class BinaryExpressionGenerator : AbstractBytecodeEmitter
+    {
+        private readonly IBytecodeGenerator _leftExpression, _rightExpression;
+        private readonly Instruction _op;
+
+        public BinaryExpressionGenerator(IBytecodeGenerator leftExpression, IBytecodeGenerator rightExpression, Instruction op)
+        {
+            _leftExpression = leftExpression;
+            _rightExpression = rightExpression;
+
+            // do some basic validation of the operator
+            switch (op)
+            {
+                case Instruction.OperatorMultiply:
+                case Instruction.OperatorDivide:
+                case Instruction.OperatorMod:
+                case Instruction.OperatorAdd:
+                case Instruction.OperatorSubtract:
+                case Instruction.OperatorLessThan:
+                case Instruction.OperatorGreaterThan:
+                case Instruction.OperatorLessThanEqual:
+                case Instruction.OperatorGreaterThanEqual:
+                case Instruction.OperatorEqual:
+                case Instruction.OperatorNotEqual:
+                case Instruction.OperatorAnd:
+                case Instruction.OperatorOr:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("op", op, "The operator supplied is not a binary operator.");
+            }
+            _op = op;
+        }
+
+        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        {
+            // Binary expression code:
+            // Generate code for left expression (should push onto stack)
+            // Generate code for right expression (should push onto stack)
+            // Instruction.{depends on context.Operator.Type}
+
+            var code = new CodeBlock();
+
+            code.Add(_leftExpression.Generate(propCtx, scopeManager));
+            code.Add(_rightExpression.Generate(propCtx, scopeManager));
+            code.Add(_op);
+
+            return code;
+        }
+    }
+}
