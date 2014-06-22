@@ -147,39 +147,12 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitIfStatement(HekateParser.IfStatementContext context)
         {
-            var code = new CodeScope();
-            var ifBodyStatement = context.statement(0);
-            var elseStatement = context.statement(1);
+            var ifBodyStatementGen = Visit(context.statement(0));
+            var elseBodyStatement = context.statement(1);
+            var elseBodyStatementGen = elseBodyStatement == null ? null : Visit(elseBodyStatement);
+            var ifConditionGen = Visit(context.parExpression());
 
-            // If statement code
-            // Generate parExpression code
-            // Instruction.JumpOffsetIfZero
-            // The offset to jump if the parExpression is 0 (size of statement)
-            // Generate expression code for statement
-            // Instruction.JumpOffset if needed
-            // offset to jump if needed
-            // Generate code for statement (if it exists)
-
-            code.Add(Visit(context.parExpression()));
-            code.Add(Instruction.JumpOffsetIfZero);
-
-            var ifBodyCode = Visit(ifBodyStatement);
-
-            if (elseStatement != null) {
-                code.Add(ifBodyCode.Size + 2); // + 2 because of the jump statement
-                code.Add(ifBodyCode);
-
-                var elseCode = Visit(elseStatement);
-                code.Add(Instruction.JumpOffset);
-                code.Add(elseCode.Size);
-                code.Add(elseCode);
-            }
-            else {
-                code.Add(ifBodyCode.Size);
-                code.Add(ifBodyCode);
-            }
-
-            return code;
+            return new IfStatementEmitter(ifBodyStatementGen, elseBodyStatementGen, ifConditionGen);
         }
 
         public override AbstractBytecodeEmitter VisitForStatement(HekateParser.ForStatementContext context)
