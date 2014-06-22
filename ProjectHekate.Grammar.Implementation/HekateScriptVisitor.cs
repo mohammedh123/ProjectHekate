@@ -351,10 +351,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
         {
-            // Normal identifier expression code:
-            // Instructions.Push
-            // {index of variable if it exists}
-            return GenerateCodeForValueOfVariable(context.NormalIdentifier().GetText());
+            var identifierName = context.NormalIdentifier().GetText();
+
+            return new NormalIdentifierExpressionGenerator(identifierName);
         }
 
         public override AbstractBytecodeEmitter VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
