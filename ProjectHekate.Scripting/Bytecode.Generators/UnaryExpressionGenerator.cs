@@ -33,7 +33,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // Generate code for expression (should push onto stack)
             // op
 
-            var code = new CodeScope();
+            var code = new CodeBlock();
 
             code.Add(_expression.Generate(vm, scopeManager));
             code.Add(_op);

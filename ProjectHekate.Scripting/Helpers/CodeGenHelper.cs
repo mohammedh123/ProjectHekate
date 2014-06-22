@@ -14,7 +14,7 @@ namespace ProjectHekate.Scripting.Helpers
             var scope = scopeManager.GetCurrentScope();
             var index = scope.GetNumericalVariable(name).Index;
 
-            var code = new CodeScope();
+            var code = new CodeBlock();
             code.Add(Instruction.GetVariable);
             code.Add(index);
 
@@ -25,7 +25,7 @@ namespace ProjectHekate.Scripting.Helpers
         {
             var index = propCtx.GetProperty(name).Index;
 
-            var code = new CodeScope();
+            var code = new CodeBlock();
             code.Add(Instruction.GetProperty);
             code.Add(index);
 
