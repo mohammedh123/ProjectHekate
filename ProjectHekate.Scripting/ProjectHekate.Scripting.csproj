@@ -60,6 +60,7 @@
     <Compile Include="AbstractBytecodeEmitter.cs" />
     <Compile Include="BulletUpdaterCodeScope.cs" />
     <Compile Include="Bytecode.Emitters\BlockEmitter.cs" />
+    <Compile Include="Bytecode.Emitters\EmitterUpdaterDeclarationStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ExpressionStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\EmptyEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ForStatementEmitter.cs" />
