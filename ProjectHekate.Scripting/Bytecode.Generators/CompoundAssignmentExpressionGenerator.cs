@@ -10,7 +10,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 {
     public class CompoundAssignmentExpressionGenerator : AbstractBytecodeEmitter
     {
-        private readonly IBytecodeGenerator _valueToAssignExpression;
+        private readonly IBytecodeGenerator _valueExpression;
         private readonly IdentifierType _identifierType;
         private readonly string _identifierName;
         private readonly Instruction _op;
@@ -18,12 +18,12 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
         /// <summary>
         /// Constructs a compound assignment expression generator.
         /// </summary>
-        /// <param name="valueToAssignExpression">The bytecode generator that will generate the code for the assignment's value</param>
+        /// <param name="valueExpression">The bytecode generator that will generate the code for the value that will be compounded with the identifier's value</param>
         /// <param name="identifierType">The type of identifier</param>
         /// <param name="identifierName">The identifier name</param>
         /// <param name="op">The operator (+-*/) of this compound assignment</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the operator is not valid</exception>
-        public CompoundAssignmentExpressionGenerator(IBytecodeGenerator valueToAssignExpression, IdentifierType identifierType, string identifierName, Instruction op)
+        public CompoundAssignmentExpressionGenerator(IBytecodeGenerator valueExpression, IdentifierType identifierType, string identifierName, Instruction op)
         {
             switch (op) {
                 case Instruction.OperatorMultiply:
@@ -35,7 +35,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
                     throw new ArgumentOutOfRangeException("op", op, "The operator must be *, /, +, or -.");
             }
 
-            _valueToAssignExpression = valueToAssignExpression;
+            _valueExpression = valueExpression;
             _identifierType = identifierType;
             _identifierName = identifierName;
             _op = op;
@@ -46,7 +46,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // NOTE: this assignment only happens for numeral assignments
             // Compound assignment expression code:
             // {evaluate identifier's value, should place value on stack}
-            // {evaluate valueToAssignExpression, should place value on stack}
+            // {evaluate valueExpression, should place value on stack}
             // {an Instruction depending on what kind of assignment}
             // Instruction.SetVariable or Instruction.SetProperty
             // {index of the variable}
@@ -55,7 +55,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
             var propValueGen = new PropertyIdentifierExpressionGenerator(_identifierName);
             code.Add(propValueGen.Generate(propCtx, scopeManager));
-            code.Add(_valueToAssignExpression.Generate(propCtx, scopeManager));
+            code.Add(_valueExpression.Generate(propCtx, scopeManager));
             code.Add(_op);
 
             switch (_identifierType) {
