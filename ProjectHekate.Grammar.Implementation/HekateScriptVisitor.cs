@@ -132,23 +132,10 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
         {
-            var code = new CodeScope();
-            var scope = _scopeManager.GetCurrentScope();
-
+            var valueExpression = Visit(context.expression());
             var variableName = context.NormalIdentifier().GetText();
-            var index = scope.AddNumericalVariable(variableName);
 
-            // NOTE: this declaration only happens for numeral assignments
-            // Variable declaration code:
-            // {evaluate expression, should place value on stack}
-            // Instruction.SetVariable
-            // {index of the variable}
-
-            code.Add(Visit(context.expression()));
-            code.Add(Instruction.SetVariable);
-            code.Add(index);
-
-            return code;
+            return new VariableDeclarationGenerator(valueExpression, variableName);
         }
 
         public override AbstractBytecodeEmitter VisitReturnStatement(HekateParser.ReturnStatementContext context)
