@@ -3,7 +3,7 @@
     /// <summary>
     /// An interface for a class that generates bytecode.
     /// </summary>
-    interface IBytecodeGenerator
+    public interface IBytecodeGenerator
     {
         ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager);
     }

@@ -8,7 +8,7 @@ namespace ProjectHekate.Scripting.Interfaces
         IReadOnlyList<FunctionCodeScope> FunctionCodeBlocks { get; }
         IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeBlocks { get; }
         IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeBlocks { get; }
-        CodeScope CurrentCode { get; set; }
+        ICodeBlock CurrentCode { get; set; }
 
         /// <summary>
         /// Adds a function code scope to the virtual machine.

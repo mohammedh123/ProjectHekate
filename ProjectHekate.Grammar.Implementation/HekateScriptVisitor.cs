@@ -117,19 +117,17 @@ namespace ProjectHekate.Grammar.Implementation
             return funcCodeBlock;
         }
 
-
         #endregion
       
   
         #region Statement constructs
-        {
-            var code = new CodeScope();
 
-            Visit(context.expression()); // all expressions should leave a single value on the stack
-            code.Add(Instruction.Pop);
         public override AbstractBytecodeEmitter VisitExpressionStatement(HekateParser.ExpressionStatementContext context)
+        {
+            var expGen = Visit(context.expression()); // all expressions should leave a single value on the stack
+            var expStatementEmitter = new ExpressionStatementEmitter(expGen);
 
-            return code;
+            return expStatementEmitter;
         }
 
         public override AbstractBytecodeEmitter VisitVariableDeclaration(HekateParser.VariableDeclarationContext context)
@@ -348,9 +346,7 @@ namespace ProjectHekate.Grammar.Implementation
             var text = context.GetText();
             var value = float.Parse(text);
 
-            //new LiteralExpressionInstruction(value).EmitOn(_virtualMachine, _scopeManager);
-
-            return _virtualMachine.CurrentCode;
+            return new LiteralExpressionGenerator(value);
         }
 
         public override AbstractBytecodeEmitter VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
