@@ -12,13 +12,13 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _propertyIdentifier = propertyIdentifier;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             // Property identifier expression code:
             // Instructions.Push
             // {index of property if it exists}
 
-            return CodeGenHelper.GenerateCodeForValueOfProperty(propCtx, _propertyIdentifier);
+            return CodeGenHelper.GenerateCodeForValueOfProperty(vm, _propertyIdentifier);
         }
     }
 }

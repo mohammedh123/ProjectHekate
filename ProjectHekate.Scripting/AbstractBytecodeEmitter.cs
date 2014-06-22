@@ -4,12 +4,12 @@ namespace ProjectHekate.Scripting
 {
     public abstract class AbstractBytecodeEmitter : IBytecodeEmitter
     {
-        public virtual ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public virtual ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             return new CodeBlock();
         }
 
-        public virtual void EmitTo(ICodeBlock codeBlock, IPropertyContext propCtx, IScopeManager scopeManager)
+        public virtual void EmitTo(ICodeBlock codeBlock, IVirtualMachine vm, IScopeManager scopeManager)
         {}
     }
 }

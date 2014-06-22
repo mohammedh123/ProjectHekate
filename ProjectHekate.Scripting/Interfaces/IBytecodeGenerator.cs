@@ -5,6 +5,6 @@
     /// </summary>
     public interface IBytecodeGenerator
     {
-        ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager);
+        ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager);
     }
 }

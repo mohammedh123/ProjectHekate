@@ -41,7 +41,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _op = op;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             // NOTE: this assignment only happens for numeral assignments
             // Compound assignment expression code:
@@ -54,14 +54,14 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             var code = new CodeBlock();
 
             var propValueGen = new PropertyIdentifierExpressionGenerator(_identifierName);
-            code.Add(propValueGen.Generate(propCtx, scopeManager));
-            code.Add(_valueExpression.Generate(propCtx, scopeManager));
+            code.Add(propValueGen.Generate(vm, scopeManager));
+            code.Add(_valueExpression.Generate(vm, scopeManager));
             code.Add(_op);
 
             switch (_identifierType) {
                 case IdentifierType.Property:
                 {
-                    var index = propCtx.GetProperty(_identifierName).Index;
+                    var index = vm.GetProperty(_identifierName).Index;
                     code.Add(Instruction.SetProperty);
                     code.Add(index);
 

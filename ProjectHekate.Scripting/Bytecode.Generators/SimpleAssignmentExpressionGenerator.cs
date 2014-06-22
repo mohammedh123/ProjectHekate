@@ -20,7 +20,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _identifierName = identifierName;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             // NOTE: this assignment only happens for numeral assignments
             // Simple assignment expression code:
@@ -30,12 +30,12 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
             var code = new CodeBlock();
 
-            code.Add(_valueToAssignExpression.Generate(propCtx, scopeManager));
+            code.Add(_valueToAssignExpression.Generate(vm, scopeManager));
 
             switch (_identifierType) {
                 case IdentifierType.Property:
                 {
-                    var index = propCtx.GetProperty(_identifierName).Index;
+                    var index = vm.GetProperty(_identifierName).Index;
 
                     code.Add(Instruction.SetProperty);
                     code.Add(index);

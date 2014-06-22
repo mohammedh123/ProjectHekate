@@ -11,7 +11,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _value = value;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             var code = new CodeBlock();
 

@@ -11,9 +11,9 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             _expressionCodeGenerator = expressionCodeGenerator;
         }
 
-        public override void EmitTo(ICodeBlock codeBlock, IPropertyContext propCtx, IScopeManager scopeManager)
+        public override void EmitTo(ICodeBlock codeBlock, IVirtualMachine vm, IScopeManager scopeManager)
         {
-            var expressionCode = _expressionCodeGenerator.Generate(propCtx, scopeManager);
+            var expressionCode = _expressionCodeGenerator.Generate(vm, scopeManager);
 
             codeBlock.Add(expressionCode);
             codeBlock.Add(Instruction.Pop);

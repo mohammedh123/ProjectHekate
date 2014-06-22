@@ -5,6 +5,6 @@
     /// </summary>
     interface IBytecodeEmitter : IBytecodeGenerator
     {
-        void EmitTo(ICodeBlock codeBlock, IPropertyContext propCtx, IScopeManager scopeManager);
+        void EmitTo(ICodeBlock codeBlock, IVirtualMachine vm, IScopeManager scopeManager);
     }
 }

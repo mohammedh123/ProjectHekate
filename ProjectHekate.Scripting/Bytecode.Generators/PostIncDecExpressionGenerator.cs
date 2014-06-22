@@ -26,7 +26,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _op = op;
         }
         
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {           
             // Post-inc/decrement expression code:
             // Instruction.GetVariable/Property
@@ -42,7 +42,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             var oneLitGen = new LiteralExpressionGenerator(1);
             var compAssignExprGen = new CompoundAssignmentExpressionGenerator(oneLitGen, _identifierType, _identifierName, _op);
 
-            code.Add(compAssignExprGen.Generate(propCtx, scopeManager));
+            code.Add(compAssignExprGen.Generate(vm, scopeManager));
 
             return code;
         }

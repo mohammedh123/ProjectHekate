@@ -36,7 +36,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _op = op;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             // Binary expression code:
             // Generate code for left expression (should push onto stack)
@@ -45,8 +45,8 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
             var code = new CodeBlock();
 
-            code.Add(_leftExpression.Generate(propCtx, scopeManager));
-            code.Add(_rightExpression.Generate(propCtx, scopeManager));
+            code.Add(_leftExpression.Generate(vm, scopeManager));
+            code.Add(_rightExpression.Generate(vm, scopeManager));
             code.Add(_op);
 
             return code;

@@ -12,7 +12,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _identifierName = identifierName;
         }
 
-        public override ICodeBlock Generate(IPropertyContext propCtx, IScopeManager scopeManager)
+        public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
             // Normal identifier expression code:
             // Instructions.Push
