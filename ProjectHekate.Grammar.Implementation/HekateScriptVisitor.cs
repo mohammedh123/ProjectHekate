@@ -424,21 +424,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitFunctionCallExpression(HekateParser.FunctionCallExpressionContext context)
         {
-            var code = new CodeScope();
-
             var functionName = context.NormalIdentifier().GetText();
-            var functionIndex = _virtualMachine.GetFunctionCodeScope(functionName).Index;
-
-            // Function call expression code:
-            // Generate code for each parameter value (each should push a value onto the stack)
-            // Instruction.FunctionCall
-            // {function code scope's index}
-
-            code.Add(Visit(context.parExpressionList()));
-            code.Add(Instruction.FunctionCall);
-            code.Add(functionIndex);
-
-            return code;
+            
+            return new FunctionCallExpressionGenerator(Visit(context.parExpressionList()), functionName);
         }
 
         public override AbstractBytecodeEmitter VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
