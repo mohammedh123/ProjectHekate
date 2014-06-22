@@ -428,64 +428,35 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitAssignmentExpression(HekateParser.AssignmentExpressionContext context)
         {
-            var code = new CodeScope();
-
             var isNormalIdentifier = context.NormalIdentifier() != null;
             var isPropertyIdentifier = context.PropertyIdentifier() != null;
 
-            // NOTE: this assignment only happens for numeral assignments
-            // Assignment expression code:
-            // 1a. if normal assign
-            //  {evaluate expression, should place value on stack}
-            // 1b. if mul/div/add/sub
-            //  i.   {evaluate identifier's value, should place value on stack}
-            //  ii.  {evaluate expression, should place value on stack}
-            //  iii. {an Instruction depending on what kind of assignment}
-            // 2. Instruction.SetVariable or Instruction.SetProperty
-            // 3. {index of the variable}
-
-
             // determine whether its a variable or a property
-            int index;
-            Instruction assignmentOp;
-            CodeScope codeToAdd; // to make sure redundant checks arent done later on)
+            IdentifierType identifierType;
+            string identifierName;
             if (isNormalIdentifier)
             {
-                var scope = _scopeManager.GetCurrentScope();
-                var identifierName = context.NormalIdentifier().GetText();
-                index = scope.GetNumericalVariable(identifierName).Index;
-                assignmentOp = Instruction.SetVariable;
-
-                codeToAdd = GenerateCodeForValueOfVariable(identifierName);
+                identifierType = IdentifierType.Variable;
+                identifierName = context.NormalIdentifier().GetText();
             }
             else if (isPropertyIdentifier)
             {
-                var identifierName = context.PropertyIdentifier().GetText();
-                index = _virtualMachine.GetProperty(identifierName).Index;
-                assignmentOp = Instruction.SetProperty;
-
-                codeToAdd = GenerateCodeForValueOfProperty(identifierName);
+                identifierType = IdentifierType.Property;
+                identifierName = context.PropertyIdentifier().GetText();
             }
             else
             {
                 throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitAssignmentExpression.");
             }
 
-            // 1
-            if (context.Operator.Type == HekateParser.ASSIGN) { // a
-                code.Add(Visit(context.expression()));
+            var exprGen = Visit(context.expression());
+            if (context.Operator.Type == HekateParser.ASSIGN) {
+                return new SimpleAssignmentExpressionGenerator(exprGen, identifierType, identifierName);
             }
-            else { // b
-                code.Add(codeToAdd); // i
-                code.Add(Visit(context.expression())); // ii
-                code.Add(GetCompoundAssignmentOperatorFromContext(context)); // iii
+            else {
+                var op = GetCompoundAssignmentOperatorFromContext(context);
+                return new CompoundAssignmentExpressionGenerator(exprGen, identifierType, identifierName, op);
             }
-
-            // 2,3
-            code.Add(assignmentOp);
-            code.Add(index);
-
-            return code;
         }
 
         public override AbstractBytecodeEmitter VisitFunctionCallExpression(HekateParser.FunctionCallExpressionContext context)
@@ -541,8 +512,7 @@ namespace ProjectHekate.Grammar.Implementation
 
         private Instruction GetBinaryOperatorFromContext(HekateParser.BinaryExpressionContext context)
         {
-            switch (context.Operator.Type)
-            {
+            switch (context.Operator.Type) {
                 case HekateParser.MUL:      return Instruction.OperatorMultiply;
                 case HekateParser.DIV:      return Instruction.OperatorDivide;
                 case HekateParser.MOD:      return Instruction.OperatorMod;
@@ -562,8 +532,7 @@ namespace ProjectHekate.Grammar.Implementation
 
         private Instruction GetCompoundAssignmentOperatorFromContext(HekateParser.AssignmentExpressionContext context)
         {
-            switch (context.Operator.Type)
-            {
+            switch (context.Operator.Type) {
                 case HekateParser.MUL_ASSIGN:   return Instruction.OperatorMultiply;
                 case HekateParser.DIV_ASSIGN:   return Instruction.OperatorDivide;
                 case HekateParser.ADD_ASSIGN:   return Instruction.OperatorAdd;

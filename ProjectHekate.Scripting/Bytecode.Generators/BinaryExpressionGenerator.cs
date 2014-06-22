@@ -14,9 +14,6 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
         public BinaryExpressionGenerator(IBytecodeGenerator leftExpression, IBytecodeGenerator rightExpression, Instruction op)
         {
-            _leftExpression = leftExpression;
-            _rightExpression = rightExpression;
-
             // do some basic validation of the operator
             switch (op)
             {
@@ -37,6 +34,9 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
                 default:
                     throw new ArgumentOutOfRangeException("op", op, "The operator supplied is not a binary operator.");
             }
+
+            _leftExpression = leftExpression;
+            _rightExpression = rightExpression;
             _op = op;
         }
 
