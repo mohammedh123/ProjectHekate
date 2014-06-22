@@ -8,7 +8,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class UnaryExpressionGenerator : EmptyBytecodeEmitter
+    public class UnaryExpressionGenerator : EmptyEmitter
     {
         private readonly IBytecodeGenerator _expression;
         private readonly Instruction _op;

@@ -7,11 +7,11 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
-    public class BlockBytecodeEmitter : EmptyBytecodeEmitter
+    public class BlockEmitter : EmptyEmitter
     {
         private readonly IList<IBytecodeEmitter> _statementEmitters;
 
-        public BlockBytecodeEmitter(IList<IBytecodeEmitter> statementEmitters)
+        public BlockEmitter(IList<IBytecodeEmitter> statementEmitters)
         {
             _statementEmitters = statementEmitters;
         }

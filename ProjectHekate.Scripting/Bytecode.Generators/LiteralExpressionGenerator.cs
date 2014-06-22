@@ -3,7 +3,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class LiteralExpressionGenerator : EmptyBytecodeEmitter
+    public class LiteralExpressionGenerator : EmptyEmitter
     {
         private readonly float _value;
         

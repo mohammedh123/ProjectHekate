@@ -4,11 +4,11 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class ExpressionListBytecodeGenerator : EmptyBytecodeEmitter
+    public class ExpressionListGenerator : EmptyEmitter
     {
         private readonly IList<IBytecodeGenerator> _expressionList;
 
-        public ExpressionListBytecodeGenerator(IList<IBytecodeGenerator> expressionList)
+        public ExpressionListGenerator(IList<IBytecodeGenerator> expressionList)
         {
             _expressionList = expressionList;
         }

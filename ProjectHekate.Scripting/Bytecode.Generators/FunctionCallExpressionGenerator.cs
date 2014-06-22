@@ -8,7 +8,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class FunctionCallExpressionGenerator : EmptyBytecodeEmitter
+    public class FunctionCallExpressionGenerator : EmptyEmitter
     {
         private readonly IBytecodeGenerator _parametersExpression;
         private readonly string _functionName;

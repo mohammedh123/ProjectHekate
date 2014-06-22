@@ -4,7 +4,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class BinaryExpressionGenerator : EmptyBytecodeEmitter
+    public class BinaryExpressionGenerator : EmptyEmitter
     {
         private readonly IBytecodeGenerator _leftExpression, _rightExpression;
         private readonly Instruction _op;

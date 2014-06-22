@@ -299,14 +299,14 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitParExpressionList(HekateParser.ParExpressionListContext context)
         {
-            return context.expressionList() == null ? new EmptyBytecodeEmitter() : Visit(context.expressionList());
+            return context.expressionList() == null ? new EmptyEmitter() : Visit(context.expressionList());
         }
 
         public override AbstractBytecodeEmitter VisitExpressionList(HekateParser.ExpressionListContext context)
         {
             var expressionList = context.expression().Select(Visit).Cast<IBytecodeGenerator>().ToList();
 
-            return new ExpressionListBytecodeGenerator(expressionList);
+            return new ExpressionListGenerator(expressionList);
         }
 
         public override AbstractBytecodeEmitter VisitBlockStatement(HekateParser.BlockStatementContext context)
@@ -318,7 +318,7 @@ namespace ProjectHekate.Grammar.Implementation
         {
             var statementEmitters = context.statement().Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
-            return new BlockBytecodeEmitter(statementEmitters);
+            return new BlockEmitter(statementEmitters);
         }
 
         public override AbstractBytecodeEmitter VisitForInit(HekateParser.ForInitContext context)

@@ -9,7 +9,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class CompoundAssignmentExpressionGenerator : EmptyBytecodeEmitter
+    public class CompoundAssignmentExpressionGenerator : EmptyEmitter
     {
         private readonly IBytecodeGenerator _valueExpression;
         private readonly IdentifierType _identifierType;

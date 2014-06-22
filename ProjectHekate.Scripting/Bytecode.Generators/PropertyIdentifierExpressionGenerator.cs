@@ -4,7 +4,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class PropertyIdentifierExpressionGenerator : EmptyBytecodeEmitter
+    public class PropertyIdentifierExpressionGenerator : EmptyEmitter
     {
         private readonly string _propertyIdentifier;
 

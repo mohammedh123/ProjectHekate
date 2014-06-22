@@ -4,7 +4,7 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
 {
-    public class PostIncDecExpressionGenerator : EmptyBytecodeEmitter
+    public class PostIncDecExpressionGenerator : EmptyEmitter
     {
         private readonly IdentifierType _identifierType;
         private readonly string _identifierName;

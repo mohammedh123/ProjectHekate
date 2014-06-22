@@ -2,7 +2,7 @@
 
 namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
-    public class EmptyBytecodeEmitter : AbstractBytecodeEmitter
+    public class EmptyEmitter : AbstractBytecodeEmitter
     {
         public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
