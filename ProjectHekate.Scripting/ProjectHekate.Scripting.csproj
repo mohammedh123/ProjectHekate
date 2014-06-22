@@ -62,6 +62,7 @@
     <Compile Include="Bytecode.Emitters\ExpressionStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\EmptyBytecodeEmitter.cs" />
     <Compile Include="Bytecode.Generators\CompoundAssignmentExpressionGenerator.cs" />
+    <Compile Include="Bytecode.Generators\ExpressionListBytecodeGenerator.cs" />
     <Compile Include="Bytecode.Generators\FunctionCallExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\SimpleAssignmentExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\BinaryExpressionGenerator.cs" />
