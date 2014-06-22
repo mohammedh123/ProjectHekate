@@ -68,6 +68,7 @@
     <Compile Include="Bytecode.Generators\NormalIdentifierExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\PostIncDecExpressionGenerator.cs" />
     <Compile Include="Bytecode.Generators\PropertyIdentifierExpressionGenerator.cs" />
+    <Compile Include="Bytecode.Generators\UnaryExpressionGenerator.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeScope.cs" />
     <Compile Include="EmitterUpdaterCodeScope.cs" />

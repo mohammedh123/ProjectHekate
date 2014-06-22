@@ -431,15 +431,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitUnaryExpression(HekateParser.UnaryExpressionContext context)
         {
-            var code = new CodeScope();
+            var op = GetUnaryOperatorFromContext(context);
 
-            // Unary expression code:
-            // Generate code for expression (should push onto stack)
-            // Instruction.{depends on context.Operator.Type}
-            code.Add(Visit(context.expression()));
-            code.Add(GetUnaryOperatorFromContext(context));
-
-            return code;
+            return new UnaryExpressionGenerator(Visit(context.expression()), op);
         }
 
         public override AbstractBytecodeEmitter VisitBinaryExpression(HekateParser.BinaryExpressionContext context)
