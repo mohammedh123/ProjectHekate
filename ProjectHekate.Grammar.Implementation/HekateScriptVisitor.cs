@@ -584,33 +584,5 @@ namespace ProjectHekate.Grammar.Implementation
         }
 
         #endregion
-
-
-        #region Miscellaneous helper functions
-
-        private CodeScope GenerateCodeForValueOfVariable(string name)
-        {
-            var scope = _scopeManager.GetCurrentScope();
-            var index = scope.GetNumericalVariable(name).Index;
-
-            var code = new CodeScope();
-            code.Add(Instruction.GetVariable);
-            code.Add(index);
-
-            return code;
-        }
-
-        private CodeScope GenerateCodeForValueOfProperty(string name)
-        {
-            var index = _virtualMachine.GetProperty(name).Index;
-
-            var code = new CodeScope();
-            code.Add(Instruction.GetProperty);
-            code.Add(index);
-
-            return code;
-        }
-
-        #endregion
     }
 }
