@@ -67,7 +67,6 @@
     <Compile Include="IdentifierTypeEnum.cs" />
     <Compile Include="InstructionEnum.cs" />
     <Compile Include="EmitterScriptState.cs" />
-    <Compile Include="Instructions\Expressions\LiteralExpressionBytecodeGenerator.cs" />
     <Compile Include="Interfaces\IBytecodeEmitter.cs" />
     <Compile Include="Interfaces\IBytecodeGenerator.cs" />
     <Compile Include="Interfaces\ICodeBlock.cs" />
@@ -80,9 +79,7 @@
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Instructions\Statements\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
