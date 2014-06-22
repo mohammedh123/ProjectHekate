@@ -358,10 +358,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
         {
-            // Property identifier expression code:
-            // Instructions.Push
-            // {index of property if it exists}
-            return GenerateCodeForValueOfProperty(context.PropertyIdentifier().GetText());
+            var identifierName = context.PropertyIdentifier().GetText();
+
+            return new PropertyIdentifierExpressionGenerator(identifierName);
         }
 
         public override AbstractBytecodeEmitter VisitPostIncDecExpression(HekateParser.PostIncDecExpressionContext context)
