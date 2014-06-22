@@ -316,13 +316,9 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitBlock(HekateParser.BlockContext context)
         {
-            var code = new CodeScope();
+            var statementEmitters = context.statement().Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
-            foreach (var statementContext in context.statement()) {
-                code.Add(Visit(statementContext));
-            }
-
-            return code;
+            return new BlockBytecodeEmitter(statementEmitters);
         }
 
         public override AbstractBytecodeEmitter VisitForInit(HekateParser.ForInitContext context)
