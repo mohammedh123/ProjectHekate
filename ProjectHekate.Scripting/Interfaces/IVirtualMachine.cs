@@ -5,9 +5,9 @@ namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IVirtualMachine : IPropertyContext
     {
-        IReadOnlyList<FunctionCodeScope> FunctionCodeBlocks { get; }
-        IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeBlocks { get; }
-        IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeBlocks { get; }
+        IReadOnlyList<FunctionCodeScope> FunctionCodeScopes { get; }
+        IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeScopes { get; }
+        IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeScopes { get; }
         ICodeBlock CurrentCode { get; set; }
 
         /// <summary>

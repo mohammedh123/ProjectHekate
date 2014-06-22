@@ -15,9 +15,9 @@ namespace ProjectHekate.Scripting
         public const int MaxProperties = 32;
 
 
-        public IReadOnlyList<FunctionCodeScope> FunctionCodeBlocks { get; private set; }
-        public IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeBlocks { get; private set; }
-        public IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeBlocks { get; private set; }
+        public IReadOnlyList<FunctionCodeScope> FunctionCodeScopes { get; private set; }
+        public IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeScopes { get; private set; }
+        public IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeScopes { get; private set; }
         public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
         public ICodeBlock CurrentCode { get; set; }
 
@@ -44,9 +44,9 @@ namespace ProjectHekate.Scripting
             _propertyRecords = new List<IdentifierRecord>();
             _propertyNameToIndex = new Dictionary<string, int>();
 
-            FunctionCodeBlocks = _functionCodeScopes.AsReadOnly();
-            BulletUpdaterCodeBlocks = _bulletUpdaterCodeScopes.AsReadOnly();
-            EmitterUpdaterCodeBlocks = _emitterUpdaterCodeScopes.AsReadOnly();
+            FunctionCodeScopes = _functionCodeScopes.AsReadOnly();
+            BulletUpdaterCodeScopes = _bulletUpdaterCodeScopes.AsReadOnly();
+            EmitterUpdaterCodeScopes = _emitterUpdaterCodeScopes.AsReadOnly();
             PropertyRecords = _propertyRecords.AsReadOnly();
         }
 
