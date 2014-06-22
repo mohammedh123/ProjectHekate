@@ -157,34 +157,16 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitForStatement(HekateParser.ForStatementContext context)
         {
-            var code = new CodeScope();
-            var forInitCtx = context.forControl().forInit();
-            var expressionCtx = context.forControl().expression();
-            var forUpdateCtx = context.forControl().forUpdate();
-            var bodyStatement = context.statement();
+            var forInitCtx = context.forInit();
+            var forCondCtx = context.expression();
+            var forUpdateCtx = context.forUpdate();
+            
+            var forInitGen = forInitCtx == null ? null : Visit(forInitCtx);
+            var forCondGen = forCondCtx == null ? null : Visit(forCondCtx);
+            var forUpdateGen = forUpdateCtx == null ? null : Visit(forUpdateCtx);
+            var bodyStatementGen = Visit(context.statement());
 
-            // For statement code
-            // Generate code for the initialization (if there is one)
-            // Generate code for the test expression (if there is one)
-            // Generate code for the increment expressions (if there are any)
-            // Generate code for the body statement
-            // Instruction.JumpOffset
-            // the number of instructions backwards until we get to the test expression
-
-            if (forInitCtx != null) code.Add(Visit(forInitCtx));
-
-            var codeToLoop = new CodeScope();
-            if (expressionCtx != null) codeToLoop.Add(Visit(expressionCtx));
-            if (forUpdateCtx != null) codeToLoop.Add(Visit(forUpdateCtx));
-            codeToLoop.Add(Visit(bodyStatement));
-
-            code.Add(codeToLoop);
-
-            var numInstructionsToJumpBack = codeToLoop.Size;
-            code.Add(Instruction.JumpOffset);
-            code.Add(-numInstructionsToJumpBack); // negative because this is a jump backwards
-
-            return code;
+            return new ForStatementEmitter(forInitGen, forCondGen, forUpdateGen, bodyStatementGen);
         }
 
         public override AbstractBytecodeEmitter VisitWhileStatement(HekateParser.WhileStatementContext context)

@@ -62,6 +62,7 @@
     <Compile Include="Bytecode.Emitters\BlockEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ExpressionStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\EmptyEmitter.cs" />
+    <Compile Include="Bytecode.Emitters\ForStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\IfStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ReturnStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\VariableDeclarationStatementEmitter.cs" />

@@ -56,7 +56,7 @@ formalParameters
 statement
 	:	block	# BlockStatement
 	|	IF parExpression statement (ELSE statement)?		# IfStatement
-	|	FOR LPAREN forControl RPAREN statement				# ForStatement
+	|	FOR LPAREN forInit? SEMI expression? SEMI forUpdate? RPAREN statement				# ForStatement
 	|	WHILE parExpression statement						# WhileStatement
 	|	BREAK SEMI				# BreakStatement
 	|	CONTINUE SEMI			# ContinueStatement
@@ -77,11 +77,7 @@ returnStatement
 fromEmitterOption
 	:	FROM NormalIdentifier
 	;
-
-forControl
-	:	forInit? SEMI expression? SEMI forUpdate?
-	;
-
+	
 forInit
 	:	variableDeclaration
 	|	expressionList
