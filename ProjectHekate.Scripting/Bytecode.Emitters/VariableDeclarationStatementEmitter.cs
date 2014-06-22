@@ -1,14 +1,13 @@
-﻿using ProjectHekate.Scripting.Bytecode.Emitters;
-using ProjectHekate.Scripting.Interfaces;
+﻿using ProjectHekate.Scripting.Interfaces;
 
-namespace ProjectHekate.Scripting.Bytecode.Generators
+namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
-    public class VariableDeclarationGenerator : EmptyEmitter
-    {
+    public class VariableDeclarationStatementEmitter : EmptyEmitter
+    {        
         private readonly IBytecodeGenerator _valueExpression;
         private readonly string _variableName;
 
-        public VariableDeclarationGenerator(IBytecodeGenerator valueExpression, string variableName)
+        public VariableDeclarationStatementEmitter(IBytecodeGenerator valueExpression, string variableName)
         {
             _valueExpression = valueExpression;
             _variableName = variableName;
@@ -32,6 +31,13 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             code.Add(index);
 
             return code;
+        }
+
+        public override void EmitTo(ICodeBlock codeBlock, IVirtualMachine vm, IScopeManager scopeManager)
+        {
+            var code = Generate(vm, scopeManager);
+
+            codeBlock.Add(code);
         }
     }
 }

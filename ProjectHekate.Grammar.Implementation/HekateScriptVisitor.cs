@@ -135,7 +135,7 @@ namespace ProjectHekate.Grammar.Implementation
             var valueExpression = Visit(context.expression());
             var variableName = context.NormalIdentifier().GetText();
 
-            return new VariableDeclarationGenerator(valueExpression, variableName);
+            return new VariableDeclarationStatementEmitter(valueExpression, variableName);
         }
 
         public override AbstractBytecodeEmitter VisitReturnStatement(HekateParser.ReturnStatementContext context)
@@ -273,7 +273,14 @@ namespace ProjectHekate.Grammar.Implementation
 
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
-        
+
+        public override AbstractBytecodeEmitter VisitVariableDeclarationStatement(HekateParser.VariableDeclarationStatementContext context)
+        {
+            var varDeclarationGen = Visit(context.variableDeclaration());
+
+            return varDeclarationGen;
+        }
+
         public override AbstractBytecodeEmitter VisitParenthesizedExpression(HekateParser.ParenthesizedExpressionContext context)
         {
             return Visit(context.expression());
