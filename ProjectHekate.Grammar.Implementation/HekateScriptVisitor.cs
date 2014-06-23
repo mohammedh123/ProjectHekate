@@ -13,9 +13,6 @@ namespace ProjectHekate.Grammar.Implementation
 {
     public class HekateScriptVisitor : HekateBaseVisitor<AbstractBytecodeEmitter>
     {
-        private readonly IVirtualMachine _virtualMachine;
-        private readonly IScopeManager _scopeManager;
-
         // These two stack's of lists are used to replace the dummy values for jumps/continues
         //  with the actual size of the enclosing loop constructs they should be in
         // When a loop construct 'begins', it should add an empty list to each of these
@@ -25,11 +22,8 @@ namespace ProjectHekate.Grammar.Implementation
         private readonly Stack<List<int>> _breakLocations;
         private readonly Stack<List<int>> _continueLocations;
 
-        public HekateScriptVisitor(IVirtualMachine virtualMachine, IScopeManager scopeManager)
+        public HekateScriptVisitor()
         {
-            _virtualMachine = virtualMachine;
-            _scopeManager = scopeManager;
-
             _breakLocations = new Stack<List<int>>();
             _continueLocations = new Stack<List<int>>();
         }
