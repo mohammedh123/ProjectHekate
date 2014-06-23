@@ -141,6 +141,12 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitForStatement(HekateParser.ForStatementContext context)
         {
+            var breakList = new List<int>();
+            _breakLocations.Push(breakList);
+
+            var continueList = new List<int>();
+            _continueLocations.Push(continueList);
+
             var forInitCtx = context.forInit();
             var forCondCtx = context.expression();
             var forUpdateCtx = context.forUpdate();
@@ -150,7 +156,7 @@ namespace ProjectHekate.Grammar.Implementation
             var forUpdateGen = forUpdateCtx == null ? null : Visit(forUpdateCtx);
             var bodyStatementGen = Visit(context.statement());
 
-            return new ForStatementEmitter(forInitGen, forCondGen, forUpdateGen, bodyStatementGen);
+            return new ForStatementEmitter(forInitGen, forCondGen, forUpdateGen, bodyStatementGen, breakList, continueList);
         }
 
         public override AbstractBytecodeEmitter VisitWhileStatement(HekateParser.WhileStatementContext context)

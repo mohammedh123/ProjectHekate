@@ -47,7 +47,6 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             foreach (var idx in _breakList) {
                 codeBlock[idx] = codeBlock.Size;
             }
-
             _breakList.Clear();
 
             // loop through all continue locations and update them
@@ -55,7 +54,6 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             {
                 codeBlock[idx] = loopBeginIdx;
             }
-
             _continueList.Clear();
         }
     }
