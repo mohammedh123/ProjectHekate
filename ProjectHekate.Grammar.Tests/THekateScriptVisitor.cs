@@ -445,7 +445,29 @@ else {
 
                 // Verify
                 result.Code.Should().HaveCount(2);
-                result.Code[0].Should().Be((byte) Instruction.Jump);
+                result.Code[0].Should().Be((byte)Instruction.Jump);
+                result.Code[1].Should().Be(0);
+            }
+        }
+
+        [TestClass]
+        public class VisitContinueStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForContinueStatementBecauseOfDummyJumpValue()
+            {
+                // Setup: dummy data
+                const string expression = @"continue;";
+
+                // Act
+                var result = new CodeBlock();
+                Subject
+                    .VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(2);
+                result.Code[0].Should().Be((byte)Instruction.Jump);
                 result.Code[1].Should().Be(0);
             }
         }
