@@ -54,8 +54,20 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
             var code = new CodeBlock();
 
-            var propValueGen = new PropertyIdentifierExpressionGenerator(_identifierName);
-            code.Add(propValueGen.Generate(vm, scopeManager));
+            IBytecodeGenerator valueGen;
+            switch (_identifierType) {
+                case IdentifierType.Property:
+                    valueGen = new PropertyIdentifierExpressionGenerator(_identifierName);
+                    break;
+                case IdentifierType.Variable:
+                    valueGen = new NormalIdentifierExpressionGenerator(_identifierName);
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        "A new type of identifier was added, but the CompoundAssignmentExpressionGenerator was not updated to reflect this.");
+            }
+
+            code.Add(valueGen.Generate(vm, scopeManager));
             code.Add(_valueExpression.Generate(vm, scopeManager));
             code.Add(_op);
 
@@ -78,9 +90,6 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
                     break;
                 }
-                default:
-                    throw new InvalidOperationException(
-                        "A new type of identifier was added, but the SimpleAssignmentExpressionGenerator was not updated to reflect this.");
             }
 
             return code;
