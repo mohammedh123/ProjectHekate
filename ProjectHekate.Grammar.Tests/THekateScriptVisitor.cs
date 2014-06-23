@@ -88,8 +88,10 @@ namespace ProjectHekate.Grammar.Tests
                 const string expression = "return 3;";
 
                 // Act
-                var result = Subject.VisitReturnStatement(GenerateContext<HekateParser.ReturnStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitReturnStatement(GenerateContext<HekateParser.ReturnStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(3);
@@ -109,15 +111,17 @@ namespace ProjectHekate.Grammar.Tests
                 const string expression = "if(1) {}";
 
                 // Act
-                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(4);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(0);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(4);
             }
 
             [TestMethod]
@@ -129,15 +133,17 @@ namespace ProjectHekate.Grammar.Tests
 }";
 
                 // Act
-                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(7);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(3);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(7);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
                 result.Code[6].Should().Be((byte) Instruction.Pop);
@@ -155,20 +161,22 @@ else {
 }";
 
                 // Act
-                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(12);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(5);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(9);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
                 result.Code[6].Should().Be((byte) Instruction.Pop);
-                result.Code[7].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[8].Should().Be(3);
+                result.Code[7].Should().Be((byte) Instruction.Jump);
+                result.Code[8].Should().Be(12);
                 result.Code[9].Should().Be((byte) Instruction.Push);
                 result.Code[10].Should().Be(4);
                 result.Code[11].Should().Be((byte) Instruction.Pop);
@@ -189,29 +197,31 @@ else {
 }";
 
                 // Act
-                var result = Subject.VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(21);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(5);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(9);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
                 result.Code[6].Should().Be((byte) Instruction.Pop);
-                result.Code[7].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[8].Should().Be(12);
+                result.Code[7].Should().Be((byte) Instruction.Jump);
+                result.Code[8].Should().Be(21);
                 result.Code[9].Should().Be((byte) Instruction.Push);
                 result.Code[10].Should().Be(2);
-                result.Code[11].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[12].Should().Be(5);
+                result.Code[11].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[12].Should().Be(18);
                 result.Code[13].Should().Be((byte) Instruction.Push);
                 result.Code[14].Should().Be(4);
                 result.Code[15].Should().Be((byte) Instruction.Pop);
-                result.Code[16].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[17].Should().Be(3);
+                result.Code[16].Should().Be((byte) Instruction.Jump);
+                result.Code[17].Should().Be(21);
                 result.Code[18].Should().Be((byte) Instruction.Push);
                 result.Code[19].Should().Be(5);
                 result.Code[20].Should().Be((byte) Instruction.Pop);
@@ -228,12 +238,14 @@ else {
                 const string expression = @"for(;;) {}";
 
                 // Act
-                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(2);
-                result.Code[0].Should().Be((byte) Instruction.JumpOffset);
+                result.Code[0].Should().Be((byte) Instruction.Jump);
                 result.Code[1].Should().Be(0);
             }
 
@@ -245,8 +257,10 @@ else {
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
-                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(6);
@@ -254,8 +268,8 @@ else {
                 result.Code[1].Should().Be(23);
                 result.Code[2].Should().Be((byte) Instruction.SetVariable);
                 result.Code[3].Should().Be(0);
-                result.Code[4].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[5].Should().Be(0);
+                result.Code[4].Should().Be((byte) Instruction.Jump);
+                result.Code[5].Should().Be(4);
             }
 
             [TestMethod]
@@ -266,8 +280,10 @@ else {
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
-                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(11);
@@ -280,8 +296,8 @@ else {
                 result.Code[6].Should().Be((byte) Instruction.Push);
                 result.Code[7].Should().Be(10);
                 result.Code[8].Should().Be((byte) Instruction.OperatorLessThan);
-                result.Code[9].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[10].Should().Be(-5);
+                result.Code[9].Should().Be((byte) Instruction.Jump);
+                result.Code[10].Should().Be(4);
             }
 
             [TestMethod]
@@ -291,9 +307,10 @@ else {
                 const string expression = @"for(var i = 5; i < 10; i++) {}";
                 SetUpGetCurrentScope(new CodeScope());
 
-                // Act
-                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(18);
@@ -313,8 +330,8 @@ else {
                 result.Code[13].Should().Be((byte) Instruction.OperatorAdd);
                 result.Code[14].Should().Be((byte) Instruction.SetVariable);
                 result.Code[15].Should().Be(0);
-                result.Code[16].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[17].Should().Be(-12);
+                result.Code[16].Should().Be((byte) Instruction.Jump);
+                result.Code[17].Should().Be(4);
             }
 
             [TestMethod]
@@ -327,8 +344,10 @@ else {
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
-                var result = Subject.VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(21);
@@ -351,8 +370,8 @@ else {
                 result.Code[16].Should().Be((byte) Instruction.Push);
                 result.Code[17].Should().Be(3);
                 result.Code[18].Should().Be((byte) Instruction.Pop);
-                result.Code[19].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[20].Should().Be(-15);
+                result.Code[19].Should().Be((byte) Instruction.Jump);
+                result.Code[20].Should().Be(4);
             }
         }
 
@@ -366,17 +385,19 @@ else {
                 const string expression = @"while(1) {}";
 
                 // Act
-                var result = Subject.VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(6);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(2);
-                result.Code[4].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[5].Should().Be(-4);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(6);
+                result.Code[4].Should().Be((byte) Instruction.Jump);
+                result.Code[5].Should().Be(0);
             }
 
             [TestMethod]
@@ -388,20 +409,22 @@ else {
 }";
 
                 // Act
-                var result = Subject.VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(9);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpOffsetIfZero);
-                result.Code[3].Should().Be(5);
+                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[3].Should().Be(9);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
                 result.Code[6].Should().Be((byte) Instruction.Pop);
-                result.Code[7].Should().Be((byte) Instruction.JumpOffset);
-                result.Code[8].Should().Be(-7);
+                result.Code[7].Should().Be((byte) Instruction.Jump);
+                result.Code[8].Should().Be(0);
             }
         }
 
@@ -420,7 +443,7 @@ else {
 
                 // Verify
                 result.Code.Should().HaveCount(2);
-                result.Code[0].Should().Be((byte) Instruction.JumpOffset);
+                result.Code[0].Should().Be((byte) Instruction.Jump);
                 result.Code[1].Should().Be(0);
             }
         }

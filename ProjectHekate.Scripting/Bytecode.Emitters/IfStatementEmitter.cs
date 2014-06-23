@@ -42,6 +42,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             codeBlock[conditionalIdx] = codeBlock.Size; // now itll jump to the else, if it exists
 
             if (_elseBodyStatement != null) {
+                codeBlock[conditionalIdx] += 2; // update the previous jump
                 codeBlock.Add(Instruction.Jump); // jump past the else
 
                 var elseIdx = codeBlock.Size;
