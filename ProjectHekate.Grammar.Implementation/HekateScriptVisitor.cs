@@ -97,21 +97,20 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)
         {
-            var paramContexts = context.formalParameters().formalParameterList().formalParameter();
-            var paramNames = paramContexts.Select(fpc => fpc.NormalIdentifier().GetText());
-            var name = context.NormalIdentifier().GetText();
-            var funcCodeBlock = new FunctionCodeScope(paramNames);
+            var paramNames = new List<string>();
 
-            AddNewScope(funcCodeBlock);
-            foreach (var child in context.children) {
-                Visit(child);
+            var paramList = context.formalParameters().formalParameterList();
+            if (paramList != null)
+            {
+                var paramContexts = paramList.formalParameter();
+
+                paramNames.AddRange(paramContexts.Select(fpc => fpc.NormalIdentifier().GetText()));
             }
-            RemoveMostRecentScope();
 
-            // done, now add to the pool of function records
-            _virtualMachine.AddFunctionCodeScope(name, funcCodeBlock);
+            var name = context.NormalIdentifier().GetText();
+            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
-            return funcCodeBlock;
+            return new FunctionDeclarationStatementEmitter(paramNames, name, statements);
         }
 
         #endregion
