@@ -48,18 +48,6 @@ namespace ProjectHekate.Grammar.Implementation
             return null; // TODO: WHAT THE FUCK?
         }
 
-        private void AddNewScope(CodeScope codeScope)
-        {
-            _scopeManager.Add(codeScope);
-            _virtualMachine.CurrentCode = codeScope;
-        }
-
-        private void RemoveMostRecentScope()
-        {
-            _scopeManager.Remove();
-            _virtualMachine.CurrentCode = null;
-        }
-
         public override AbstractBytecodeEmitter VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
         {
             var paramNames = new List<string>();
