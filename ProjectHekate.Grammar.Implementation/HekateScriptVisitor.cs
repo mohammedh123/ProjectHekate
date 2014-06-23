@@ -155,10 +155,16 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitWhileStatement(HekateParser.WhileStatementContext context)
         {
+            var breakList = new List<int>();
+            _breakLocations.Push(breakList);
+
+            var continueList = new List<int>();
+            _continueLocations.Push(continueList);
+
             var conditionExpressionGen = Visit(context.parExpression());
             var whileBodyStatementGen = Visit(context.statement());
             
-            return new WhileStatementEmitter(conditionExpressionGen, whileBodyStatementGen);
+            return new WhileStatementEmitter(conditionExpressionGen, whileBodyStatementGen, breakList, continueList);
         }
 
         public override AbstractBytecodeEmitter VisitBreakStatement(HekateParser.BreakStatementContext context)

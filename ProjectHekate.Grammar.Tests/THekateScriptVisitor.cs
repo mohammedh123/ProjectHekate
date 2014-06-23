@@ -426,6 +426,66 @@ else {
                 result.Code[7].Should().Be((byte) Instruction.Jump);
                 result.Code[8].Should().Be(0);
             }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForWhileWithBreakStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"while(1) {
+    3;
+    break;
+}";
+
+                // Act
+                var result = new CodeBlock();
+                Subject
+                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(11);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(11);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
+                result.Code[7].Should().Be((byte)Instruction.Jump);
+                result.Code[8].Should().Be(11);
+                result.Code[9].Should().Be((byte)Instruction.Jump);
+                result.Code[10].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldGenerateCodeForWhileWithContinueStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"while(1) {
+    3;
+    continue;
+}";
+
+                // Act
+                var result = new CodeBlock();
+                Subject
+                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(11);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
+                result.Code[3].Should().Be(11);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Pop);
+                result.Code[7].Should().Be((byte)Instruction.Jump);
+                result.Code[8].Should().Be(0);
+                result.Code[9].Should().Be((byte)Instruction.Jump);
+                result.Code[10].Should().Be(0);
+            }
         }
 
         [TestClass]
