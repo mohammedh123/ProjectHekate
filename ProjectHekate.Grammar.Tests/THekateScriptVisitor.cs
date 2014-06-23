@@ -438,8 +438,10 @@ else {
                 const string expression = @"break;";
 
                 // Act
-                var result = Subject.VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression))
-                    .Generate(MockVirtualMachine, MockScopeManager);
+                var result = new CodeBlock();
+                Subject
+                    .VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(2);

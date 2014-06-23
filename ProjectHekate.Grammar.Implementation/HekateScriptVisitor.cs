@@ -22,16 +22,16 @@ namespace ProjectHekate.Grammar.Implementation
         // When a loop construct completes adding its code in its entirety, it should:
         //  1. Pop the top of the stack
         //  2. Iterate over each list and replace code[location] with the appropriate jump offset
-        private readonly Stack<List<uint>> _breakLocations;
-        private readonly Stack<List<uint>> _continueLocations;
+        private readonly Stack<List<int>> _breakLocations;
+        private readonly Stack<List<int>> _continueLocations;
 
         public HekateScriptVisitor(IVirtualMachine virtualMachine, IScopeManager scopeManager)
         {
             _virtualMachine = virtualMachine;
             _scopeManager = scopeManager;
 
-            _breakLocations = new Stack<List<uint>>();
-            _continueLocations = new Stack<List<uint>>();
+            _breakLocations = new Stack<List<int>>();
+            _continueLocations = new Stack<List<int>>();
         }
 
         #region Top-level constructs
@@ -163,20 +163,16 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitBreakStatement(HekateParser.BreakStatementContext context)
         {
-            var code = new CodeScope();
+            var breakList = _breakLocations.Any() ? _breakLocations.Peek() : new List<int>();
 
-            // Break statement
-            // Instruction.JumpOffset
-            // {0}, used as a dummy value; the enclosing loop construct must take care of replacing 
-            //      the dummy value with the actual size of the construct's code scope
-            // add a break to the list of breakStatements in the visitor
+            return new BreakStatementEmitter(breakList);
+        }
 
-            code.Add(Instruction.JumpOffset);
-            code.Add((byte)0);
+        public override AbstractBytecodeEmitter VisitContinueStatement(HekateParser.ContinueStatementContext context)
+        {
+            var continueList = _continueLocations.Any() ? _continueLocations.Peek() : new List<int>();
 
-            //_breakLocations.Peek().Add();
-
-            return code;
+            return new ContinueStatementEmitter(continueList);
         }
 
         #endregion
