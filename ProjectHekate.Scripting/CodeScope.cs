@@ -6,11 +6,9 @@ namespace ProjectHekate.Scripting
 {
     public class CodeScope : CodeBlock, IVariableContext
     {
-        public IReadOnlyList<IdentifierRecord> NumericalVariables { get; private set; }
         private readonly List<IdentifierRecord> _numericalVariables;
         private readonly Dictionary<string, int> _numericalVariablesNameToIndex;
 
-        public IReadOnlyList<IdentifierRecord> EmitterVariables { get; private set; }
         private readonly List<IdentifierRecord> _emitterVariables;
         private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
         
@@ -21,9 +19,6 @@ namespace ProjectHekate.Scripting
 
             _emitterVariables = new List<IdentifierRecord>();
             _emitterVariablesNameToIndex = new Dictionary<string, int>();
-            
-            NumericalVariables = _numericalVariables.AsReadOnly();
-            EmitterVariables = _emitterVariables.AsReadOnly();
         }
 
         public int AddNumericalVariable(string name)

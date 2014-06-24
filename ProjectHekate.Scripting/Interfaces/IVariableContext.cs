@@ -1,12 +1,7 @@
-using System.Collections.Generic;
-
 namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IVariableContext
     {
-        IReadOnlyList<IdentifierRecord> NumericalVariables { get; }
-        IReadOnlyList<IdentifierRecord> EmitterVariables { get; }
-
         /// <summary>
         /// Adds a numerical variable to the code record.
         /// </summary>
