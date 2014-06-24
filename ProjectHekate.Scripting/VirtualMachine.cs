@@ -13,14 +13,7 @@ namespace ProjectHekate.Scripting
         public const int MaxNumericalVariables = 64;
         public const int MaxEmitterVariables = 8;
         public const int MaxProperties = 32;
-
-
-        public IReadOnlyList<FunctionCodeScope> FunctionCodeScopes { get; private set; }
-        public IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeScopes { get; private set; }
-        public IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeScopes { get; private set; }
-        public IReadOnlyList<IdentifierRecord> PropertyRecords { get; private set; }
-        public ICodeBlock CurrentCode { get; set; }
-
+        
         private readonly List<FunctionCodeScope> _functionCodeScopes;
         private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeScopes;
         private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeScopes;
@@ -43,11 +36,6 @@ namespace ProjectHekate.Scripting
 
             _propertyRecords = new List<IdentifierRecord>();
             _propertyNameToIndex = new Dictionary<string, int>();
-
-            FunctionCodeScopes = _functionCodeScopes.AsReadOnly();
-            BulletUpdaterCodeScopes = _bulletUpdaterCodeScopes.AsReadOnly();
-            EmitterUpdaterCodeScopes = _emitterUpdaterCodeScopes.AsReadOnly();
-            PropertyRecords = _propertyRecords.AsReadOnly();
         }
 
         public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)

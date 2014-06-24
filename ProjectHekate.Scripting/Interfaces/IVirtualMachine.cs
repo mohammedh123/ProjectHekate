@@ -1,15 +1,9 @@
 using System;
-using System.Collections.Generic;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IVirtualMachine : IPropertyContext
     {
-        IReadOnlyList<FunctionCodeScope> FunctionCodeScopes { get; }
-        IReadOnlyList<BulletUpdaterCodeScope> BulletUpdaterCodeScopes { get; }
-        IReadOnlyList<EmitterUpdaterCodeScope> EmitterUpdaterCodeScopes { get; }
-        ICodeBlock CurrentCode { get; set; }
-
         /// <summary>
         /// Adds a function code scope to the virtual machine.
         /// </summary>

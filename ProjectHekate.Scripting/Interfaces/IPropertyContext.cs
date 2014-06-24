@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IPropertyContext
     {
-        IReadOnlyList<IdentifierRecord> PropertyRecords { get; }
-
         /// <summary>
         /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
         /// </summary>
