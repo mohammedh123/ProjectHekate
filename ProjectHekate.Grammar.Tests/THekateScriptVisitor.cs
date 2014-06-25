@@ -682,7 +682,7 @@ else {
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddNumericalVariable(identifier);
+                var idx = codeScope.AddSymbol(identifier, SymbolTypes.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -903,7 +903,7 @@ else {
                 var idx = -1;
                 if (type == IdentifierType.Variable) {
                     var codeScope = new CodeScope();
-                    idx = codeScope.AddNumericalVariable(identifier);
+                    idx = codeScope.AddSymbol(identifier, SymbolTypes.Numerical);
                     SetUpGetCurrentScope(codeScope);
                 }
                 else if (type == IdentifierType.Property) {
@@ -970,7 +970,7 @@ else {
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddNumericalVariable(variableName);
+                var idx = codeScope.AddSymbol(variableName, SymbolTypes.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -1034,7 +1034,6 @@ else {
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeScope = new CodeScope();
-                codeScope.AddEmitterVariable(variableName);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
@@ -1053,7 +1052,7 @@ else {
                 const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeScope = new CodeScope();
-                codeScope.AddEmitterVariable(variableName);
+                codeScope.AddSymbol(variableName, SymbolTypes.Emitter);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
@@ -1062,7 +1061,7 @@ else {
                         hsv =>
                             hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
                                 .Generate(MockVirtualMachine, MockScopeManager))
-                        .ShouldThrow<ArgumentException>();
+                        .ShouldThrow<InvalidOperationException>();
             }
 
 
@@ -1073,7 +1072,7 @@ else {
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddNumericalVariable(variableName);
+                var idx = codeScope.AddSymbol(variableName, SymbolTypes.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -1113,6 +1112,25 @@ else {
             public void ShouldGenerateCodeForSubtractAssignToExistingNumericalVariable()
             {
                 TestCompoundAssignmentWithExistingNumericalVariable("-", Instruction.OperatorSubtract);
+            }
+            
+            [TestMethod]
+            public void ShouldThrowExceptionForCompoundAssigningToExistingEmitterVariable()
+            {
+                // Setup: create code scope with existing emitter variable, mock scope out
+                const string variableName = "someEmitterVariable";
+                var expression = String.Format("{0} += 3.5", variableName);
+                var codeScope = new CodeScope();
+                codeScope.AddSymbol(variableName, SymbolTypes.Emitter);
+                SetUpGetCurrentScope(codeScope);
+
+                // Act + Verify
+                var result =
+                    Subject.Invoking(
+                        hsv =>
+                            hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                                .Generate(MockVirtualMachine, MockScopeManager))
+                        .ShouldThrow<InvalidOperationException>();
             }
         }
 

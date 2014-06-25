@@ -4,65 +4,46 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
 {
-    public class CodeScope : CodeBlock, IVariableContext
+    public class CodeScope : CodeBlock, ISymbolContext
     {
-        private readonly List<IdentifierRecord> _numericalVariables;
-        private readonly Dictionary<string, int> _numericalVariablesNameToIndex;
+        private readonly IList<ISymbol> _symbols;
+        private readonly IDictionary<string, int> _symbolsNameToIndex;
 
-        private readonly List<IdentifierRecord> _emitterVariables;
-        private readonly Dictionary<string, int> _emitterVariablesNameToIndex;
-        
         public CodeScope()
         {
-            _numericalVariables = new List<IdentifierRecord>();
-            _numericalVariablesNameToIndex = new Dictionary<string, int>();
-
-            _emitterVariables = new List<IdentifierRecord>();
-            _emitterVariablesNameToIndex = new Dictionary<string, int>();
+            _symbols = new List<ISymbol>();
+            _symbolsNameToIndex = new Dictionary<string, int>();
         }
 
-        public int AddNumericalVariable(string name)
+        public int AddSymbol(string name, SymbolTypes symbolType)
         {
-            return AddIdentifierToList(name, _numericalVariables, _numericalVariablesNameToIndex);
+            if (_symbolsNameToIndex.ContainsKey(name))
+                throw new ArgumentException("A variable with the name \"" + name + "\" already exists in this scope.", "name");
+
+            var newIdx = _symbols.Count;
+            ISymbol newSymbol;
+
+            switch (symbolType) {
+                case SymbolTypes.Numerical: newSymbol = new NumericalSymbol(name, newIdx);  break;
+                case SymbolTypes.Emitter:   newSymbol = new EmitterSymbol(name, newIdx);    break;
+                default:
+                    throw new ArgumentOutOfRangeException("symbolType", "An unknown symbol type was found when attempting to add a new symbol.");
+            }
+
+            _symbols.Add(newSymbol);
+            _symbolsNameToIndex[name] = newIdx;
+
+            return newIdx;
         }
 
-        public IdentifierRecord GetNumericalVariable(string name)
-        {
-            return GetSpecificIdentifier(name, _numericalVariables, _numericalVariablesNameToIndex);
-        }
-
-        public int AddEmitterVariable(string name)
-        {
-            return AddIdentifierToList(name, _emitterVariables, _emitterVariablesNameToIndex);
-        }
-
-        public IdentifierRecord GetEmitterVariable(string name)
-        {
-            return GetSpecificIdentifier(name, _emitterVariables, _emitterVariablesNameToIndex);
-        }
-
-        private int AddIdentifierToList(string name, ICollection<IdentifierRecord> identifierList, IDictionary<string, int> identifierNameToIndexMap)
-        {
-            // TODO: make method thread-safe
-            // TODO: make sure it checks all other identifiers too (emitters being made, final emitters, etc)
-            if (_numericalVariablesNameToIndex.ContainsKey(name))
-                throw new ArgumentException("An identifier with the name \"" + name + "\" already exists (as a numerical variable) in this script.", "name");
-
-            var identifier = new IdentifierRecord(name, identifierList.Count); // this is so bad and unsafe
-            identifierList.Add(identifier);
-            identifierNameToIndexMap[name] = identifier.Index;
-
-            return identifier.Index;
-        }
-
-        private IdentifierRecord GetSpecificIdentifier(string name, IList<IdentifierRecord> identifierList, IDictionary<string, int> identifierNameToIndexMap)
+        public ISymbol GetSymbol(string name)
         {
             int index;
-            var worked = identifierNameToIndexMap.TryGetValue(name, out index);
+            var worked = _symbolsNameToIndex.TryGetValue(name, out index);
 
-            if (!worked) throw new ArgumentException("An identifier with the name " + name + " could not be found.");
+            if (!worked) throw new ArgumentException("A symbol with the name " + name + " could not be found.");
 
-            return identifierList[index];
+            return _symbols[index];
         }
     }
 }

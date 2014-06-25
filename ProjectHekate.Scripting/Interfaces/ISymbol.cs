@@ -3,7 +3,7 @@
     public interface ISymbol
     {
         string Name { get; }
-
-        SymbolTypes SymbolType { get; }
+        int Index { get; }
+        SymbolTypes Type { get; }
     }
 }

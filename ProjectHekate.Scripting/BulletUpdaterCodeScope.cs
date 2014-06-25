@@ -8,7 +8,7 @@ namespace ProjectHekate.Scripting
         {
             // the parameters are added as local variables
             foreach(var paramName in paramNames) {
-                AddNumericalVariable(paramName);
+                AddSymbol(paramName, SymbolTypes.Numerical); // bullet updaters can only have numerical params
             }
         }
     }

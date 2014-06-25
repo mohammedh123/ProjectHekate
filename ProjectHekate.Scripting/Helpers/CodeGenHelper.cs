@@ -12,7 +12,7 @@ namespace ProjectHekate.Scripting.Helpers
         internal static ICodeBlock GenerateCodeForValueOfVariable(IScopeManager scopeManager, string name)
         {
             var scope = scopeManager.GetCurrentScope();
-            var index = scope.GetNumericalVariable(name).Index;
+            var index = scope.GetSymbol(name).Index;
 
             var code = new CodeBlock();
             code.Add(Instruction.GetVariable);

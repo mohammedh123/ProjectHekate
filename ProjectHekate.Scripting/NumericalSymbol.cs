@@ -4,16 +4,21 @@ namespace ProjectHekate.Scripting
 {
     public class NumericalSymbol : ISymbol
     {
-        public string Name { get; private set; }
+        private readonly string _name;
+        private readonly int _index;
 
-        public SymbolTypes SymbolType
+        public string Name { get { return _name; } }
+        public int Index { get { return _index; } }
+
+        public SymbolTypes Type
         {
             get { return SymbolTypes.Numerical; }
         }
 
-        public NumericalSymbol(string name)
+        public NumericalSymbol(string name, int index)
         {
-            Name = name;
+            _name = name;
+            _index = index;
         }
     }
 }

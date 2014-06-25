@@ -42,10 +42,14 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
                 case IdentifierType.Variable:
                 {
                     var scope = scopeManager.GetCurrentScope();
-                    var index = scope.GetNumericalVariable(_identifierName).Index;
+                    var symbol = scope.GetSymbol(_identifierName);
+
+                    if (symbol.Type != SymbolTypes.Numerical) {
+                        throw new InvalidOperationException("Cannot use assignment expression with non-numerical symbols.");
+                    }
 
                     code.Add(Instruction.SetVariable);
-                    code.Add(index);
+                    code.Add(symbol.Index);
 
                     break;
                 }
