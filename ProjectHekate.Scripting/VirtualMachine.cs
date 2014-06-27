@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
@@ -17,11 +14,14 @@ namespace ProjectHekate.Scripting
         private readonly List<FunctionCodeScope> _functionCodeScopes;
         private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeScopes;
         private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeScopes;
-        private readonly List<IdentifierRecord> _propertyRecords;
         private readonly Dictionary<string, int> _functionCodeScopeNameToIndex;
         private readonly Dictionary<string, int> _bulletUpdaterCodeScopeNameToIndex;
         private readonly Dictionary<string, int> _emitterUpdaterCodeScopeNameToIndex;
+
+        private readonly List<IdentifierRecord> _propertyRecords;
         private readonly Dictionary<string, int> _propertyNameToIndex;
+        
+        private readonly IDictionary<string, float> _globalSymbolsNameToValue;
 
         public VirtualMachine()
         {
@@ -36,6 +36,8 @@ namespace ProjectHekate.Scripting
 
             _propertyRecords = new List<IdentifierRecord>();
             _propertyNameToIndex = new Dictionary<string, int>();
+
+            _globalSymbolsNameToValue = new Dictionary<string, float>();
         }
 
         public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)
@@ -125,6 +127,19 @@ namespace ProjectHekate.Scripting
                 throw new ArgumentException("This code scope has already been added, but with a different name (as a bullet updater).", "codeScope");
             if (_emitterUpdaterCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as an emitter updater).", "codeScope");
+        }
+
+        public void AddGlobalSymbol(string name, float value)
+        {
+            if (_globalSymbolsNameToValue.ContainsKey(name))
+                throw new ArgumentException("A global numerical symbol with the name \"" + name + "\" already exists.", "name");
+
+            _globalSymbolsNameToValue[name] = value;
+        }
+
+        public bool TryGetGlobalSymbol(string name, out float value)
+        {
+            return _globalSymbolsNameToValue.TryGetValue(name, out value);
         }
     }
 }

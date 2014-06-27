@@ -95,6 +95,7 @@
     <Compile Include="Interfaces\IBytecodeEmitter.cs" />
     <Compile Include="Interfaces\IBytecodeGenerator.cs" />
     <Compile Include="Interfaces\ICodeBlock.cs" />
+    <Compile Include="Interfaces\IGlobalSymbolContext.cs" />
     <Compile Include="Interfaces\IPropertyContext.cs" />
     <Compile Include="Interfaces\IScopeManager.cs" />
     <Compile Include="Interfaces\ISymbol.cs" />

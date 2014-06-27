@@ -2,7 +2,7 @@ using System;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
-    public interface IVirtualMachine : IPropertyContext
+    public interface IVirtualMachine : IGlobalSymbolContext, IPropertyContext
     {
         /// <summary>
         /// Adds a function code scope to the virtual machine.
