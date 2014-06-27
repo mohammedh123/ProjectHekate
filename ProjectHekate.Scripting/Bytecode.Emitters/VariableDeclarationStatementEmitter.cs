@@ -24,7 +24,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             var code = new CodeBlock();
 
             var currentScope = scopeManager.GetCurrentScope();
-            var index = currentScope.AddSymbol(_variableName, SymbolTypes.Numerical);
+            var index = currentScope.AddSymbol(_variableName, SymbolType.Numerical);
 
             code.Add(_valueExpression.Generate(vm, scopeManager));
             code.Add(Instruction.SetVariable);

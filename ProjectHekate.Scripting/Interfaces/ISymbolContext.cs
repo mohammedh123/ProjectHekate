@@ -7,7 +7,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// </summary>
         /// <returns>Returns the index of the symbol</returns>
         /// <exception cref="System.ArgumentException">Thrown when a symbol with that name already exists</exception>
-        int AddSymbol(string name, SymbolTypes symbolType);
+        int AddSymbol(string name, SymbolType symbolType);
 
         /// <summary>
         /// Gets the symbol with a given name.

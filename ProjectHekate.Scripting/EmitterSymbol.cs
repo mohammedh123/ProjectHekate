@@ -10,9 +10,9 @@ namespace ProjectHekate.Scripting
         public string Name  { get { return _name; } }
         public int Index { get { return _index; } }
 
-        public SymbolTypes Type
+        public SymbolType Type
         {
-            get { return SymbolTypes.Emitter; }
+            get { return SymbolType.Emitter; }
         }
 
         public EmitterSymbol(string name, int index)

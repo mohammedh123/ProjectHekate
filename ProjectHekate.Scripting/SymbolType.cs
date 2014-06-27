@@ -1,6 +1,6 @@
 ﻿namespace ProjectHekate.Scripting
 {
-    public enum SymbolTypes : byte
+    public enum SymbolType : byte
     {
         Numerical,
         Emitter

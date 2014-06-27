@@ -80,7 +80,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
                     var scope = scopeManager.GetCurrentScope();
                     var symbol = scope.GetSymbol(_identifierName);
 
-                    if (symbol.Type != SymbolTypes.Numerical)
+                    if (symbol.Type != SymbolType.Numerical)
                     {
                         throw new InvalidOperationException("Cannot use assignment expression with non-numerical symbols.");
                     }

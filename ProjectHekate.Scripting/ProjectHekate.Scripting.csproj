@@ -103,7 +103,7 @@
     <Compile Include="NumericalSymbol.cs" />
     <Compile Include="ScriptState.cs" />
     <Compile Include="StackScopeManager.cs" />
-    <Compile Include="SymbolTypes.cs" />
+    <Compile Include="SymbolType.cs" />
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

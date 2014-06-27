@@ -4,6 +4,6 @@
     {
         string Name { get; }
         int Index { get; }
-        SymbolTypes Type { get; }
+        SymbolType Type { get; }
     }
 }

@@ -682,7 +682,7 @@ else {
                 const string identifier = "someIdentifier";
                 var expression = String.Format("{0}", identifier);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddSymbol(identifier, SymbolTypes.Numerical);
+                var idx = codeScope.AddSymbol(identifier, SymbolType.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -903,7 +903,7 @@ else {
                 var idx = -1;
                 if (type == IdentifierType.Variable) {
                     var codeScope = new CodeScope();
-                    idx = codeScope.AddSymbol(identifier, SymbolTypes.Numerical);
+                    idx = codeScope.AddSymbol(identifier, SymbolType.Numerical);
                     SetUpGetCurrentScope(codeScope);
                 }
                 else if (type == IdentifierType.Property) {
@@ -970,7 +970,7 @@ else {
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddSymbol(variableName, SymbolTypes.Numerical);
+                var idx = codeScope.AddSymbol(variableName, SymbolType.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -1052,7 +1052,7 @@ else {
                 const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} = 3.5", variableName);
                 var codeScope = new CodeScope();
-                codeScope.AddSymbol(variableName, SymbolTypes.Emitter);
+                codeScope.AddSymbol(variableName, SymbolType.Emitter);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify
@@ -1072,7 +1072,7 @@ else {
                 const string variableName = "someNumericalVariable";
                 var expression = String.Format("{0} {1}= 3.5", variableName, opStr);
                 var codeScope = new CodeScope();
-                var idx = codeScope.AddSymbol(variableName, SymbolTypes.Numerical);
+                var idx = codeScope.AddSymbol(variableName, SymbolType.Numerical);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
@@ -1121,7 +1121,7 @@ else {
                 const string variableName = "someEmitterVariable";
                 var expression = String.Format("{0} += 3.5", variableName);
                 var codeScope = new CodeScope();
-                codeScope.AddSymbol(variableName, SymbolTypes.Emitter);
+                codeScope.AddSymbol(variableName, SymbolType.Emitter);
                 SetUpGetCurrentScope(codeScope);
 
                 // Act + Verify

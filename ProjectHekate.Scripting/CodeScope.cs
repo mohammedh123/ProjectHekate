@@ -15,7 +15,7 @@ namespace ProjectHekate.Scripting
             _symbolsNameToIndex = new Dictionary<string, int>();
         }
 
-        public int AddSymbol(string name, SymbolTypes symbolType)
+        public int AddSymbol(string name, SymbolType symbolType)
         {
             if (_symbolsNameToIndex.ContainsKey(name))
                 throw new ArgumentException("A variable with the name \"" + name + "\" already exists in this scope.", "name");
@@ -24,8 +24,8 @@ namespace ProjectHekate.Scripting
             ISymbol newSymbol;
 
             switch (symbolType) {
-                case SymbolTypes.Numerical: newSymbol = new NumericalSymbol(name, newIdx);  break;
-                case SymbolTypes.Emitter:   newSymbol = new EmitterSymbol(name, newIdx);    break;
+                case SymbolType.Numerical: newSymbol = new NumericalSymbol(name, newIdx);  break;
+                case SymbolType.Emitter:   newSymbol = new EmitterSymbol(name, newIdx);    break;
                 default:
                     throw new ArgumentOutOfRangeException("symbolType", "An unknown symbol type was found when attempting to add a new symbol.");
             }
