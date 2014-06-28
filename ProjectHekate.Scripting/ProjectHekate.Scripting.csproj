@@ -94,6 +94,7 @@
     <Compile Include="EmitterScriptState.cs" />
     <Compile Include="Interfaces\IBytecodeEmitter.cs" />
     <Compile Include="Interfaces\IBytecodeGenerator.cs" />
+    <Compile Include="Interfaces\IBytecodeInterpreter.cs" />
     <Compile Include="Interfaces\ICodeBlock.cs" />
     <Compile Include="Interfaces\IGlobalSymbolContext.cs" />
     <Compile Include="Interfaces\IPropertyContext.cs" />
