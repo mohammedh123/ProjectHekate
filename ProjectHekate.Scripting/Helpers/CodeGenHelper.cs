@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Helpers
@@ -30,6 +26,18 @@ namespace ProjectHekate.Scripting.Helpers
             code.Add(index);
 
             return code;
+        }
+
+        internal static void ThrowIfSymbolAlreadyExists(IGlobalSymbolContext globalSymbolContext, ISymbolContext localSymbolcontext,
+            string variableName)
+        {
+            if (globalSymbolContext.HasGlobalSymbolDefined(variableName)) {
+                throw new ArgumentException("A global symbol already exists with that name.", "variableName");
+            }
+
+            if (localSymbolcontext.HasSymbolDefined(variableName)) {
+                throw new ArgumentException("A local symbol already exists with that name.", "variableName");
+            }
         }
     }
 }

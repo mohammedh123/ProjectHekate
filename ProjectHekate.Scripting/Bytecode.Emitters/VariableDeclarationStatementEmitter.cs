@@ -1,4 +1,6 @@
-﻿using ProjectHekate.Scripting.Interfaces;
+﻿using System;
+using ProjectHekate.Scripting.Helpers;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
@@ -24,6 +26,10 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             var code = new CodeBlock();
 
             var currentScope = scopeManager.GetCurrentScope();
+
+            // make sure an existing identifier does not already exist
+            CodeGenHelper.ThrowIfSymbolAlreadyExists(vm, currentScope, _variableName);
+
             var index = currentScope.AddSymbol(_variableName, SymbolType.Numerical);
 
             code.Add(_valueExpression.Generate(vm, scopeManager));
