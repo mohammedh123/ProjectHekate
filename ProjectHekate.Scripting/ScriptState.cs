@@ -1,30 +1,37 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("ProjectHekate.Scripting.Tests")]
 namespace ProjectHekate.Scripting
 {
+    public enum ScriptStatus
+    {
+        Ok,
+        Error,
+        Suspended
+    }
+
     public class ScriptState
     {
         public int CurrentInstructionIndex { get; set; }
         public int CodeBlockIndex { get; set; }
+        
+        internal float[] NumericalVariables;
+        internal object[] EmitterVariables; // TODO: change this to SOMETHING else
+        internal float[] Properties;
 
-        public IReadOnlyList<float> NumericalVariables { get; set; }
-        public IReadOnlyList<object> EmitterVariables { get; set; } // TODO: change this to SOMETHING else
-        public IReadOnlyList<float> Properties { get; set; }  
-
-        private float[] _numericalVariables;
-        private object[] _emitterVariables; // TODO: change this to SOMETHING else
-        private float[] _properties;
+        internal IList<float> Stack;
+        internal int StackHead;
 
         public ScriptState()
         {
-            _numericalVariables = new float[VirtualMachine.MaxNumericalVariables];
-            _emitterVariables = new object[VirtualMachine.MaxEmitterVariables];
-            _properties = new float[VirtualMachine.MaxProperties];
+            NumericalVariables = new float[VirtualMachine.MaxNumericalVariables];
+            EmitterVariables = new object[VirtualMachine.MaxEmitterVariables];
+            Properties = new float[VirtualMachine.MaxProperties];
 
-            NumericalVariables = Array.AsReadOnly(_numericalVariables);
-            EmitterVariables = Array.AsReadOnly(_emitterVariables);
-            Properties = Array.AsReadOnly(_properties);
+            Stack = new float[VirtualMachine.MaxStackSize];
+            StackHead = 0;
         }
     }
 }
