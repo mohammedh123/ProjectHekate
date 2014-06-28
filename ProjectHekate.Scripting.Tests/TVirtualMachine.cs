@@ -47,7 +47,7 @@ namespace ProjectHekate.Scripting.Tests
                     const float expectedValue = 3.5f;
                     var code = new CodeBlock();
 
-                    for (var i = 0; i < VirtualMachine.MaxStackSize; i++)
+                    for (var i = 0; i <= VirtualMachine.MaxStackSize; i++)
                     {
                         code.Add(Instruction.Push);
                         code.Add(expectedValue);
@@ -170,6 +170,25 @@ namespace ProjectHekate.Scripting.Tests
                     State.StackHead.Should().Be(1);
                     State.CurrentInstructionIndex.Should().Be(1);
                     State.Stack[0].Should().Be(1);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetNotCodeForNegativeNumbersToo()
+                {
+                    // Setup: set up state
+                    const float dummyValue = -1;
+                    State.Stack[0] = dummyValue;
+                    State.StackHead = 1;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.OperatorNot);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: stack has negated dummy value on it
+                    State.StackHead.Should().Be(1);
+                    State.CurrentInstructionIndex.Should().Be(1);
+                    State.Stack[0].Should().Be(0);
                 }
 
                 [TestMethod]

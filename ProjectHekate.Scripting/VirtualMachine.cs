@@ -256,7 +256,7 @@ namespace ProjectHekate.Scripting
 
         private void ThrowIfStackLimitIsReached(ScriptState state)
         {
-            if (state.StackHead >= MaxStackSize) {
+            if (state.StackHead > MaxStackSize) {
                 throw new InvalidOperationException("Stack limit reached!");
             }
         }
