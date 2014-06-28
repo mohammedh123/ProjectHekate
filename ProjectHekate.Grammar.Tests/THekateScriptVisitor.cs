@@ -84,6 +84,39 @@ namespace ProjectHekate.Grammar.Tests
                 result.Code[2].Should().Be((byte)Instruction.SetVariable);
                 result.Code[3].Should().Be(0);
             }
+
+            [TestMethod]
+            public void ShouldThrowExceptionWhenVariableNameConflictsWithExistingSymbol()
+            {
+                // Setup: dummy data
+                const string expression = @"var someIdentifier = 6;";
+
+                var scope = new CodeScope();
+                scope.AddSymbol("someIdentifier", SymbolType.Numerical);
+                SetUpGetCurrentScope(scope);
+                
+                // Act+Verify
+                Subject.Invoking(hsv => hsv.VisitVariableDeclaration(GetFirstContext<HekateParser.VariableDeclarationContext>(expression))
+                    .Generate(MockVirtualMachine, MockScopeManager))
+                    .ShouldThrow<ArgumentException>();
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionWhenVariableNameConflictsWithGlobalSymbol()
+            {
+                // Setup: dummy data
+                const string expression = "var someIdentifier = 1.35";
+
+                SetUpGetCurrentScope(new CodeScope());
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(igsc => igsc.HasGlobalSymbolDefined("someIdentifier"))
+                    .Returns(true);
+
+                // Act+Verify
+                Subject.Invoking(hsv => hsv.VisitVariableDeclaration(GetFirstContext<HekateParser.VariableDeclarationContext>(expression))
+                    .Generate(MockVirtualMachine, MockScopeManager))
+                    .ShouldThrow<ArgumentException>();
+            }
         }
 
         [TestClass]
