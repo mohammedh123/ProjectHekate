@@ -1,4 +1,6 @@
-﻿namespace ProjectHekate.Scripting.Interfaces
+﻿using System;
+
+namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IGlobalSymbolContext
     {
@@ -10,11 +12,19 @@
         void AddGlobalSymbol(string name, float value);
 
         /// <summary>
-        /// Gets the global numerical symbol with a given name.
+        /// Gets the value for a global symbol with a given name.
         /// </summary>
-        /// <param name="name">The name of the global numerical symbol</param>
-        /// <param name="value">The output parameter for the symbol's value</param>
-        /// <returns>Returns whether or not a global numerical symbol exists with that name</returns>
-        bool TryGetGlobalSymbol(string name, out float value);
+        /// <param name="name">The name of the global symbol</param>
+        /// <returns>Returns the value of the global symbol with the given name</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a global symbol with that name does not exist</exception>
+        float GetGlobalSymbolValue(string name);
+
+        /// <summary>
+        /// Returns whether or not a global symbol with a given name has been added.
+        /// </summary>
+        /// <param name="name">The name of the global symbol</param>
+        /// <returns><b>true</b> if the global symbol is defined in this scope; <b>false</b> otherwise.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="name"/> is null</exception>
+        bool HasGlobalSymbolDefined(string name);
     }
 }

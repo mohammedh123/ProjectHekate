@@ -1,3 +1,5 @@
+using System;
+
 namespace ProjectHekate.Scripting.Interfaces
 {
     public interface ISymbolContext
@@ -16,5 +18,13 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the symbol with the given name</returns>
         /// <exception cref="System.ArgumentException">Thrown when a symbol with that name does not exist</exception>
         ISymbol GetSymbol(string name);
+
+        /// <summary>
+        /// Returns whether or not a symbol with a given name has been defined in the context.
+        /// </summary>
+        /// <param name="name">The name of the symbol</param>
+        /// <returns><b>true</b> if the symbol is defined in this scope; <b>false</b> otherwise.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="name"/> is null</exception>
+        bool HasSymbolDefined(string name);
     }
 }

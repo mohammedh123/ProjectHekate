@@ -137,9 +137,19 @@ namespace ProjectHekate.Scripting
             _globalSymbolsNameToValue[name] = value;
         }
 
-        public bool TryGetGlobalSymbol(string name, out float value)
+        public float GetGlobalSymbolValue(string name)
         {
-            return _globalSymbolsNameToValue.TryGetValue(name, out value);
+            float val;
+            var worked = _globalSymbolsNameToValue.TryGetValue(name, out val);
+
+            if (!worked) throw new ArgumentException("A global numerical symbol with the name " + name + " could not be found.");
+
+            return val;
+        }
+
+        public bool HasGlobalSymbolDefined(string name)
+        {
+            return _globalSymbolsNameToValue.ContainsKey(name);
         }
     }
 }

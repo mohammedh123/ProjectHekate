@@ -45,5 +45,10 @@ namespace ProjectHekate.Scripting
 
             return _symbols[index];
         }
+
+        public bool HasSymbolDefined(string name)
+        {
+            return _symbolsNameToIndex.ContainsKey(name);
+        }
     }
 }
