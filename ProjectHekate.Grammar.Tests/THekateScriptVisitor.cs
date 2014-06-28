@@ -30,7 +30,12 @@ namespace ProjectHekate.Grammar.Tests
         }
 
 
-        protected virtual TContextType GenerateContext<TContextType>(string expression) where TContextType : class, IParseTree
+        protected virtual TContextType GetFirstContext<TContextType>(string expression) where TContextType : class, IParseTree
+        {
+            return GetNthContext<TContextType>(expression, 0);
+        }
+
+        protected virtual TContextType GetNthContext<TContextType>(string expression, int n) where TContextType : class, IParseTree
         {
             var lexer = new HekateLexer(new AntlrInputStream(String.Format(WrappedProgramStringUnfmted, expression)));
             var tokens = new CommonTokenStream(lexer);
@@ -38,9 +43,12 @@ namespace ProjectHekate.Grammar.Tests
 
             var tree = parser.script();
 
-            return tree.GetFirstDescendantOfType<TContextType>();
+            return tree
+                .GetDescendantsOfType<TContextType>()
+                .Skip(n)
+                .FirstOrDefault();
         }
-
+        
         protected virtual void SetUpGetCurrentScope(CodeScope scope)
         {
             Mocker.GetMock<IScopeManager>()
@@ -66,14 +74,14 @@ namespace ProjectHekate.Grammar.Tests
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
-                var result = Subject.VisitVariableDeclaration(GenerateContext<HekateParser.VariableDeclarationContext>(expression))
+                var result = Subject.VisitVariableDeclaration(GetFirstContext<HekateParser.VariableDeclarationContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
                 result.Code.Should().HaveCount(4);
-                result.Code[0].Should().Be((byte) Instruction.Push);
+                result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1.35f);
-                result.Code[2].Should().Be((byte) Instruction.SetVariable);
+                result.Code[2].Should().Be((byte)Instruction.SetVariable);
                 result.Code[3].Should().Be(0);
             }
         }
@@ -90,7 +98,7 @@ namespace ProjectHekate.Grammar.Tests
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitReturnStatement(GenerateContext<HekateParser.ReturnStatementContext>(expression))
+                    .VisitReturnStatement(GetFirstContext<HekateParser.ReturnStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -113,7 +121,7 @@ namespace ProjectHekate.Grammar.Tests
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .VisitIfStatement(GetFirstContext<HekateParser.IfStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -135,7 +143,7 @@ namespace ProjectHekate.Grammar.Tests
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .VisitIfStatement(GetFirstContext<HekateParser.IfStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -163,7 +171,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .VisitIfStatement(GetFirstContext<HekateParser.IfStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -199,7 +207,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitIfStatement(GenerateContext<HekateParser.IfStatementContext>(expression))
+                    .VisitIfStatement(GetFirstContext<HekateParser.IfStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -240,7 +248,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -259,7 +267,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -282,7 +290,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -309,7 +317,7 @@ else {
 
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -345,7 +353,7 @@ else {
 
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -383,7 +391,7 @@ else {
 
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -422,7 +430,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitForStatement(GenerateContext<HekateParser.ForStatementContext>(expression))
+                    .VisitForStatement(GetFirstContext<HekateParser.ForStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -463,7 +471,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .VisitWhileStatement(GetFirstContext<HekateParser.WhileStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -487,7 +495,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .VisitWhileStatement(GetFirstContext<HekateParser.WhileStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -515,7 +523,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .VisitWhileStatement(GetFirstContext<HekateParser.WhileStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -545,7 +553,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitWhileStatement(GenerateContext<HekateParser.WhileStatementContext>(expression))
+                    .VisitWhileStatement(GetFirstContext<HekateParser.WhileStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -576,7 +584,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression))
+                    .VisitBreakStatement(GetFirstContext<HekateParser.BreakStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -598,7 +606,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitBreakStatement(GenerateContext<HekateParser.BreakStatementContext>(expression))
+                    .VisitBreakStatement(GetFirstContext<HekateParser.BreakStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -619,7 +627,7 @@ else {
                 string literalExpression = literal.ToString();
 
                 // Act
-                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression))
+                var result = Subject.VisitLiteralExpression(GetFirstContext<HekateParser.LiteralExpressionContext>(literalExpression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -636,7 +644,7 @@ else {
 
                 // Act+Verify
                 Subject
-                    .Invoking(hsv => hsv.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression))
+                    .Invoking(hsv => hsv.VisitLiteralExpression(GetFirstContext<HekateParser.LiteralExpressionContext>(literalExpression))
                         .Generate(MockVirtualMachine, MockScopeManager))
                     .ShouldThrow<OverflowException>();
             }
@@ -649,7 +657,7 @@ else {
                 string literalExpression = literal.ToString();
 
                 // Act
-                var result = Subject.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression))
+                var result = Subject.VisitLiteralExpression(GetFirstContext<HekateParser.LiteralExpressionContext>(literalExpression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -666,7 +674,7 @@ else {
 
                 // Act+Verify
                 Subject
-                    .Invoking(hsv => hsv.VisitLiteralExpression(GenerateContext<HekateParser.LiteralExpressionContext>(literalExpression))
+                    .Invoking(hsv => hsv.VisitLiteralExpression(GetFirstContext<HekateParser.LiteralExpressionContext>(literalExpression))
                         .Generate(MockVirtualMachine, MockScopeManager))
                     .ShouldThrow<OverflowException>();
             }
@@ -687,7 +695,7 @@ else {
 
                 // Act
                 var result = Subject.VisitNormalIdentifierExpression(
-                    GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression))
+                    GetFirstContext<HekateParser.NormalIdentifierExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -706,7 +714,7 @@ else {
 
                 // Act + Verify
                 Subject.Invoking(
-                    hsv => hsv.VisitNormalIdentifierExpression(GenerateContext<HekateParser.NormalIdentifierExpressionContext>(expression))
+                    hsv => hsv.VisitNormalIdentifierExpression(GetFirstContext<HekateParser.NormalIdentifierExpressionContext>(expression))
                         .Generate(MockVirtualMachine, MockScopeManager))
                     .ShouldThrow<ArgumentException>();
             }
@@ -728,7 +736,7 @@ else {
 
                 // Act
                 var result = Subject.VisitPropertyIdentifierExpression(
-                    GenerateContext<HekateParser.PropertyIdentifierExpressionContext>(expression))
+                    GetFirstContext<HekateParser.PropertyIdentifierExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -749,7 +757,7 @@ else {
                 // Act + Verify
                 Subject.Invoking(
                     hsv =>
-                        hsv.VisitPropertyIdentifierExpression(GenerateContext<HekateParser.PropertyIdentifierExpressionContext>(expression))
+                        hsv.VisitPropertyIdentifierExpression(GetFirstContext<HekateParser.PropertyIdentifierExpressionContext>(expression))
                             .Generate(MockVirtualMachine, MockScopeManager))
                     .ShouldThrow<ArgumentException>();
             }
@@ -765,7 +773,7 @@ else {
                 var expression = String.Format("{0}{1}", operatorString, value);
 
                 // Act
-                var result = Subject.VisitUnaryExpression(GenerateContext<HekateParser.UnaryExpressionContext>(expression))
+                var result = Subject.VisitUnaryExpression(GetFirstContext<HekateParser.UnaryExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -799,7 +807,7 @@ else {
                 var expression = String.Format("{0}{1}{2}", left, operatorString, right);
 
                 // Act
-                var result = Subject.VisitBinaryExpression(GenerateContext<HekateParser.BinaryExpressionContext>(expression))
+                var result = Subject.VisitBinaryExpression(GetFirstContext<HekateParser.BinaryExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -915,7 +923,7 @@ else {
                 }
 
                 // Act
-                var result = Subject.VisitPostIncDecExpression(GenerateContext<HekateParser.PostIncDecExpressionContext>(expression))
+                var result = Subject.VisitPostIncDecExpression(GetFirstContext<HekateParser.PostIncDecExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -974,7 +982,7 @@ else {
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
-                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                var result = Subject.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -997,7 +1005,7 @@ else {
                     .Returns(dummyRecord);
 
                 // Act
-                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                var result = Subject.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -1022,7 +1030,7 @@ else {
                 var result =
                     Subject.Invoking(
                         hsv =>
-                            hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                            hsv.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                                 .Generate(MockVirtualMachine, MockScopeManager))
                         .ShouldThrow<ArgumentException>();
             }
@@ -1040,7 +1048,7 @@ else {
                 var result =
                     Subject.Invoking(
                         hsv =>
-                            hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                            hsv.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                                 .Generate(MockVirtualMachine, MockScopeManager))
                         .ShouldThrow<ArgumentException>();
             }
@@ -1059,7 +1067,7 @@ else {
                 var result =
                     Subject.Invoking(
                         hsv =>
-                            hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                            hsv.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                                 .Generate(MockVirtualMachine, MockScopeManager))
                         .ShouldThrow<InvalidOperationException>();
             }
@@ -1076,7 +1084,7 @@ else {
                 SetUpGetCurrentScope(codeScope);
 
                 // Act
-                var result = Subject.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                var result = Subject.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify
@@ -1128,7 +1136,7 @@ else {
                 var result =
                     Subject.Invoking(
                         hsv =>
-                            hsv.VisitAssignmentExpression(GenerateContext<HekateParser.AssignmentExpressionContext>(expression))
+                            hsv.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
                                 .Generate(MockVirtualMachine, MockScopeManager))
                         .ShouldThrow<InvalidOperationException>();
             }
@@ -1151,7 +1159,7 @@ else {
                     .Returns(funcCodeBlock);
 
                 // Act
-                var result = Subject.VisitFunctionCallExpression(GenerateContext<HekateParser.FunctionCallExpressionContext>(expression))
+                var result = Subject.VisitFunctionCallExpression(GetFirstContext<HekateParser.FunctionCallExpressionContext>(expression))
                     .Generate(MockVirtualMachine, MockScopeManager);
 
                 // Verify

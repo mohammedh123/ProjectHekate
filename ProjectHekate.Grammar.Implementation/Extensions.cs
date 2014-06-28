@@ -10,10 +10,15 @@ namespace ProjectHekate.Grammar.Implementation
 {
     public static class Extensions
     {
-        public static TNodeType GetFirstDescendantOfType<TNodeType>(this ParserRuleContext context) where TNodeType : class, IParseTree 
+        public static IEnumerable<TNodeType> GetDescendantsOfType<TNodeType>(this ParserRuleContext context) where TNodeType : class, IParseTree 
         {
-            if (context == null) return null;
-            if (context is TNodeType) return context as TNodeType;
+            if (context == null) {
+                yield break;
+            }
+            if (context is TNodeType) {
+                yield return context as TNodeType;
+                yield break;
+            }
 
             var contextQueue = new Queue<IParseTree>();
             contextQueue.Enqueue(context);
@@ -24,12 +29,10 @@ namespace ProjectHekate.Grammar.Implementation
                 for(var i = 0; i < ctx.ChildCount; i++) {
                     var child = ctx.GetChild(i);
 
-                    if (child is TNodeType) return child as TNodeType;
+                    if (child is TNodeType) yield return child as TNodeType;
                     contextQueue.Enqueue(child);
                 }
             }
-
-            return null;
         }
     }
 }
