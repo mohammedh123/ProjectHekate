@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Grammar.Imple
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Scripting", "ProjectHekate.Scripting\ProjectHekate.Scripting.csproj", "{49AF0BB8-26FB-4542-964A-8C30B3557155}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectHekate.Scripting.Tests", "ProjectHekate.Scripting.Tests\ProjectHekate.Scripting.Tests.csproj", "{14D638F7-E17C-44A2-948E-35F438ACF619}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,17 @@ Global
 		{49AF0BB8-26FB-4542-964A-8C30B3557155}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{49AF0BB8-26FB-4542-964A-8C30B3557155}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{49AF0BB8-26FB-4542-964A-8C30B3557155}.Release|x64.ActiveCfg = Release|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|x64.ActiveCfg = Debug|x64
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Debug|x64.Build.0 = Debug|x64
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{14D638F7-E17C-44A2-948E-35F438ACF619}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
