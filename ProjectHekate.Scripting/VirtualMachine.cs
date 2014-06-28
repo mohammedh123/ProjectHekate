@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
 {
-    public class VirtualMachine : IVirtualMachine
+    public class VirtualMachine : IVirtualMachine, IBytecodeInterpreter
     {
         public const int MaxNumericalVariables = 64;
         public const int MaxEmitterVariables = 8;
         public const int MaxProperties = 32;
+        public const int MaxStackSize = 64;
         
         private readonly List<FunctionCodeScope> _functionCodeScopes;
         private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeScopes;
@@ -150,6 +152,123 @@ namespace ProjectHekate.Scripting
         public bool HasGlobalSymbolDefined(string name)
         {
             return _globalSymbolsNameToValue.ContainsKey(name);
+        }
+
+        public ScriptStatus InterpretCode(ICodeBlock code, ScriptState state, bool looping)
+        {
+            if (code == null) throw new ArgumentNullException("code");
+            if (state == null) throw new ArgumentNullException("state");
+            if (state.CurrentInstructionIndex >= code.Size) return ScriptStatus.Ok;
+
+            var inst = (Instruction)code[state.CurrentInstructionIndex];
+
+            while (true) {
+                switch (inst) {
+                    case Instruction.Push:
+                    {
+                        state.Stack[state.StackHead] = code[state.CurrentInstructionIndex + 1];
+                        state.StackHead++;
+                        state.CurrentInstructionIndex += 2;
+                        
+                        ThrowIfStackLimitIsReached(state);
+                        break;
+                    }
+                    case Instruction.Pop:
+                    {
+                        state.StackHead--;
+                        state.CurrentInstructionIndex += 1;
+
+                        ThrowIfStackBaseIsHit(state);
+                        break;   
+                    }
+                    case Instruction.Negate:
+                    {
+                        if (state.StackHead == 0) throw new InvalidOperationException("There must be a value on the stack in order to execute a Negate instruction.");
+
+                        state.Stack[state.StackHead - 1] *= -1;
+                        state.CurrentInstructionIndex += 1;
+
+                        break;
+                    }
+                    case Instruction.OperatorAdd:
+                        break;
+                    case Instruction.OperatorSubtract:
+                        break;
+                    case Instruction.OperatorMultiply:
+                        break;
+                    case Instruction.OperatorDivide:
+                        break;
+                    case Instruction.OperatorMod:
+                        break;
+                    case Instruction.OperatorLessThan:
+                        break;
+                    case Instruction.OperatorLessThanEqual:
+                        break;
+                    case Instruction.OperatorGreaterThan:
+                        break;
+                    case Instruction.OperatorGreaterThanEqual:
+                        break;
+                    case Instruction.OperatorEqual:
+                        break;
+                    case Instruction.OperatorNotEqual:
+                        break;
+                    case Instruction.OperatorAnd:
+                        break;
+                    case Instruction.OperatorOr:
+                        break;
+                    case Instruction.OperatorNot:
+                        break;
+                    case Instruction.Jump:
+                        break;
+                    case Instruction.JumpIfZero:
+                        break;
+                    case Instruction.Compare:
+                        break;
+                    case Instruction.Return:
+                        break;
+                    case Instruction.FunctionCall:
+                        break;
+                    case Instruction.GetUpdater:
+                        break;
+                    case Instruction.GetProperty:
+                        break;
+                    case Instruction.SetProperty:
+                        break;
+                    case Instruction.GetVariable:
+                        break;
+                    case Instruction.SetVariable:
+                        break;
+                    case Instruction.Fire:
+                        break;
+                    case Instruction.WaitFrames:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                if (state.CurrentInstructionIndex >= code.Size) {
+                    if (looping) {
+                        state.CurrentInstructionIndex = 0;
+                    }
+                    else {
+                        return ScriptStatus.Ok;
+                    }
+                }
+            }
+        }
+
+        private void ThrowIfStackLimitIsReached(ScriptState state)
+        {
+            if (state.StackHead >= MaxStackSize) {
+                throw new InvalidOperationException("Stack limit reached!");
+            }
+        }
+
+        private void ThrowIfStackBaseIsHit(ScriptState state)
+        {
+            if (state.StackHead < 0) {
+                throw new InvalidOperationException("Stack base has been hit!");
+            }
         }
     }
 }
