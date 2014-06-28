@@ -8,6 +8,9 @@ namespace ProjectHekate.Scripting
 {
     public class VirtualMachine : IVirtualMachine, IBytecodeInterpreter
     {
+        private const float TrueValue = 1.0f;
+        private const float FalseValue = 0.0f;
+
         public const int MaxNumericalVariables = 64;
         public const int MaxEmitterVariables = 8;
         public const int MaxProperties = 32;
@@ -183,41 +186,35 @@ namespace ProjectHekate.Scripting
                     }
                     case Instruction.Negate:
                     {
-                        if (state.StackHead == 0) throw new InvalidOperationException("There must be a value on the stack in order to execute a Negate instruction.");
+                        ThrowIfStackIsEmpty(state);
 
                         state.Stack[state.StackHead - 1] *= -1;
                         state.CurrentInstructionIndex += 1;
 
                         break;
                     }
-                    case Instruction.OperatorAdd:
-                        break;
-                    case Instruction.OperatorSubtract:
-                        break;
-                    case Instruction.OperatorMultiply:
-                        break;
-                    case Instruction.OperatorDivide:
-                        break;
-                    case Instruction.OperatorMod:
-                        break;
-                    case Instruction.OperatorLessThan:
-                        break;
-                    case Instruction.OperatorLessThanEqual:
-                        break;
-                    case Instruction.OperatorGreaterThan:
-                        break;
-                    case Instruction.OperatorGreaterThanEqual:
-                        break;
-                    case Instruction.OperatorEqual:
-                        break;
-                    case Instruction.OperatorNotEqual:
-                        break;
-                    case Instruction.OperatorAnd:
-                        break;
-                    case Instruction.OperatorOr:
-                        break;
                     case Instruction.OperatorNot:
-                        break;
+                    {
+                        ThrowIfStackIsEmpty(state);
+
+                        state.Stack[state.StackHead - 1] = state.Stack[state.StackHead - 1] != 0 ? FalseValue : TrueValue;
+                        state.CurrentInstructionIndex += 1;
+
+                        break;   
+                    }
+                    case Instruction.OperatorAdd:
+                    case Instruction.OperatorSubtract:
+                    case Instruction.OperatorMultiply:
+                    case Instruction.OperatorDivide:
+                    case Instruction.OperatorMod:
+                    case Instruction.OperatorLessThan:
+                    case Instruction.OperatorLessThanEqual:
+                    case Instruction.OperatorGreaterThan:
+                    case Instruction.OperatorGreaterThanEqual:
+                    case Instruction.OperatorEqual:
+                    case Instruction.OperatorNotEqual:
+                    case Instruction.OperatorAnd:
+                    case Instruction.OperatorOr:
                     case Instruction.Jump:
                         break;
                     case Instruction.JumpIfZero:
@@ -268,6 +265,23 @@ namespace ProjectHekate.Scripting
         {
             if (state.StackHead < 0) {
                 throw new InvalidOperationException("Stack base has been hit!");
+            }
+        }
+
+        private void ThrowIfStackIsEmpty(ScriptState state)
+        {
+            if (state.StackHead == 0) {
+                throw new InvalidOperationException("There must be a value on the stack in order to execute this instruction.");
+            }
+        }
+
+        private void ThrowIfStackDoesNotContainEnoughValues(ScriptState state, int minimumNumberOfValues)
+        {
+            if (minimumNumberOfValues == 1) {
+                ThrowIfStackIsEmpty(state);
+            }
+            else if (state.StackHead == 0) {
+                throw new InvalidOperationException("There must be at least " + minimumNumberOfValues + " values on the stack in order to execute this instruction.");
             }
         }
     }

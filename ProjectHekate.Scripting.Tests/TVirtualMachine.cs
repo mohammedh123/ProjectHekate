@@ -130,6 +130,62 @@ namespace ProjectHekate.Scripting.Tests
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
+
+            [TestClass]
+            public class Not : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetNotCodeForTrue()
+                {
+                    // Setup: set up state
+                    const float dummyValue = 3.5f;
+                    State.Stack[0] = dummyValue;
+                    State.StackHead = 1;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.OperatorNot);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: stack has negated dummy value on it
+                    State.StackHead.Should().Be(1);
+                    State.CurrentInstructionIndex.Should().Be(1);
+                    State.Stack[0].Should().Be(0);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetNotCodeForFalse()
+                {
+                    // Setup: set up state
+                    const float dummyValue = 0;
+                    State.Stack[0] = dummyValue;
+                    State.StackHead = 1;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.OperatorNot);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: stack has negated dummy value on it
+                    State.StackHead.Should().Be(1);
+                    State.CurrentInstructionIndex.Should().Be(1);
+                    State.Stack[0].Should().Be(1);
+                }
+
+                [TestMethod]
+                public void ShouldThrowExceptionWhenStackIsEmpty()
+                {
+                    // Setup: set up state
+                    State.StackHead = 0;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.OperatorNot);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<InvalidOperationException>();
+                }
+            }
         }
     }
 }
