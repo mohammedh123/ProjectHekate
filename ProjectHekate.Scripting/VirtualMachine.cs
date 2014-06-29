@@ -193,7 +193,7 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
-                    case Instruction.OperatorNot:
+                    case Instruction.OpNot:
                     {
                         ThrowIfStackIsEmpty(state);
 
@@ -202,19 +202,19 @@ namespace ProjectHekate.Scripting
 
                         break;   
                     }
-                    case Instruction.OperatorAdd:
-                    case Instruction.OperatorSubtract:
-                    case Instruction.OperatorMultiply:
-                    case Instruction.OperatorDivide:
-                    case Instruction.OperatorMod:
-                    case Instruction.OperatorLessThan:
-                    case Instruction.OperatorLessThanEqual:
-                    case Instruction.OperatorGreaterThan:
-                    case Instruction.OperatorGreaterThanEqual:
-                    case Instruction.OperatorEqual:
-                    case Instruction.OperatorNotEqual:
-                    case Instruction.OperatorAnd:
-                    case Instruction.OperatorOr:
+                    case Instruction.OpAdd:
+                    case Instruction.OpSubtract:
+                    case Instruction.OpMultiply:
+                    case Instruction.OpDivide:
+                    case Instruction.OpMod:
+                    case Instruction.OpLessThan:
+                    case Instruction.OpLessThanEqual:
+                    case Instruction.OpGreaterThan:
+                    case Instruction.OpGreaterThanEqual:
+                    case Instruction.OpEqual:
+                    case Instruction.OpNotEqual:
+                    case Instruction.OpAnd:
+                    case Instruction.OpOr:
                     case Instruction.Jump:
                         break;
                     case Instruction.JumpIfZero:

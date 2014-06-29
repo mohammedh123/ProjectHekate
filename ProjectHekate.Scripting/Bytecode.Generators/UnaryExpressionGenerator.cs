@@ -13,7 +13,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
         {
             switch (op) {
                 case Instruction.Negate:
-                case Instruction.OperatorNot:
+                case Instruction.OpNot:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("op", op, "Invalid unary operator supplied.");

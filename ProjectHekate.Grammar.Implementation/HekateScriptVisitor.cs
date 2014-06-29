@@ -347,8 +347,8 @@ namespace ProjectHekate.Grammar.Implementation
         {
             switch (context.Operator.Type)
             {
-                case HekateParser.INC: return Instruction.OperatorAdd;
-                case HekateParser.DEC: return Instruction.OperatorSubtract;
+                case HekateParser.INC: return Instruction.OpAdd;
+                case HekateParser.DEC: return Instruction.OpSubtract;
                 default: throw new InvalidOperationException("Invalid operator type found for this PostIncDecExpressionContext (" + context.Operator.Text + ").");
             }
         }
@@ -358,7 +358,7 @@ namespace ProjectHekate.Grammar.Implementation
             switch (context.Operator.Type)
             {
                 case HekateParser.SUB:      return Instruction.Negate;
-                case HekateParser.BANG:     return Instruction.OperatorNot;
+                case HekateParser.BANG:     return Instruction.OpNot;
                 default:                    throw new InvalidOperationException("You forgot to add support for an operator! Check the code for support for the " + context.Operator.Text + " operator.");
             }
         }
@@ -366,19 +366,19 @@ namespace ProjectHekate.Grammar.Implementation
         private Instruction GetBinaryOperatorFromContext(HekateParser.BinaryExpressionContext context)
         {
             switch (context.Operator.Type) {
-                case HekateParser.MUL:      return Instruction.OperatorMultiply;
-                case HekateParser.DIV:      return Instruction.OperatorDivide;
-                case HekateParser.MOD:      return Instruction.OperatorMod;
-                case HekateParser.ADD:      return Instruction.OperatorAdd;
-                case HekateParser.SUB:      return Instruction.OperatorSubtract;
-                case HekateParser.LT:       return Instruction.OperatorLessThan;
-                case HekateParser.GT:       return Instruction.OperatorGreaterThan;
-                case HekateParser.LE:       return Instruction.OperatorLessThanEqual;
-                case HekateParser.GE:       return Instruction.OperatorGreaterThanEqual;
-                case HekateParser.EQUAL:    return Instruction.OperatorEqual;
-                case HekateParser.NOTEQUAL: return Instruction.OperatorNotEqual;
-                case HekateParser.AND:      return Instruction.OperatorAnd;
-                case HekateParser.OR:       return Instruction.OperatorOr;
+                case HekateParser.MUL:      return Instruction.OpMultiply;
+                case HekateParser.DIV:      return Instruction.OpDivide;
+                case HekateParser.MOD:      return Instruction.OpMod;
+                case HekateParser.ADD:      return Instruction.OpAdd;
+                case HekateParser.SUB:      return Instruction.OpSubtract;
+                case HekateParser.LT:       return Instruction.OpLessThan;
+                case HekateParser.GT:       return Instruction.OpGreaterThan;
+                case HekateParser.LE:       return Instruction.OpLessThanEqual;
+                case HekateParser.GE:       return Instruction.OpGreaterThanEqual;
+                case HekateParser.EQUAL:    return Instruction.OpEqual;
+                case HekateParser.NOTEQUAL: return Instruction.OpNotEqual;
+                case HekateParser.AND:      return Instruction.OpAnd;
+                case HekateParser.OR:       return Instruction.OpOr;
                 default:                    throw new InvalidOperationException("You forgot to add support for an operator! Check the code for support for the " + context.Operator.Text + " operator.");
             }
         }
@@ -386,10 +386,10 @@ namespace ProjectHekate.Grammar.Implementation
         private Instruction GetCompoundAssignmentOperatorFromContext(HekateParser.AssignmentExpressionContext context)
         {
             switch (context.Operator.Type) {
-                case HekateParser.MUL_ASSIGN:   return Instruction.OperatorMultiply;
-                case HekateParser.DIV_ASSIGN:   return Instruction.OperatorDivide;
-                case HekateParser.ADD_ASSIGN:   return Instruction.OperatorAdd;
-                case HekateParser.SUB_ASSIGN:   return Instruction.OperatorSubtract;
+                case HekateParser.MUL_ASSIGN:   return Instruction.OpMultiply;
+                case HekateParser.DIV_ASSIGN:   return Instruction.OpDivide;
+                case HekateParser.ADD_ASSIGN:   return Instruction.OpAdd;
+                case HekateParser.SUB_ASSIGN:   return Instruction.OpSubtract;
                 default:
                     throw new InvalidOperationException(
                         "You forgot to add a case for a compound assignment operator! Check the code for GetCompoundAssignmentOperatorFromContext.");

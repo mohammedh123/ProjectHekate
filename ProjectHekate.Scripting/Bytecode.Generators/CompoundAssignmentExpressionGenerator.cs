@@ -22,10 +22,10 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
         public CompoundAssignmentExpressionGenerator(IBytecodeGenerator valueExpression, IdentifierType identifierType, string identifierName, Instruction op)
         {
             switch (op) {
-                case Instruction.OperatorMultiply:
-                case Instruction.OperatorDivide:
-                case Instruction.OperatorAdd:
-                case Instruction.OperatorSubtract:
+                case Instruction.OpMultiply:
+                case Instruction.OpDivide:
+                case Instruction.OpAdd:
+                case Instruction.OpSubtract:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("op", op, "The operator must be *, /, +, or -.");

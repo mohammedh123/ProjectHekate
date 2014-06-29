@@ -15,8 +15,8 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // basic validation of operator
             switch (op)
             {
-                case Instruction.OperatorAdd:
-                case Instruction.OperatorSubtract:
+                case Instruction.OpAdd:
+                case Instruction.OpSubtract:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("op", op, "The operator must be either the addition operator or the subtraction operator.");
@@ -34,7 +34,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // {index of variable/property}
             // Instructions.Push
             // {1}
-            // Instruction.OperatorAdd/Subtract
+            // Instruction.OpAdd/Subtract
             // Instruction.SetVariable/Property
             // {index of variable/property}
 

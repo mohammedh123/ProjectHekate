@@ -142,7 +142,7 @@ namespace ProjectHekate.Scripting.Tests
                     State.Stack[0] = dummyValue;
                     State.StackHead = 1;
                     var code = new CodeBlock();
-                    code.Add(Instruction.OperatorNot);
+                    code.Add(Instruction.OpNot);
 
                     // Act: call method
                     Subject.InterpretCode(code, State, false);
@@ -161,7 +161,7 @@ namespace ProjectHekate.Scripting.Tests
                     State.Stack[0] = dummyValue;
                     State.StackHead = 1;
                     var code = new CodeBlock();
-                    code.Add(Instruction.OperatorNot);
+                    code.Add(Instruction.OpNot);
 
                     // Act: call method
                     Subject.InterpretCode(code, State, false);
@@ -180,7 +180,7 @@ namespace ProjectHekate.Scripting.Tests
                     State.Stack[0] = dummyValue;
                     State.StackHead = 1;
                     var code = new CodeBlock();
-                    code.Add(Instruction.OperatorNot);
+                    code.Add(Instruction.OpNot);
 
                     // Act: call method
                     Subject.InterpretCode(code, State, false);
@@ -197,7 +197,7 @@ namespace ProjectHekate.Scripting.Tests
                     // Setup: set up state
                     State.StackHead = 0;
                     var code = new CodeBlock();
-                    code.Add(Instruction.OperatorNot);
+                    code.Add(Instruction.OpNot);
 
                     // Act+Verify
                     Subject

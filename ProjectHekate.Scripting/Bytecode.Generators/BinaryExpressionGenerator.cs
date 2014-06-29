@@ -14,19 +14,19 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // do some basic validation of the operator
             switch (op)
             {
-                case Instruction.OperatorMultiply:
-                case Instruction.OperatorDivide:
-                case Instruction.OperatorMod:
-                case Instruction.OperatorAdd:
-                case Instruction.OperatorSubtract:
-                case Instruction.OperatorLessThan:
-                case Instruction.OperatorGreaterThan:
-                case Instruction.OperatorLessThanEqual:
-                case Instruction.OperatorGreaterThanEqual:
-                case Instruction.OperatorEqual:
-                case Instruction.OperatorNotEqual:
-                case Instruction.OperatorAnd:
-                case Instruction.OperatorOr:
+                case Instruction.OpMultiply:
+                case Instruction.OpDivide:
+                case Instruction.OpMod:
+                case Instruction.OpAdd:
+                case Instruction.OpSubtract:
+                case Instruction.OpLessThan:
+                case Instruction.OpGreaterThan:
+                case Instruction.OpLessThanEqual:
+                case Instruction.OpGreaterThanEqual:
+                case Instruction.OpEqual:
+                case Instruction.OpNotEqual:
+                case Instruction.OpAnd:
+                case Instruction.OpOr:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("op", op, "The operator supplied is not a binary operator.");

@@ -336,7 +336,7 @@ else {
                 result.Code[5].Should().Be(0);
                 result.Code[6].Should().Be((byte) Instruction.Push);
                 result.Code[7].Should().Be(10);
-                result.Code[8].Should().Be((byte) Instruction.OperatorLessThan);
+                result.Code[8].Should().Be((byte) Instruction.OpLessThan);
                 result.Code[9].Should().Be((byte) Instruction.Jump);
                 result.Code[10].Should().Be(4);
             }
@@ -363,12 +363,12 @@ else {
                 result.Code[5].Should().Be(0);
                 result.Code[6].Should().Be((byte) Instruction.Push);
                 result.Code[7].Should().Be(10);
-                result.Code[8].Should().Be((byte) Instruction.OperatorLessThan);
+                result.Code[8].Should().Be((byte) Instruction.OpLessThan);
                 result.Code[9].Should().Be((byte) Instruction.GetVariable);
                 result.Code[10].Should().Be(0);
                 result.Code[11].Should().Be((byte) Instruction.Push);
                 result.Code[12].Should().Be(1);
-                result.Code[13].Should().Be((byte) Instruction.OperatorAdd);
+                result.Code[13].Should().Be((byte) Instruction.OpAdd);
                 result.Code[14].Should().Be((byte) Instruction.SetVariable);
                 result.Code[15].Should().Be(0);
                 result.Code[16].Should().Be((byte) Instruction.Jump);
@@ -399,12 +399,12 @@ else {
                 result.Code[5].Should().Be(0);
                 result.Code[6].Should().Be((byte)Instruction.Push);
                 result.Code[7].Should().Be(10);
-                result.Code[8].Should().Be((byte)Instruction.OperatorLessThan);
+                result.Code[8].Should().Be((byte)Instruction.OpLessThan);
                 result.Code[9].Should().Be((byte)Instruction.GetVariable);
                 result.Code[10].Should().Be(0);
                 result.Code[11].Should().Be((byte)Instruction.Push);
                 result.Code[12].Should().Be(1);
-                result.Code[13].Should().Be((byte)Instruction.OperatorAdd);
+                result.Code[13].Should().Be((byte)Instruction.OpAdd);
                 result.Code[14].Should().Be((byte)Instruction.SetVariable);
                 result.Code[15].Should().Be(0);
                 result.Code[16].Should().Be((byte)Instruction.Jump);
@@ -437,12 +437,12 @@ else {
                 result.Code[5].Should().Be(0);
                 result.Code[6].Should().Be((byte)Instruction.Push);
                 result.Code[7].Should().Be(10);
-                result.Code[8].Should().Be((byte)Instruction.OperatorLessThan);
+                result.Code[8].Should().Be((byte)Instruction.OpLessThan);
                 result.Code[9].Should().Be((byte)Instruction.GetVariable);
                 result.Code[10].Should().Be(0);
                 result.Code[11].Should().Be((byte)Instruction.Push);
                 result.Code[12].Should().Be(1);
-                result.Code[13].Should().Be((byte)Instruction.OperatorAdd);
+                result.Code[13].Should().Be((byte)Instruction.OpAdd);
                 result.Code[14].Should().Be((byte)Instruction.SetVariable);
                 result.Code[15].Should().Be(0);
                 result.Code[16].Should().Be((byte)Instruction.Jump);
@@ -476,12 +476,12 @@ else {
                 result.Code[5].Should().Be(0);
                 result.Code[6].Should().Be((byte) Instruction.Push);
                 result.Code[7].Should().Be(10);
-                result.Code[8].Should().Be((byte) Instruction.OperatorLessThan);
+                result.Code[8].Should().Be((byte) Instruction.OpLessThan);
                 result.Code[9].Should().Be((byte) Instruction.GetVariable);
                 result.Code[10].Should().Be(0);
                 result.Code[11].Should().Be((byte) Instruction.Push);
                 result.Code[12].Should().Be(1);
-                result.Code[13].Should().Be((byte) Instruction.OperatorAdd);
+                result.Code[13].Should().Be((byte) Instruction.OpAdd);
                 result.Code[14].Should().Be((byte) Instruction.SetVariable);
                 result.Code[15].Should().Be(0);
                 result.Code[16].Should().Be((byte) Instruction.Push);
@@ -819,7 +819,7 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForConditionalNot()
             {
-                TestCodeGenerationForOperator("!", Instruction.OperatorNot);
+                TestCodeGenerationForOperator("!", Instruction.OpNot);
             }
 
             [TestMethod]
@@ -855,79 +855,79 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForMultiplication()
             {
-                TestCodeGenerationForOperator("*", Instruction.OperatorMultiply);
+                TestCodeGenerationForOperator("*", Instruction.OpMultiply);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForDivision()
             {
-                TestCodeGenerationForOperator("/", Instruction.OperatorDivide);
+                TestCodeGenerationForOperator("/", Instruction.OpDivide);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForModulus()
             {
-                TestCodeGenerationForOperator("%", Instruction.OperatorMod);
+                TestCodeGenerationForOperator("%", Instruction.OpMod);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForAddition()
             {
-                TestCodeGenerationForOperator("+", Instruction.OperatorAdd);
+                TestCodeGenerationForOperator("+", Instruction.OpAdd);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForSubtraction()
             {
-                TestCodeGenerationForOperator("-", Instruction.OperatorSubtract);
+                TestCodeGenerationForOperator("-", Instruction.OpSubtract);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForLessThan()
             {
-                TestCodeGenerationForOperator("<", Instruction.OperatorLessThan);
+                TestCodeGenerationForOperator("<", Instruction.OpLessThan);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForGreaterThan()
             {
-                TestCodeGenerationForOperator(">", Instruction.OperatorGreaterThan);
+                TestCodeGenerationForOperator(">", Instruction.OpGreaterThan);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForLessThanEqual()
             {
-                TestCodeGenerationForOperator("<=", Instruction.OperatorLessThanEqual);
+                TestCodeGenerationForOperator("<=", Instruction.OpLessThanEqual);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForGreaterThanEqual()
             {
-                TestCodeGenerationForOperator(">=", Instruction.OperatorGreaterThanEqual);
+                TestCodeGenerationForOperator(">=", Instruction.OpGreaterThanEqual);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForEquality()
             {
-                TestCodeGenerationForOperator("==", Instruction.OperatorEqual);
+                TestCodeGenerationForOperator("==", Instruction.OpEqual);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForInequality()
             {
-                TestCodeGenerationForOperator("!=", Instruction.OperatorNotEqual);
+                TestCodeGenerationForOperator("!=", Instruction.OpNotEqual);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForConditionalAnd()
             {
-                TestCodeGenerationForOperator("&&", Instruction.OperatorAnd);
+                TestCodeGenerationForOperator("&&", Instruction.OpAnd);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForConditionalOr()
             {
-                TestCodeGenerationForOperator("||", Instruction.OperatorOr);
+                TestCodeGenerationForOperator("||", Instruction.OpOr);
             }
         }
 
@@ -964,7 +964,7 @@ else {
                 result.Code[1].Should().Be(idx);
                 result.Code[2].Should().Be((byte) Instruction.Push);
                 result.Code[3].Should().Be(1);
-                result.Code[4].Should().Be(isIncrementing ? (byte) Instruction.OperatorAdd : (byte) Instruction.OperatorSubtract);
+                result.Code[4].Should().Be(isIncrementing ? (byte) Instruction.OpAdd : (byte) Instruction.OpSubtract);
                 if (type == IdentifierType.Variable) {
                     result.Code[0].Should().Be((byte) Instruction.GetVariable);
                     result.Code[5].Should().Be((byte) Instruction.SetVariable);
@@ -1134,25 +1134,25 @@ else {
             [TestMethod]
             public void ShouldGenerateCodeForMultiplyAssignToExistingNumericalVariable()
             {
-                TestCompoundAssignmentWithExistingNumericalVariable("*", Instruction.OperatorMultiply);
+                TestCompoundAssignmentWithExistingNumericalVariable("*", Instruction.OpMultiply);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForDivideAssignToExistingNumericalVariable()
             {
-                TestCompoundAssignmentWithExistingNumericalVariable("/", Instruction.OperatorDivide);
+                TestCompoundAssignmentWithExistingNumericalVariable("/", Instruction.OpDivide);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForAddAssignToExistingNumericalVariable()
             {
-                TestCompoundAssignmentWithExistingNumericalVariable("+", Instruction.OperatorAdd);
+                TestCompoundAssignmentWithExistingNumericalVariable("+", Instruction.OpAdd);
             }
 
             [TestMethod]
             public void ShouldGenerateCodeForSubtractAssignToExistingNumericalVariable()
             {
-                TestCompoundAssignmentWithExistingNumericalVariable("-", Instruction.OperatorSubtract);
+                TestCompoundAssignmentWithExistingNumericalVariable("-", Instruction.OpSubtract);
             }
             
             [TestMethod]
