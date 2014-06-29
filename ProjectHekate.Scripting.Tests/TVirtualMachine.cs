@@ -205,6 +205,127 @@ namespace ProjectHekate.Scripting.Tests
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
+
+            [TestClass]
+            public class BinaryOperators : TVirtualMachine
+            {
+                private void TestBinaryOperator(Instruction binOp, Func<float, float, float> func)
+                {
+                    const float left = 3.5f;
+                    const float right = 3;
+
+                    // Setup: set up state
+                    State.StackHead = 2;
+                    State.Stack[0] = left;
+                    State.Stack[1] = right;
+                    var code = new CodeBlock();
+                    code.Add(binOp);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: stack has the right value on it
+                    State.StackHead.Should().Be(1);
+                    State.CurrentInstructionIndex.Should().Be(1);
+                    State.Stack[0].Should().Be(func(left, right));
+                }
+
+                [TestMethod]
+                public void ShouldInterpretAddCode()
+                {
+                    TestBinaryOperator(Instruction.OpAdd, (l, r) => l + r);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretSubtractCode()
+                {
+                    TestBinaryOperator(Instruction.OpSubtract, (l, r) => l - r);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretMultiplyCode()
+                {
+                    TestBinaryOperator(Instruction.OpMultiply, (l, r) => l * r);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretDivideCode()
+                {
+                    TestBinaryOperator(Instruction.OpDivide, (l, r) => l / r);
+                }
+
+                [TestMethod]
+                public void ShouldThrowInvalidOperationForDivideByZero()
+                {
+                    // Setup: set up state
+                    const float left = 3.5f;
+                    const float right = 0;
+                    State.StackHead = 2;
+                    State.Stack[0] = left;
+                    State.Stack[1] = right;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.OpDivide);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<InvalidOperationException>();
+                }
+
+                [TestMethod]
+                public void ShouldInterpretModCode()
+                {
+                    TestBinaryOperator(Instruction.OpMod, (l, r) => l % r);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretLessThanCode()
+                {
+                    TestBinaryOperator(Instruction.OpLessThan, (l, r) => l < r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretLessThanEqualCode()
+                {
+                    TestBinaryOperator(Instruction.OpLessThanEqual, (l, r) => l <= r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretGreaterThanCode()
+                {
+                    TestBinaryOperator(Instruction.OpGreaterThan, (l, r) => l > r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretGreaterThanEqualCode()
+                {
+                    TestBinaryOperator(Instruction.OpGreaterThanEqual, (l, r) => l >= r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretEqualCode()
+                {
+                    TestBinaryOperator(Instruction.OpEqual, (l, r) => l == r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretNotEqualCode()
+                {
+                    TestBinaryOperator(Instruction.OpNotEqual, (l, r) => l != r ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretAndCode()
+                {
+                    TestBinaryOperator(Instruction.OpAnd, (l, r) => l > 0 && r > 0 ? 1.0f : 0.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpretOrCode()
+                {
+                    TestBinaryOperator(Instruction.OpOr, (l, r) => l > 0 || r > 0 ? 1.0f : 0.0f);
+                }
+            }
         }
     }
 }

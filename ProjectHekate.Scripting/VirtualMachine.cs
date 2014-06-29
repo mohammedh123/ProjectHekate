@@ -215,6 +215,37 @@ namespace ProjectHekate.Scripting
                     case Instruction.OpNotEqual:
                     case Instruction.OpAnd:
                     case Instruction.OpOr:
+                    {
+                        ThrowIfStackDoesNotContainEnoughValues(state, 2);
+
+                        var val1 = state.Stack[state.StackHead - 2];
+                        var val2 = state.Stack[state.StackHead - 1];
+                        var newValue = val1;
+
+                        switch (inst) {
+                            case Instruction.OpAdd:                 newValue = val1 + val2; break;
+                            case Instruction.OpSubtract:            newValue = val1 - val2; break;
+                            case Instruction.OpMultiply:            newValue = val1 * val2; break;
+                            case Instruction.OpDivide: 
+                                if(val2 == 0.0f) throw new InvalidOperationException("Cannot divide by zero.");
+                                newValue = val1 / val2; break;
+                            case Instruction.OpMod:                 newValue = val1 %  val2; break;
+                            case Instruction.OpLessThan:            newValue = val1 <  val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpLessThanEqual:       newValue = val1 <= val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpGreaterThan:         newValue = val1 >  val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpGreaterThanEqual:    newValue = val1 >= val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpEqual:               newValue = val1 == val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpNotEqual:            newValue = val1 != val2 ? TrueValue : FalseValue; break;
+                            case Instruction.OpAnd:                 newValue = val1 != 0 && val2 != 0 ? TrueValue : FalseValue; break;
+                            case Instruction.OpOr:                  newValue = val1 != 0 || val2 != 0 ? TrueValue : FalseValue; break;
+                        }
+
+                        state.Stack[state.StackHead - 2] = newValue;
+                        state.StackHead--;
+                        state.CurrentInstructionIndex += 1;
+
+                        break;
+                    }
                     case Instruction.Jump:
                         break;
                     case Instruction.JumpIfZero:
@@ -256,7 +287,7 @@ namespace ProjectHekate.Scripting
 
         private void ThrowIfStackLimitIsReached(ScriptState state)
         {
-            if (state.StackHead > MaxStackSize) {
+            if (state.StackHead >= MaxStackSize) {
                 throw new InvalidOperationException("Stack limit reached!");
             }
         }
