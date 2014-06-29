@@ -374,6 +374,83 @@ namespace ProjectHekate.Scripting.Tests
                         .ShouldThrow<IndexOutOfRangeException>();
                 }
             }
+
+            [TestClass]
+            public class JumpIfZero : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetJumpIfZeroCodeForZero()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.JumpIfZero);
+                    code.Add(4);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: instruction index changes to beginning
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(2);
+                    State.Stack[1].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldNotJumpForNonZero()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 5;
+                    code.Add(Instruction.JumpIfZero);
+                    code.Add(4);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: stack has all 3 values on it
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(3);
+                    State.Stack[2].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldThrowOutOfRangeExceptionForInvalidJumpAddress()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.JumpIfZero);
+                    code.Add(-10);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+
+                    code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.Jump);
+                    code.Add(2); // out of range
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+                }
+            }
         }
     }
 }
