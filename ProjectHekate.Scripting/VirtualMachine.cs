@@ -163,9 +163,10 @@ namespace ProjectHekate.Scripting
             if (state == null) throw new ArgumentNullException("state");
             if (state.CurrentInstructionIndex >= code.Size) return ScriptStatus.Ok;
 
-            var inst = (Instruction)code[state.CurrentInstructionIndex];
 
             while (true) {
+                var inst = (Instruction)code[state.CurrentInstructionIndex];
+
                 switch (inst) {
                     case Instruction.Push:
                     {
@@ -247,7 +248,15 @@ namespace ProjectHekate.Scripting
                         break;
                     }
                     case Instruction.Jump:
+                    {
+                        var address = (int) code[state.CurrentInstructionIndex + 1];
+
+                        if(address < 0 || address >= code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump: {0}, size: {1}).", address, code.Size));
+
+                        state.CurrentInstructionIndex = address;
+
                         break;
+                    }
                     case Instruction.JumpIfZero:
                         break;
                     case Instruction.Compare:

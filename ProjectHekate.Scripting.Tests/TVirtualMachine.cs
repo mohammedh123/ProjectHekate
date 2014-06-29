@@ -326,6 +326,54 @@ namespace ProjectHekate.Scripting.Tests
                     TestBinaryOperator(Instruction.OpOr, (l, r) => l > 0 || r > 0 ? 1.0f : 0.0f);
                 }
             }
+
+            [TestClass]
+            public class Jump : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetJumpCode()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.Jump);
+                    code.Add(4);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, false);
+
+                    // Verify: instruction index changes to beginning
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldThrowOutOfRangeExceptionForInvalidJumpAddress()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.Jump);
+                    code.Add(-10);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+
+                    code = new CodeBlock();
+                    code.Add(Instruction.Jump);
+                    code.Add(2); // out of range
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+                }
+            }
         }
     }
 }
