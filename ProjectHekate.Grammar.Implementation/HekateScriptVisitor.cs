@@ -59,7 +59,7 @@ namespace ProjectHekate.Grammar.Implementation
             return new EmitterUpdaterDeclarationStatementEmitter(paramNames, name, statements);
         }
 
-        public override AbstractBytecodeEmitter VisitBulletUpdaterDeclaration(HekateParser.BulletUpdaterDeclarationContext context)
+        public override AbstractBytecodeEmitter VisitActionDeclaration(HekateParser.ActionDeclarationContext context)
         {
             var paramNames = new List<string>();
 
@@ -74,7 +74,7 @@ namespace ProjectHekate.Grammar.Implementation
             var name = context.NormalIdentifier().GetText();
             var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
-            return new BulletUpdaterDeclarationStatementEmitter(paramNames, name, statements);
+            return new ActionDeclarationStatementEmitter(paramNames, name, statements);
         }
 
         public override AbstractBytecodeEmitter VisitFunctionDeclaration(HekateParser.FunctionDeclarationContext context)

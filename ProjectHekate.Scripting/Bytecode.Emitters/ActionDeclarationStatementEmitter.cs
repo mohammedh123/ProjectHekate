@@ -3,13 +3,13 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Emitters
 {
-    public class BulletUpdaterDeclarationStatementEmitter : EmptyEmitter
+    public class ActionDeclarationStatementEmitter : EmptyEmitter
     {        
         private readonly IReadOnlyList<string> _parameterNames;
         private readonly string _name;
         private readonly IReadOnlyList<IBytecodeEmitter> _statements;
 
-        public BulletUpdaterDeclarationStatementEmitter(IReadOnlyList<string> parameterNames, string name, IReadOnlyList<IBytecodeEmitter> statements)
+        public ActionDeclarationStatementEmitter(IReadOnlyList<string> parameterNames, string name, IReadOnlyList<IBytecodeEmitter> statements)
         {
             _parameterNames = parameterNames;
             _name = name;
@@ -18,7 +18,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
 
         public override void EmitTo(ICodeBlock codeBlock, IVirtualMachine vm, IScopeManager scopeManager)
         {
-            var bUpdaterCodeBlock = new BulletUpdaterCodeScope(_parameterNames);
+            var bUpdaterCodeBlock = new ActionCodeScope(_parameterNames);
 
             scopeManager.Add(bUpdaterCodeBlock);
             foreach (var statement in _statements)
@@ -27,8 +27,8 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             }
             scopeManager.Remove();
 
-            // done, now add to the pool of bullet updater records
-            vm.AddBulletUpdaterCodeScope(_name, bUpdaterCodeBlock);
+            // done, now add to the pool of action records
+            vm.AddActionCodeScope(_name, bUpdaterCodeBlock);
         }
     }
 }

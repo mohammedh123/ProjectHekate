@@ -17,10 +17,10 @@ namespace ProjectHekate.Scripting
         public const int MaxStackSize = 64;
         
         private readonly List<FunctionCodeScope> _functionCodeScopes;
-        private readonly List<BulletUpdaterCodeScope> _bulletUpdaterCodeScopes;
+        private readonly List<ActionCodeScope> _actionCodeScopes;
         private readonly List<EmitterUpdaterCodeScope> _emitterUpdaterCodeScopes;
         private readonly Dictionary<string, int> _functionCodeScopeNameToIndex;
-        private readonly Dictionary<string, int> _bulletUpdaterCodeScopeNameToIndex;
+        private readonly Dictionary<string, int> _actionCodeScopeNameToIndex;
         private readonly Dictionary<string, int> _emitterUpdaterCodeScopeNameToIndex;
 
         private readonly List<IdentifierRecord> _propertyRecords;
@@ -33,8 +33,8 @@ namespace ProjectHekate.Scripting
             _functionCodeScopes = new List<FunctionCodeScope>();
             _functionCodeScopeNameToIndex = new Dictionary<string, int>();
 
-            _bulletUpdaterCodeScopes = new List<BulletUpdaterCodeScope>();
-            _bulletUpdaterCodeScopeNameToIndex = new Dictionary<string, int>();
+            _actionCodeScopes = new List<ActionCodeScope>();
+            _actionCodeScopeNameToIndex = new Dictionary<string, int>();
 
             _emitterUpdaterCodeScopes = new List<EmitterUpdaterCodeScope>();
             _emitterUpdaterCodeScopeNameToIndex = new Dictionary<string, int>();
@@ -55,14 +55,14 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeScope(name, "function", _functionCodeScopes, _functionCodeScopeNameToIndex);
         }
 
-        public int AddBulletUpdaterCodeScope(string name, BulletUpdaterCodeScope codeScope)
+        public int AddActionCodeScope(string name, ActionCodeScope codeScope)
         {
-            return AddSpecializedCodeScope(name, _bulletUpdaterCodeScopes, _bulletUpdaterCodeScopeNameToIndex, codeScope);
+            return AddSpecializedCodeScope(name, _actionCodeScopes, _actionCodeScopeNameToIndex, codeScope);
         }
 
-        public BulletUpdaterCodeScope GetBulletUpdaterCodeScope(string name)
+        public ActionCodeScope GetActionCodeScope(string name)
         {
-            return GetSpecializedCodeScope(name, "bullet updater", _bulletUpdaterCodeScopes, _bulletUpdaterCodeScopeNameToIndex);
+            return GetSpecializedCodeScope(name, "action", _actionCodeScopes, _actionCodeScopeNameToIndex);
         }
 
         public int AddEmitterUpdaterCodeScope(string name, EmitterUpdaterCodeScope codeScope)
@@ -118,8 +118,8 @@ namespace ProjectHekate.Scripting
         {
             if (_functionCodeScopeNameToIndex.ContainsKey(name))
                 throw new ArgumentException("A function with the name \"" + name + "\" already exists in this script.", "name");
-            if (_bulletUpdaterCodeScopeNameToIndex.ContainsKey(name))
-                throw new ArgumentException("A bullet updater with the name \"" + name + "\" already exists in this script.", "name");
+            if (_actionCodeScopeNameToIndex.ContainsKey(name))
+                throw new ArgumentException("An action with the name \"" + name + "\" already exists in this script.", "name");
             if (_emitterUpdaterCodeScopeNameToIndex.ContainsKey(name))
                 throw new ArgumentException("An emitter updater with the name \"" + name + "\" already exists in this script.", "name");
         }
@@ -128,8 +128,8 @@ namespace ProjectHekate.Scripting
         {
             if (_functionCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as a function).", "codeScope");
-            if (_bulletUpdaterCodeScopes.Contains(codeScope))
-                throw new ArgumentException("This code scope has already been added, but with a different name (as a bullet updater).", "codeScope");
+            if (_actionCodeScopes.Contains(codeScope))
+                throw new ArgumentException("This code scope has already been added, but with a different name (as an action).", "codeScope");
             if (_emitterUpdaterCodeScopes.Contains(codeScope))
                 throw new ArgumentException("This code scope has already been added, but with a different name (as an emitter updater).", "codeScope");
         }

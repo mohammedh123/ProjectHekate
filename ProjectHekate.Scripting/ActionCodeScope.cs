@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace ProjectHekate.Scripting
 {
-    public class BulletUpdaterCodeScope : CodeScope
+    public class ActionCodeScope : CodeScope
     {
-        public BulletUpdaterCodeScope(IEnumerable<string> paramNames)
+        public ActionCodeScope(IEnumerable<string> paramNames)
         {
             // the parameters are added as local variables
             foreach(var paramName in paramNames) {

@@ -58,10 +58,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractBytecodeEmitter.cs" />
-    <Compile Include="BulletUpdaterCodeScope.cs" />
+    <Compile Include="ActionCodeScope.cs" />
     <Compile Include="Bytecode.Emitters\BlockEmitter.cs" />
     <Compile Include="Bytecode.Emitters\BreakStatementEmitter.cs" />
-    <Compile Include="Bytecode.Emitters\BulletUpdaterDeclarationStatementEmitter.cs" />
+    <Compile Include="Bytecode.Emitters\ActionDeclarationStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ContinueStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\EmitterUpdaterDeclarationStatementEmitter.cs" />
     <Compile Include="Bytecode.Emitters\ExpressionStatementEmitter.cs" />

@@ -5,7 +5,7 @@ grammar Hekate;
  */
 
 script
-	:	(functionDeclaration|emitterUpdaterDeclaration|bulletUpdaterDeclaration)*
+	:	(functionDeclaration|emitterUpdaterDeclaration|actionDeclaration)*
 	;
 	
 variableDeclaration
@@ -20,8 +20,8 @@ emitterUpdaterDeclaration
 	:	EUPDATER NormalIdentifier formalParameters updaterBody
 	;
 
-bulletUpdaterDeclaration
-	:	BUPDATER NormalIdentifier formalParameters updaterBody
+actionDeclaration
+	:	ACTION NormalIdentifier formalParameters updaterBody
 	;
 
 functionBody
@@ -176,7 +176,7 @@ CREATE		: 'create';
 EMITTER		: 'emitter';
 WITH		: 'with';
 UPDATER		: 'updater';
-BUPDATER	: 'bulletUpdater';
+ACTION		: 'action';
 EUPDATER	: 'emitterUpdater';
 ATTACH		: 'attach';
 BUILD		: 'build';

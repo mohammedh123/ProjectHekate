@@ -7,7 +7,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <summary>
         /// Adds a function code scope to the virtual machine.
         /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
+        /// <param name="name">The name of the action</param>
         /// <param name="codeScope">The function code scope</param>
         /// <returns>Returns the index of the function code scope (also populates the Index property of the code scope)</returns>
         /// <exception cref="System.ArgumentException">Thrown when a function with that name already exists</exception>
@@ -23,22 +23,22 @@ namespace ProjectHekate.Scripting.Interfaces
         FunctionCodeScope GetFunctionCodeScope(string name);
 
         /// <summary>
-        /// Adds a bullet updater code scope to the virtual machine.
+        /// Adds an action code scope to the virtual machine.
         /// </summary>
-        /// <param name="name">The name of the bullet updater</param>
-        /// <param name="codeScope">The bullet updater code scope</param>
-        /// <returns>Returns the index of the bullet updater code scope (also populates the Index property of the code scope)</returns>
-        /// <exception cref="System.ArgumentException">Thrown when a bullet updater with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the bullet updater has already been added, but with a different name</exception>
-        int AddBulletUpdaterCodeScope(string name, BulletUpdaterCodeScope codeScope);
+        /// <param name="name">The name of the action</param>
+        /// <param name="codeScope">The action code scope</param>
+        /// <returns>Returns the index of the action code scope (also populates the Index property of the code scope)</returns>
+        /// <exception cref="System.ArgumentException">Thrown when an action with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the action has already been added, but with a different name</exception>
+        int AddActionCodeScope(string name, ActionCodeScope codeScope);
 
         /// <summary>
-        /// Gets a bullet updater code scope by name if it exists.
+        /// Gets an action code scope by name if it exists.
         /// </summary>
-        /// <param name="name">The name of the bullet updater code scope</param>
-        /// <returns>The bullet updater code scope mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a bullet updater with that name does not exist</exception>
-        BulletUpdaterCodeScope GetBulletUpdaterCodeScope(string name);
+        /// <param name="name">The name of the action code scope</param>
+        /// <returns>The action code scope mapped with the given name</returns>
+        /// <exception cref="ArgumentException">Thrown when an action with that name does not exist</exception>
+        ActionCodeScope GetActionCodeScope(string name);
 
         /// <summary>
         /// Adds an emitter updater code scope to the program code scope.
