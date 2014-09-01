@@ -55,7 +55,7 @@ namespace ProjectHekate.Scripting
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
+            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
             
             return new EmitterUpdaterDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -73,7 +73,7 @@ namespace ProjectHekate.Scripting
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
+            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
             return new ActionDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -91,7 +91,7 @@ namespace ProjectHekate.Scripting
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
+            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
             return new FunctionDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -211,7 +211,7 @@ namespace ProjectHekate.Scripting
 
         public override AbstractBytecodeEmitter VisitExpressionList(HekateParser.ExpressionListContext context)
         {
-            var expressionList = Enumerable.Cast<IBytecodeGenerator>(context.expression().Select(Visit)).ToList();
+            var expressionList = context.expression().Select(Visit).Cast<IBytecodeGenerator>().ToList();
 
             return new ExpressionListGenerator(expressionList);
         }
@@ -223,7 +223,7 @@ namespace ProjectHekate.Scripting
 
         public override AbstractBytecodeEmitter VisitBlock(HekateParser.BlockContext context)
         {
-            var statementEmitters = Enumerable.Cast<IBytecodeEmitter>(context.statement().Select(Visit)).ToList();
+            var statementEmitters = context.statement().Select(Visit).Cast<IBytecodeEmitter>().ToList();
 
             return new BlockEmitter(statementEmitters);
         }
