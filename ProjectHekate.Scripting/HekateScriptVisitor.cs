@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Antlr4.Runtime.Tree;
-using ProjectHekate.Scripting;
+using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Bytecode.Emitters;
 using ProjectHekate.Scripting.Bytecode.Generators;
 using ProjectHekate.Scripting.Interfaces;
 
-namespace ProjectHekate.Grammar.Implementation
+namespace ProjectHekate.Scripting
 {
     public class HekateScriptVisitor : HekateBaseVisitor<AbstractBytecodeEmitter>
     {
@@ -58,7 +55,7 @@ namespace ProjectHekate.Grammar.Implementation
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
+            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
             
             return new EmitterUpdaterDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -76,7 +73,7 @@ namespace ProjectHekate.Grammar.Implementation
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
+            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
 
             return new ActionDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -94,7 +91,7 @@ namespace ProjectHekate.Grammar.Implementation
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
+            var statements = Enumerable.Cast<IBytecodeEmitter>(context.children.Select(Visit)).ToList();
 
             return new FunctionDeclarationStatementEmitter(paramNames, name, statements);
         }
@@ -214,7 +211,7 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitExpressionList(HekateParser.ExpressionListContext context)
         {
-            var expressionList = context.expression().Select(Visit).Cast<IBytecodeGenerator>().ToList();
+            var expressionList = Enumerable.Cast<IBytecodeGenerator>(context.expression().Select(Visit)).ToList();
 
             return new ExpressionListGenerator(expressionList);
         }
@@ -226,7 +223,7 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitBlock(HekateParser.BlockContext context)
         {
-            var statementEmitters = context.statement().Select(Visit).Cast<IBytecodeEmitter>().ToList();
+            var statementEmitters = Enumerable.Cast<IBytecodeEmitter>(context.statement().Select(Visit)).ToList();
 
             return new BlockEmitter(statementEmitters);
         }

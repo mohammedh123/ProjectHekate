@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using AutoMoq.Helpers;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using ProjectHekate.Grammar.Implementation;
-using ProjectHekate.Scripting;
+using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Interfaces;
 
-namespace ProjectHekate.Grammar.Tests
+namespace ProjectHekate.Scripting.Tests
 {
     [TestClass]
     public class THekateScriptVisitor : AutoMoqTestFixture<HekateScriptVisitor>
@@ -43,8 +39,7 @@ namespace ProjectHekate.Grammar.Tests
 
             var tree = parser.script();
 
-            return tree
-                .GetDescendantsOfType<TContextType>()
+            return tree.GetDescendantsOfType<TContextType>()
                 .Skip(n)
                 .FirstOrDefault();
         }

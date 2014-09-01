@@ -84,6 +84,8 @@ namespace ProjectHekate.Scripting
             var parser = new HekateParser(tokens);
 
             var tree = parser.script();
+
+            var visitor = new HekateScriptVisitor();
         }
 
         public void Update(AbstractScriptObject so, float delta)

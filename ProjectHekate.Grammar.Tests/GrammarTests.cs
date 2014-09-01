@@ -4,7 +4,6 @@ using Antlr4.Runtime.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProjectHekate.Grammar;
 using FluentAssertions;
-using ProjectHekate.Grammar.Implementation;
 
 namespace ProjectHekate.Grammar.Tests
 {
