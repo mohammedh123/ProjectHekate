@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ProjectHekate.Core.MathExtras;
+using ProjectHekate.Scripting;
 
 namespace ProjectHekate.Core
 {
@@ -20,7 +21,7 @@ namespace ProjectHekate.Core
         float Angle { get; }
 
         /// <summary>
-        /// The speed of the bullet (measured in pixels per frame).
+        /// The speed of the bullet (measured in pixels per frame). 
         /// </summary>
         float Speed { get; }
 
@@ -68,7 +69,7 @@ namespace ProjectHekate.Core
         float CurrentLength { get; }
     }
 
-    public abstract class AbstractProjectile
+    public abstract class AbstractProjectile : AbstractScriptObject
     {
         public uint Id { get; internal set; }
         public float X { get; set; }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectHekate.Core.Interfaces;
+using ProjectHekate.Scripting;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -47,8 +50,9 @@ namespace ProjectHekate.Core
     {
         private readonly BulletSystem _bulletSystem;
         private readonly InterpolationSystem _interpolationSystem;
-        private readonly List<Controller> _controllers;
+        private readonly IVirtualMachine _vm;
 
+        private readonly List<Controller> _controllers;
         private readonly List<Emitter> _emitters;
 
         public IBulletSystem BulletSystem
@@ -63,10 +67,15 @@ namespace ProjectHekate.Core
 
         public Engine()
         {
-            _bulletSystem = new BulletSystem();
+            _vm = new VirtualMachine();
+            _bulletSystem = new BulletSystem(_vm);
             _interpolationSystem = new InterpolationSystem();
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();
+
+            var scriptBody = File.ReadAllText(@"Resources\sample_bullet.txt");
+
+            _vm.LoadCode(scriptBody);
         }
 
         public ControllerBuilder CreateController(float x, float y, float angle, bool enabled)

@@ -128,6 +128,7 @@
     <Content Include="openal32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Scripts\sample_bullet.txt" />
     <Content Include="Resources\Textures\tilemap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -136,6 +137,10 @@
     <ProjectReference Include="..\ProjectHekate.Core\ProjectHekate.Core.csproj">
       <Project>{5cf4018e-2fdf-4e2d-b74b-4356aae8de7e}</Project>
       <Name>ProjectHekate.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectHekate.Scripting\ProjectHekate.Scripting.csproj">
+      <Project>{49AF0BB8-26FB-4542-964A-8C30B3557155}</Project>
+      <Name>ProjectHekate.Scripting</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +160,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\Scripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

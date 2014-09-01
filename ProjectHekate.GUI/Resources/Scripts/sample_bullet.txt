@@ -1,0 +1,5 @@
+action UpdateBullet()
+{
+    $X += 3;
+    wait(1);
+}

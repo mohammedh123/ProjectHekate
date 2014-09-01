@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Antlr4.Runtime;
+using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
@@ -73,6 +75,15 @@ namespace ProjectHekate.Scripting
         public EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name)
         {
             return GetSpecializedCodeScope(name, "emitter updater", _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex);
+        }
+
+        public void LoadCode(string text)
+        {
+            var lexer = new HekateLexer(new AntlrInputStream(text));
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new HekateParser(tokens);
+
+            var tree = parser.script();
         }
 
         public void Update(AbstractScriptObject so, float delta)
@@ -277,10 +288,12 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
-                    case Instruction.Compare:
-                        break;
                     case Instruction.Return:
-                        break;
+                    {
+
+
+                        break;   
+                    }
                     case Instruction.FunctionCall:
                         break;
                     case Instruction.GetUpdater:

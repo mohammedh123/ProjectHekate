@@ -94,6 +94,10 @@
       <Project>{5CF4018E-2FDF-4E2D-B74B-4356AAE8DE7E}</Project>
       <Name>ProjectHekate.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProjectHekate.Scripting\ProjectHekate.Scripting.csproj">
+      <Project>{49AF0BB8-26FB-4542-964A-8C30B3557155}</Project>
+      <Name>ProjectHekate.Scripting</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
