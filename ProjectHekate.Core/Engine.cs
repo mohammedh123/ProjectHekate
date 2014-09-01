@@ -73,7 +73,7 @@ namespace ProjectHekate.Core
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();
 
-            var scriptBody = File.ReadAllText(@"Resources\sample_bullet.txt");
+            var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
 
             _vm.LoadCode(scriptBody);
         }
