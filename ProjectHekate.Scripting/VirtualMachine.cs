@@ -83,9 +83,12 @@ namespace ProjectHekate.Scripting
             var tokens = new CommonTokenStream(lexer);
             var parser = new HekateParser(tokens);
 
-            var tree = parser.script();
+            var scriptContext = parser.script();
 
             var visitor = new HekateScriptVisitor();
+            var emitter = visitor.Visit(scriptContext);
+
+            emitter.EmitTo(null, this, new StackScopeManager());
         }
 
         public void Update(AbstractScriptObject so, float delta)
