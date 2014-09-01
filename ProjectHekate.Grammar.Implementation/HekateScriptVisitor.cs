@@ -32,14 +32,18 @@ namespace ProjectHekate.Grammar.Implementation
 
         public override AbstractBytecodeEmitter VisitScript(HekateParser.ScriptContext context)
         {
+            var topLevelEmitters = new List<IBytecodeEmitter>();
+
             foreach (var child in context.children)
             {
                 // visit each child and append the code to the main record
-                var childRecord = Visit(child);
-                if(childRecord == null) throw new InvalidOperationException("A visit to a child resulted in a null return value; check the visitor and make sure it overrides " + child.GetType().Name + "\'s visit method.");
+                var childEmitter = Visit(child);
+                if(childEmitter == null) throw new InvalidOperationException("A visit to a child resulted in a null return value; check the visitor and make sure it overrides " + child.GetType().Name + "\'s visit method.");
+
+                topLevelEmitters.Add(childEmitter);
             }
 
-            return null; // TODO: WHAT THE FUCK?
+            return new ScriptEmitter(topLevelEmitters); // TODO: WHAT THE FUCK?
         }
 
         public override AbstractBytecodeEmitter VisitEmitterUpdaterDeclaration(HekateParser.EmitterUpdaterDeclarationContext context)
