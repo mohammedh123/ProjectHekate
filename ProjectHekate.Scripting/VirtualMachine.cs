@@ -75,6 +75,11 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeScope(name, "emitter updater", _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex);
         }
 
+        public void Update(AbstractScriptObject so, float delta)
+        {
+            InterpretCode(_actionCodeScopes[so.ScriptState.CodeBlockIndex], so.ScriptState, true);
+        }
+
         public int AddProperty(string name)
         {
             // TODO: make method thread-safe

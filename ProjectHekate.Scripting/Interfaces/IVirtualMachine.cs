@@ -57,5 +57,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>The emitter updater code scope mapped with the given name</returns>
         /// <exception cref="ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
         EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name);
+
+        void Update(AbstractScriptObject so, float delta);
     }
 }
