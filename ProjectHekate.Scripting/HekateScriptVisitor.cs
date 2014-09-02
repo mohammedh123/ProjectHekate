@@ -235,6 +235,23 @@ namespace ProjectHekate.Scripting
             return isVariableDeclaration ? Visit(context.variableDeclaration()) : Visit(context.expressionList());
         }
 
+        public override AbstractBytecodeEmitter VisitFormalParameters(HekateParser.FormalParametersContext context)
+        {
+            return context.formalParameterList() == null ? new EmptyEmitter() : Visit(context.formalParameterList());
+        }
+
+        public override AbstractBytecodeEmitter VisitFormalParameterList(HekateParser.FormalParameterListContext context)
+        {
+            var parameterList = context.formalParameter().Select(Visit).Cast<IBytecodeGenerator>().ToList();
+
+            return new ExpressionListGenerator(parameterList);
+        }
+
+        public override AbstractBytecodeEmitter VisitUpdaterBody(HekateParser.UpdaterBodyContext context)
+        {
+            return Visit(context.block());
+        }
+
         #endregion
 
 

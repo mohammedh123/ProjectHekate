@@ -5,6 +5,7 @@ using Antlr4.Runtime.Tree;
 using AutoMoq.Helpers;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Interfaces;
 
@@ -26,14 +27,14 @@ namespace ProjectHekate.Scripting.Tests
         }
 
 
-        protected virtual TContextType GetFirstContext<TContextType>(string expression) where TContextType : class, IParseTree
+        protected virtual TContextType GetFirstContext<TContextType>(string expression, bool wrappedInFunctionString = true) where TContextType : class, IParseTree
         {
-            return GetNthContext<TContextType>(expression, 0);
+            return GetNthContext<TContextType>(expression, 0, wrappedInFunctionString);
         }
 
-        protected virtual TContextType GetNthContext<TContextType>(string expression, int n) where TContextType : class, IParseTree
+        protected virtual TContextType GetNthContext<TContextType>(string expression, int n, bool wrappedInFunctionString = true) where TContextType : class, IParseTree
         {
-            var lexer = new HekateLexer(new AntlrInputStream(String.Format(WrappedProgramStringUnfmted, expression)));
+            var lexer = new HekateLexer(new AntlrInputStream(wrappedInFunctionString ? String.Format(WrappedProgramStringUnfmted, expression) : expression));
             var tokens = new CommonTokenStream(lexer);
             var parser = new HekateParser(tokens);
 
@@ -1217,6 +1218,42 @@ else {
             public void ShouldGenerateCodeForCallingAnExistingFunctionWithThreeParameters()
             {
                 TestFunctionCallGenerationWithParameters(3);
+            }
+        }
+
+        [TestClass]
+        public class VisitActionDeclarationExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateAnActionCodeScopeWithNoParameters()
+            {
+                // Setup: dummy data
+                const string expression = "action SomeAction(){}";
+
+                SetUpGetCurrentScope(new CodeScope());
+
+                // Act
+                Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
+                    .EmitTo(null, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                Mocker.GetMock<IVirtualMachine>().Verify(vm => vm.AddActionCodeScope("SomeAction", It.IsAny<ActionCodeScope>()), Times.Once());
+            }
+            
+            [TestMethod]
+            public void ShouldGenerateAnActionCodeScopeWithSomeParameters()
+            {
+                // Setup: dummy data
+                const string expression = "action SomeAction(someParam){}";
+
+                SetUpGetCurrentScope(new CodeScope());
+
+                // Act
+                Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
+                    .EmitTo(null, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                Mocker.GetMock<IVirtualMachine>().Verify(vm => vm.AddActionCodeScope("SomeAction", It.IsAny<ActionCodeScope>()), Times.Once());
             }
         }
     }
