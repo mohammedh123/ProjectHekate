@@ -73,7 +73,8 @@ namespace ProjectHekate.Scripting
             }
 
             var name = context.NormalIdentifier().GetText();
-            var statements = context.children.Select(Visit).Cast<IBytecodeEmitter>().ToList();
+
+            var statements = new List<IBytecodeEmitter> {Visit(context.formalParameters()), Visit(context.updaterBody())};
 
             return new ActionDeclarationStatementEmitter(paramNames, name, statements);
         }
