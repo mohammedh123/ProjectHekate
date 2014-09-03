@@ -39,5 +39,19 @@ namespace ProjectHekate.Scripting.Helpers
                 throw new ArgumentException("A local symbol already exists with that name.", "variableName");
             }
         }
+
+        public static void CoaxIdentifierToProperName(IdentifierType identifierType, ref string identifierName)
+        {
+            switch (identifierType) {
+                case IdentifierType.Property:
+                    identifierName = identifierName.Substring(1); // get rid of the first character
+                    break;
+                case IdentifierType.Variable:
+                    // dont need to coax variable identifierName to anything
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("identifierType");
+            }
+        }
     }
 }

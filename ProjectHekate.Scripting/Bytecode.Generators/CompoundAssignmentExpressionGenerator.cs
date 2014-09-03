@@ -1,5 +1,6 @@
 ﻿using System;
 using ProjectHekate.Scripting.Bytecode.Emitters;
+using ProjectHekate.Scripting.Helpers;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
@@ -35,6 +36,8 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _identifierType = identifierType;
             _identifierName = identifierName;
             _op = op;
+
+            CodeGenHelper.CoaxIdentifierToProperName(_identifierType, ref _identifierName);
         }
 
         public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
