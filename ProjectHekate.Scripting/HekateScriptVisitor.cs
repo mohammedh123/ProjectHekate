@@ -183,6 +183,13 @@ namespace ProjectHekate.Scripting
             return new ContinueStatementEmitter(continueList);
         }
 
+        public override AbstractBytecodeEmitter VisitWaitStatement(HekateParser.WaitStatementContext context)
+        {
+            var expressionEmitter = Visit(context.expression());
+
+            return new WaitStatementEmitter(expressionEmitter);
+        }
+
         #endregion
 
 

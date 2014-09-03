@@ -646,6 +646,29 @@ else {
         }
 
         [TestClass]
+        public class VisitWaitStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForWaitStatement()
+            {
+                // Setup: dummy data
+                const string expression = @"wait 1 frames;";
+
+                // Act
+                var result = new CodeBlock();
+                Subject
+                    .VisitWaitStatement(GetFirstContext<HekateParser.WaitStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(3);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.WaitFrames);
+            }
+        }
+
+        [TestClass]
         public class VisitLiteralExpression : THekateScriptVisitor
         {
             [TestMethod]
