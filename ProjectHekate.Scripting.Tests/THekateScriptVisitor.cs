@@ -635,7 +635,7 @@ else {
                 // Act
                 var result = new CodeBlock();
                 Subject
-                    .VisitBreakStatement(GetFirstContext<HekateParser.BreakStatementContext>(expression))
+                    .VisitContinueStatement(GetFirstContext<HekateParser.ContinueStatementContext>(expression))
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
