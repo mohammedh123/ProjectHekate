@@ -27,7 +27,6 @@ namespace ProjectHekate.Scripting
         OpNot,
         Jump,
         JumpIfZero,
-        Compare,
         Return,
         FunctionCall,
         GetUpdater,
