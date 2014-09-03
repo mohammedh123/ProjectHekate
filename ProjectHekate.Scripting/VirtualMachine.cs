@@ -88,6 +88,8 @@ namespace ProjectHekate.Scripting
             var visitor = new HekateScriptVisitor();
             var emitter = visitor.Visit(scriptContext);
 
+            AddProperty("X");
+
             emitter.EmitTo(null, this, new StackScopeManager());
         }
 
