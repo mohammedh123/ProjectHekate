@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -46,6 +47,11 @@ namespace ProjectHekate.GUI.Screens
         public TestScreen()
         {
             _engine = new Engine();
+
+            var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
+
+            _engine.VirtualMachine.LoadCode(scriptBody);
+            _engine.VirtualMachine.AddProperty("X");
 
             _player.Controller = _engine
                 .CreateController(_player.X, _player.Y, 0, true)

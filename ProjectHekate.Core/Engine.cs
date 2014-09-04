@@ -77,10 +77,6 @@ namespace ProjectHekate.Core
             _interpolationSystem = new InterpolationSystem();
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();
-
-            var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
-
-            _vm.LoadCode(scriptBody);
         }
 
         public ControllerBuilder CreateController(float x, float y, float angle, bool enabled)
