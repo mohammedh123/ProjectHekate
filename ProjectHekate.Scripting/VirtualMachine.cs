@@ -186,6 +186,7 @@ namespace ProjectHekate.Scripting
 
 
             while (true) {
+                var beginningInstructionIndex = state.CurrentInstructionIndex;
                 var inst = (Instruction)code[state.CurrentInstructionIndex];
 
                 switch (inst) {
@@ -317,6 +318,10 @@ namespace ProjectHekate.Scripting
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
+                }
+
+                if (state.CurrentInstructionIndex == beginningInstructionIndex) {
+                    throw new InvalidOperationException(String.Format("The current instruction index did not advance this tick; check InterpretCode and make sure {0} is implemented properly.", inst.ToString()));
                 }
 
                 if (state.CurrentInstructionIndex >= code.Size) {
