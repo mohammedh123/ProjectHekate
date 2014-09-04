@@ -58,8 +58,8 @@ namespace ProjectHekate.GUI.Screens
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
 
-            _engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
-                .Build();
+            //_engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
+            //    .Build();
         }
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
@@ -93,8 +93,14 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IEngine engine)
         {
-            engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
-            engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+            var testAction = engine.VirtualMachine.GetActionCodeScope("UpdateBullet");
+
+            engine.BulletSystem.FireScriptedBullet(e.X - 5, e.Y, Math.ToRadians(-90), 0, testAction);
+
+            //engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
+            //engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+
+           
             yield return new WaitInFrames(5);
         }
         
