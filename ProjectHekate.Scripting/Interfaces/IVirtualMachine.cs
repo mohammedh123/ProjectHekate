@@ -19,7 +19,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// </summary>
         /// <param name="name">The name of the function code scope</param>
         /// <returns>The function code scope mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a function with that name does not exist</exception>
+        /// <exception cref="System.ArgumentException">Thrown when a function with that name does not exist</exception>
         FunctionCodeScope GetFunctionCodeScope(string name);
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// </summary>
         /// <param name="name">The name of the action code scope</param>
         /// <returns>The action code scope mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when an action with that name does not exist</exception>
+        /// <exception cref="System.ArgumentException">Thrown when an action with that name does not exist</exception>
         ActionCodeScope GetActionCodeScope(string name);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// </summary>
         /// <param name="name">The name of the emitter updater code scope</param>
         /// <returns>The emitter updater code scope mapped with the given name</returns>
-        /// <exception cref="ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
+        /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
         EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name);
 
         void LoadCode(string text);
