@@ -24,6 +24,7 @@ namespace ProjectHekate.Core
     {
         IBulletSystem BulletSystem { get; }
         IInterpolationSystem InterpolationSystem { get; }
+        IVirtualMachine VirtualMachine { get; } // TEMPORARY! just for testing out each new milestone
 
         /// <summary>
         /// Creates a controller that (should be) controlled by an external entity. The controller returned
@@ -63,6 +64,10 @@ namespace ProjectHekate.Core
         public IInterpolationSystem InterpolationSystem
         {
             get { return _interpolationSystem; }
+        }
+
+        public IVirtualMachine VirtualMachine{
+            get { return _vm; }
         }
 
         public Engine()
