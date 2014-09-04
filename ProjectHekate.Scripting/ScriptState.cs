@@ -16,7 +16,8 @@ namespace ProjectHekate.Scripting
     {
         public int CurrentInstructionIndex { get; set; }
         public int CodeBlockIndex { get; set; }
-        
+        public int SuspendTime { get; set; }
+
         internal float[] NumericalVariables;
         internal object[] EmitterVariables; // TODO: change this to SOMETHING else
         internal float[] Properties;
@@ -32,6 +33,7 @@ namespace ProjectHekate.Scripting
 
             Stack = new float[VirtualMachine.MaxStackSize];
             StackHead = 0;
+            SuspendTime = 0;
         }
     }
 }
