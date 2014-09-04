@@ -316,7 +316,17 @@ namespace ProjectHekate.Scripting
                         break;
                     }
                     case Instruction.SetProperty:
+                    {
+                        ThrowIfStackIsEmpty(state);
+
+                        var val = state.Stack[state.StackHead - 1];
+                        var idx = (uint)code[state.CurrentInstructionIndex + 1];
+
+                        state.CurrentInstructionIndex += 2;
+                        state.Properties[idx] = val;
+
                         break;
+                    }
                     case Instruction.GetVariable:
                         break;
                     case Instruction.SetVariable:
