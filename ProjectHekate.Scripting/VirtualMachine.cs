@@ -121,7 +121,7 @@ namespace ProjectHekate.Scripting
             ThrowIfCodeScopeAlreadyExists(codeScope);
 
             codeScopeList.Add(codeScope);
-            codeScope.Index = codeScopeList.Count;
+            codeScope.Index = codeScopeList.Count - 1;
             codeScopeNameToIndexMap[name] = codeScope.Index;
 
             return codeScope.Index;

@@ -1252,15 +1252,16 @@ else {
             {
                 // Setup: dummy data
                 const string expression = "action SomeAction(){}";
+                var vmachine = new VirtualMachine();
 
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
-                    .EmitTo(null, MockVirtualMachine, MockScopeManager);
+                    .EmitTo(null, vmachine, MockScopeManager);
 
                 // Verify
-                Mocker.GetMock<IVirtualMachine>().Verify(vm => vm.AddActionCodeScope("SomeAction", It.IsAny<ActionCodeScope>()), Times.Once());
+                vmachine.GetActionCodeScope("SomeAction").Index.Should().Be(0);
             }
             
             [TestMethod]
@@ -1268,15 +1269,16 @@ else {
             {
                 // Setup: dummy data
                 const string expression = "action SomeAction(someParam){}";
+                var vmachine = new VirtualMachine();
 
                 SetUpGetCurrentScope(new CodeScope());
 
                 // Act
                 Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
-                    .EmitTo(null, MockVirtualMachine, MockScopeManager);
+                    .EmitTo(null, vmachine, MockScopeManager);
 
                 // Verify
-                Mocker.GetMock<IVirtualMachine>().Verify(vm => vm.AddActionCodeScope("SomeAction", It.IsAny<ActionCodeScope>()), Times.Once());
+                vmachine.GetActionCodeScope("SomeAction").Index.Should().Be(0);
             }
         }
     }
