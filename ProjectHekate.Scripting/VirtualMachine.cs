@@ -305,7 +305,16 @@ namespace ProjectHekate.Scripting
                     case Instruction.GetUpdater:
                         break;
                     case Instruction.GetProperty:
+                    {
+                        var idx = (uint)code[state.CurrentInstructionIndex + 1];
+                        state.Stack[state.StackHead] = state.Properties[idx];
+                        state.StackHead++;
+                        state.CurrentInstructionIndex += 2;
+
+                        ThrowIfStackLimitIsReached(state);
+
                         break;
+                    }
                     case Instruction.SetProperty:
                         break;
                     case Instruction.GetVariable:
