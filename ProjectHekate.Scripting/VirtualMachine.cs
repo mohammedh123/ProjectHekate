@@ -334,7 +334,22 @@ namespace ProjectHekate.Scripting
                     case Instruction.Fire:
                         break;
                     case Instruction.WaitFrames:
-                        break;
+                    {
+                        ThrowIfStackIsEmpty(state);
+
+                        var val = (int)state.Stack[--state.StackHead];
+
+                        state.SuspendTime = val;
+                        state.CurrentInstructionIndex += 1;
+
+                        if (state.CurrentInstructionIndex >= code.Size && looping) { // need to do the check here because we're returning early
+                            state.CurrentInstructionIndex = 0;
+                        }
+                        
+                        ThrowIfStackBaseIsHit(state);
+
+                        return ScriptStatus.Suspended;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
