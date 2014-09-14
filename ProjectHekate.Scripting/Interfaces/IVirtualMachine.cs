@@ -63,12 +63,10 @@ namespace ProjectHekate.Scripting.Interfaces
         /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
         /// </summary>
         /// <param name="typeName">The name of the type this property belongs to</param>
-        /// <param name="propertyName">The name of the property</param>
-        /// <param name="propertyExpression">The CLR property mapped to the type property</param>
-        /// <returns>Returns the index of the property</returns>
+        /// <param name="propertyExpressions">The CLR properties mapped to the type's properties</param>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
-        /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
-        int AddProperty(string typeName, string propertyName, Expression<Func<AbstractScriptObject, float>> propertyExpression);
+        /// <exception cref="System.ArgumentException">Thrown when any of the expressions in  <paramref name="propertyExpressions"/> do not map to a CLR property.</exception>
+        void AddProperty<TScriptObjectType>(string typeName, params Expression<Func<TScriptObjectType, float>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>
         /// Retrieves the global property index of the property with the given name.
@@ -79,6 +77,6 @@ namespace ProjectHekate.Scripting.Interfaces
 
         void LoadCode(string text);
 
-        void Update(AbstractScriptObject so, float delta);
+        void Update<TScriptObjectType>(TScriptObjectType so, float delta) where TScriptObjectType : AbstractScriptObject;
     }
 }

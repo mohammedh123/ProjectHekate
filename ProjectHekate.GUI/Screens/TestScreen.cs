@@ -46,8 +46,8 @@ namespace ProjectHekate.GUI.Screens
 
             var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
 
-            _engine.VirtualMachine.AddType("bullet");
-            _engine.VirtualMachine.AddProperty("bullet", "X", aso => (aso as Bullet).X);
+            _engine.VirtualMachine.AddType<Bullet>("bullet");
+            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y);
             _engine.VirtualMachine.LoadCode(scriptBody);
 
             _player.Controller = _engine

@@ -15,14 +15,22 @@ namespace ProjectHekate.Scripting
         {
         }
     }
-    
-    public class TypeDefinition : IPropertyContext
+
+    public interface ITypeDefinition : IPropertyContext
+    {
+        string Name { get; set; }
+        int Index { get; set; }
+        IPropertyRecord GetPropertyByGlobalIndex(int globalIdx);
+        void UpdatePropertyMappings(IList<string> properties);
+    }
+
+    public class TypeDefinition : ITypeDefinition
     {
         public string Name { get; set; }
 
         public int Index { get; set; }
 
-        private readonly List<PropertyRecord> _propertyDefinitions;
+        private readonly List<IPropertyRecord> _propertyDefinitions;
         private readonly Dictionary<string, int> _propertyDefinitionsNameToIndex;
 
         private readonly IList<int> _globalPropertyIndexMappings;  
@@ -32,30 +40,32 @@ namespace ProjectHekate.Scripting
             Name = name;
             Index = index;
 
-            _propertyDefinitions = new List<PropertyRecord>();
+            _propertyDefinitions = new List<IPropertyRecord>();
             _propertyDefinitionsNameToIndex = new Dictionary<string, int>();
             _globalPropertyIndexMappings = new List<int>();
         }
 
-        public int AddProperty(string propertyName, Expression<Func<AbstractScriptObject, float>> propertyExpression)
+        public int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression) where TScriptObjectType : AbstractScriptObject
         {
+            var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
+            var propertyName = pi.Name;
+
             int index;
             var worked = _propertyDefinitionsNameToIndex.TryGetValue(propertyName, out index);
 
             if(worked) throw new ArgumentException("A property with the name " + propertyName + " already exists.");
 
-            var addedProperty = new PropertyRecord();
+            var addedProperty = new PropertyRecord<TScriptObjectType>();
 
-            var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
             var setMethod = pi.GetSetMethod();
             var getMethod = pi.GetGetMethod();
 
-            var target = Expression.Parameter(typeof(AbstractScriptObject));
+            var target = Expression.Parameter(typeof(TScriptObjectType));
             var value = Expression.Parameter(typeof(float));
             var setBody = Expression.Call(target, setMethod, Expression.Convert(value, pi.PropertyType));
-            var setMethodAction = Expression.Lambda<Action<AbstractScriptObject, float>>(setBody, target, value).Compile();
+            var setMethodAction = Expression.Lambda<Action<TScriptObjectType, float>>(setBody, target, value).Compile();
             var getBody = Expression.Call(target, getMethod);
-            var getMethodAction = Expression.Lambda<Func<AbstractScriptObject, float>>(getBody, target).Compile();
+            var getMethodAction = Expression.Lambda<Func<TScriptObjectType, float>>(getBody, target).Compile();
 
             addedProperty.Name = propertyName;
             addedProperty.Index = _propertyDefinitions.Count;
@@ -68,7 +78,7 @@ namespace ProjectHekate.Scripting
             return addedProperty.Index;
         }
 
-        public PropertyRecord GetProperty(string name)
+        public IPropertyRecord GetProperty(string name)
         {
             if (!_propertyDefinitionsNameToIndex.ContainsKey(name))
                 throw new ArgumentException("A property with the name \"" + name + "\" could not be found.", name);
@@ -76,7 +86,12 @@ namespace ProjectHekate.Scripting
             return _propertyDefinitions[_propertyDefinitionsNameToIndex[name]];
         }
 
-        public PropertyRecord GetPropertyByGlobalIndex(int globalIdx)
+        public IPropertyRecord GetProperty(int idx)
+        {
+            return _propertyDefinitions[idx];
+        }
+
+        public IPropertyRecord GetPropertyByGlobalIndex(int globalIdx)
         {
             var idx = _globalPropertyIndexMappings[globalIdx];
 

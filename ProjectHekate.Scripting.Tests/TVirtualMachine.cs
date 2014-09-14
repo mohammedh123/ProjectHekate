@@ -457,7 +457,10 @@ namespace ProjectHekate.Scripting.Tests
             {
                 private class TestBullet : AbstractScriptObject
                 {
-                    public float X { get; set; }    
+                    public float X { get; set; }
+                    public float Y { get; set; }
+                    public float Angle { get; set; }
+                    public float Speed { get; set; }    
                 }
 
                 private class TestBullet2 : AbstractScriptObject
@@ -469,13 +472,14 @@ namespace ProjectHekate.Scripting.Tests
                 public void ShouldInterpetGetPropertyWithMultipleTypes()
                 {
                     // Setup: set up state + setup mappings
-                    Subject.AddType("bullet");
-                    Subject.AddType("bullet2");
-                    Subject.AddProperty("bullet", "X", aso => (aso as TestBullet).X);
-                    Subject.AddProperty("bullet2", "X", aso => (aso as TestBullet2).X);
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddType<TestBullet2>("bullet2");
+                    Subject.AddProperty<TestBullet>("bullet", b  => b.X);
+                    Subject.AddProperty<TestBullet2>("bullet2", b => b.X);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
+                    dummyBullet.X = 100;
                     dummyBullet.EmitTypeIndex = 0;
 
                     var code = new CodeBlock();
@@ -484,12 +488,164 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add((byte)0);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, new TestBullet(), false);
+                    Subject.InterpretCode(code, State, dummyBullet, false);
 
-                    // Verify: instruction index changes to beginning
-                    State.CurrentInstructionIndex.Should().Be(6);
+                    // Verify: instruction index changes to end, stack has value of property
+                    State.CurrentInstructionIndex.Should().Be(2);
                     State.StackHead.Should().Be(1);
                     State.Stack[0].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetGetPropertyWithSingleType()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.X = 100;
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 0;
+                    code.Add(Instruction.GetProperty);
+                    code.Add((byte)0);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, dummyBullet, false);
+
+                    // Verify: instruction index changes to end, stack has value of property
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetGetPropertyWithMultipleProperties()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddProperty<TestBullet>("bullet", b => b.X, b => b.Y, b => b.Speed, b => b.Angle);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.Speed = 100;
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 0;
+                    code.Add(Instruction.GetProperty);
+                    code.Add(2); // 2 should be speed
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, dummyBullet, false);
+
+                    // Verify: instruction index changes to end, stack has value of property
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
+                }
+            }
+
+            [TestClass]
+            public class SetProperty : TVirtualMachine
+            {
+                private class TestBullet : AbstractScriptObject
+                {
+                    public float X { get; set; }
+                    public float Y { get; set; }
+                    public float Angle { get; set; }
+                    public float Speed { get; set; }
+                }
+
+                private class TestBullet2 : AbstractScriptObject
+                {
+                    public float X { get; set; }
+                }
+
+                [TestMethod]
+                public void ShouldInterpetSetPropertyWithMultipleTypes()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddType<TestBullet2>("bullet2");
+                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
+                    Subject.AddProperty<TestBullet2>("bullet2", b => b.X);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.X = 100;
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 35.0f;
+                    code.Add(Instruction.SetProperty);
+                    code.Add((byte)0);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, dummyBullet, false);
+
+                    // Verify: instruction index changes to end, property on object changes
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.StackHead.Should().Be(1);
+                    dummyBullet.X.Should().Be(35.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetSetPropertyWithSingleType()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.X = 100;
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 35.0f;
+                    code.Add(Instruction.SetProperty);
+                    code.Add((byte)0);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, dummyBullet, false);
+
+                    // Verify: instruction index changes to end, property on object changes
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.StackHead.Should().Be(1);
+                    dummyBullet.X.Should().Be(35.0f);
+                }
+
+                [TestMethod]
+                public void ShouldInterpetGetPropertyWithMultipleProperties()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddProperty<TestBullet>("bullet", b => b.X, b => b.Y, b => b.Speed, b => b.Angle);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.Speed = 100;
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 35.0f;
+                    code.Add(Instruction.SetProperty);
+                    code.Add(2); // 2 should be speed
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, dummyBullet, false);
+
+                    // Verify: instruction index changes to end, property on object changes
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.StackHead.Should().Be(1);
+                    dummyBullet.Speed.Should().Be(35.0f);
                 }
             }
         }
