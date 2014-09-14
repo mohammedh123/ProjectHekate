@@ -48,8 +48,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime.v4.5">
-      <HintPath>..\packages\Antlr4.Runtime.4.2.2-alpha001\lib\net45\Antlr4.Runtime.v4.5.dll</HintPath>
+    <Reference Include="Antlr4.Runtime.net45">
+      <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
