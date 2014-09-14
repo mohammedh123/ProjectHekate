@@ -90,6 +90,7 @@
     <Compile Include="Bytecode.Generators\UnaryExpressionGenerator.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeScope.cs" />
+    <Compile Include="EmitterDefinition.cs" />
     <Compile Include="EmitterSymbol.cs" />
     <Compile Include="EmitterUpdaterCodeScope.cs" />
     <Compile Include="Extensions.cs" />
@@ -109,8 +110,10 @@
     <Compile Include="Interfaces\IScopeManager.cs" />
     <Compile Include="Interfaces\ISymbol.cs" />
     <Compile Include="Interfaces\ISymbolContext.cs" />
+    <Compile Include="Interfaces\ITypeManager.cs" />
     <Compile Include="Interfaces\IVirtualMachine.cs" />
     <Compile Include="NumericalSymbol.cs" />
+    <Compile Include="PropertyRecord.cs" />
     <Compile Include="ScriptState.cs" />
     <Compile Include="StackScopeManager.cs" />
     <Compile Include="SymbolType.cs" />

@@ -1,8 +1,9 @@
 using System;
+using System.Linq.Expressions;
 
 namespace ProjectHekate.Scripting.Interfaces
 {
-    public interface IVirtualMachine : IGlobalSymbolContext, IPropertyContext
+    public interface IVirtualMachine : IGlobalSymbolContext, ITypeManager
     {
         /// <summary>
         /// Adds a function code scope to the virtual machine.
@@ -57,6 +58,24 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>The emitter updater code scope mapped with the given name</returns>
         /// <exception cref="System.ArgumentException">Thrown when a emitter updater with that name does not exist</exception>
         EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name);
+
+        /// <summary>
+        /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
+        /// </summary>
+        /// <param name="typeName">The name of the type this property belongs to</param>
+        /// <param name="propertyName">The name of the property</param>
+        /// <param name="propertyExpression">The CLR property mapped to the type property</param>
+        /// <returns>Returns the index of the property</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
+        int AddProperty(string typeName, string propertyName, Expression<Func<AbstractScriptObject, float>> propertyExpression);
+
+        /// <summary>
+        /// Retrieves the global property index of the property with the given name.
+        /// </summary>
+        /// <param name="propertyName">The name of the property</param>
+        /// <returns>The global property index of the property with the given name if it has been registered; <b>-1></b> otherwise.</returns>
+        int GetPropertyIndex(string propertyName);
 
         void LoadCode(string text);
 

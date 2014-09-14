@@ -72,7 +72,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             switch (_identifierType) {
                 case IdentifierType.Property:
                 {
-                    var index = vm.GetProperty(_identifierName).Index;
+                    var index = vm.GetPropertyIndex(_identifierName);
                     code.Add(Instruction.SetProperty);
                     code.Add(index);
 

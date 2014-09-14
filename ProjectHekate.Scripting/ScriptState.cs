@@ -20,7 +20,6 @@ namespace ProjectHekate.Scripting
 
         internal float[] NumericalVariables;
         internal object[] EmitterVariables; // TODO: change this to SOMETHING else
-        internal float[] Properties;
 
         internal IList<float> Stack;
         internal int StackHead;
@@ -29,7 +28,6 @@ namespace ProjectHekate.Scripting
         {
             NumericalVariables = new float[VirtualMachine.MaxNumericalVariables];
             EmitterVariables = new object[VirtualMachine.MaxEmitterVariables];
-            Properties = new float[VirtualMachine.MaxProperties];
 
             Stack = new float[VirtualMachine.MaxStackSize];
             StackHead = 0;

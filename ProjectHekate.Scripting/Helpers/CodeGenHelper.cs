@@ -17,9 +17,9 @@ namespace ProjectHekate.Scripting.Helpers
             return code;
         }
 
-        internal static ICodeBlock GenerateCodeForValueOfProperty(IPropertyContext propCtx, string name)
+        internal static ICodeBlock GenerateCodeForValueOfProperty(IVirtualMachine vm, string name)
         {
-            var index = propCtx.GetProperty(name).Index;
+            var index = vm.GetPropertyIndex(name);
 
             var code = new CodeBlock();
             code.Add(Instruction.GetProperty);

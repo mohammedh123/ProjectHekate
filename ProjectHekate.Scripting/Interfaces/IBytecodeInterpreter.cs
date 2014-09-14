@@ -8,6 +8,6 @@ namespace ProjectHekate.Scripting.Interfaces
 {
     public interface IBytecodeInterpreter
     {
-        ScriptStatus InterpretCode(ICodeBlock code, ScriptState state, bool looping);
+        ScriptStatus InterpretCode(ICodeBlock code, ScriptState state, AbstractScriptObject obj, bool looping);
     }
 }

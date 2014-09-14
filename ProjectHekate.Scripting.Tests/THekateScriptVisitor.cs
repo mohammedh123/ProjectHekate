@@ -783,8 +783,8 @@ else {
                 var expression = String.Format("{0}", identifier);
                 var dummyRecord = new IdentifierRecord(identifier, 0);
                 Mocker.GetMock<IVirtualMachine>()
-                    .Setup(ivm => ivm.GetProperty(identifier))
-                    .Returns(dummyRecord);
+                    .Setup(ivm => ivm.GetPropertyIndex(identifier))
+                    .Returns(dummyRecord.Index);
 
                 // Act
                 var result = Subject.VisitPropertyIdentifierExpression(
@@ -803,7 +803,7 @@ else {
                 const string identifier = "$SomeIdentifier";
                 var expression = String.Format("{0}", identifier);
                 Mocker.GetMock<IVirtualMachine>()
-                    .Setup(ivm => ivm.GetProperty(identifier))
+                    .Setup(ivm => ivm.GetPropertyIndex(identifier))
                     .Throws<ArgumentException>();
 
                 // Act + Verify
@@ -970,8 +970,8 @@ else {
                     var dummyRecord = new IdentifierRecord(identifier, 0);
                     idx = dummyRecord.Index;
                     Mocker.GetMock<IVirtualMachine>()
-                        .Setup(ivm => ivm.GetProperty(identifier))
-                        .Returns(dummyRecord);
+                        .Setup(ivm => ivm.GetPropertyIndex(identifier))
+                        .Returns(dummyRecord.Index);
                 }
 
                 // Act
@@ -1053,8 +1053,8 @@ else {
                 var expression = String.Format("{0} = 3.5", propertyName);
                 var dummyRecord = new IdentifierRecord(propertyName, 0);
                 Mocker.GetMock<IVirtualMachine>()
-                    .Setup(ivm => ivm.GetProperty(propertyName))
-                    .Returns(dummyRecord);
+                    .Setup(ivm => ivm.GetPropertyIndex(propertyName))
+                    .Returns(dummyRecord.Index);
 
                 // Act
                 var result = Subject.VisitAssignmentExpression(GetFirstContext<HekateParser.AssignmentExpressionContext>(expression))
@@ -1075,7 +1075,7 @@ else {
                 const string propertyName = "$SomeProperty";
                 var expression = String.Format("{0} = 3.5", propertyName);
                 Mocker.GetMock<IVirtualMachine>()
-                    .Setup(ivm => ivm.GetProperty(propertyName))
+                    .Setup(ivm => ivm.GetPropertyIndex(propertyName))
                     .Throws<ArgumentException>();
 
                 // Act + Verify

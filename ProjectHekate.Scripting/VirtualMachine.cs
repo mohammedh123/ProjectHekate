@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using Antlr4.Runtime;
 using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Interfaces;
@@ -25,10 +25,12 @@ namespace ProjectHekate.Scripting
         private readonly Dictionary<string, int> _actionCodeScopeNameToIndex;
         private readonly Dictionary<string, int> _emitterUpdaterCodeScopeNameToIndex;
 
-        private readonly List<IdentifierRecord> _propertyRecords;
-        private readonly Dictionary<string, int> _propertyNameToIndex;
+        private readonly List<TypeDefinition> _typeDefinitions;
+        private readonly Dictionary<string, int> _typeNameToIndex;
         
         private readonly IDictionary<string, float> _globalSymbolsNameToValue;
+
+        private readonly List<string> _globalPropertyList;
 
         public VirtualMachine()
         {
@@ -41,10 +43,12 @@ namespace ProjectHekate.Scripting
             _emitterUpdaterCodeScopes = new List<EmitterUpdaterCodeScope>();
             _emitterUpdaterCodeScopeNameToIndex = new Dictionary<string, int>();
 
-            _propertyRecords = new List<IdentifierRecord>();
-            _propertyNameToIndex = new Dictionary<string, int>();
+            _typeDefinitions = new List<TypeDefinition>();
+            _typeNameToIndex = new Dictionary<string, int>();
 
             _globalSymbolsNameToValue = new Dictionary<string, float>();
+
+            _globalPropertyList = new List<string>();
         }
 
         public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)
@@ -77,6 +81,23 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeScope(name, "emitter updater", _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex);
         }
 
+        public int AddProperty(string typeName, string propertyName,
+            Expression<Func<AbstractScriptObject, float>> propertyExpression)
+        {
+            var type = GetType(typeName);
+            var idx = type.AddProperty(propertyName, propertyExpression);
+
+            var exists = _globalPropertyList.Contains(propertyName);
+            if (!exists) _globalPropertyList.Add(propertyName);
+
+            return idx;
+        }
+
+        public int GetPropertyIndex(string propertyName)
+        {
+            return _globalPropertyList.IndexOf(propertyName);
+        }
+
         public void LoadCode(string text)
         {
             var lexer = new HekateLexer(new AntlrInputStream(text));
@@ -89,29 +110,22 @@ namespace ProjectHekate.Scripting
             var emitter = visitor.Visit(scriptContext);
 
             emitter.EmitTo(null, this, new StackScopeManager());
+
+            UpdatePropertyMappings();
+        }
+
+        internal void UpdatePropertyMappings()
+        {
+            // now loop through all the emit types and map the properties correctly
+            foreach (var emitType in _typeDefinitions)
+            {
+                emitType.UpdatePropertyMappings(_globalPropertyList);
+            }
         }
 
         public void Update(AbstractScriptObject so, float delta)
         {
-            InterpretCode(_actionCodeScopes[so.ScriptState.CodeBlockIndex], so.ScriptState, true);
-        }
-
-        public int AddProperty(string name)
-        {
-            // TODO: make method thread-safe
-            if (_propertyNameToIndex.ContainsKey(name))
-                throw new ArgumentException("A property with the name \"" + name + "\" already exists in this virtual machine.", "name");
-
-            var identifier = new IdentifierRecord(name, _propertyRecords.Count); // this is so bad and unsafe
-            _propertyRecords.Add(identifier);
-            _propertyNameToIndex[name] = identifier.Index;
-
-            return identifier.Index;
-        }
-
-        public IdentifierRecord GetProperty(string name)
-        {
-            return GetSpecializedCodeScope(name, "property", _propertyRecords, _propertyNameToIndex);
+            InterpretCode(_actionCodeScopes[so.ScriptState.CodeBlockIndex], so.ScriptState, so, true);
         }
 
         private int AddSpecializedCodeScope<TCodeScopeType>(string name, ICollection<TCodeScopeType> codeScopeList, IDictionary<string,int> codeScopeNameToIndexMap, TCodeScopeType codeScope) where TCodeScopeType : CodeScope
@@ -178,7 +192,7 @@ namespace ProjectHekate.Scripting
             return _globalSymbolsNameToValue.ContainsKey(name);
         }
 
-        public ScriptStatus InterpretCode(ICodeBlock code, ScriptState state, bool looping)
+        public ScriptStatus InterpretCode(ICodeBlock code, ScriptState state, AbstractScriptObject obj, bool looping)
         {
             if (code == null) throw new ArgumentNullException("code");
             if (state == null) throw new ArgumentNullException("state");
@@ -306,8 +320,12 @@ namespace ProjectHekate.Scripting
                         break;
                     case Instruction.GetProperty:
                     {
-                        var idx = (uint)code[state.CurrentInstructionIndex + 1];
-                        state.Stack[state.StackHead] = state.Properties[idx];
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        var type = _typeDefinitions[obj.EmitTypeIndex];
+                        var prop = type.GetPropertyByGlobalIndex(idx);
+                        var val = prop.Getter(obj);
+
+                        state.Stack[state.StackHead] = val;
                         state.StackHead++;
                         state.CurrentInstructionIndex += 2;
 
@@ -320,10 +338,12 @@ namespace ProjectHekate.Scripting
                         ThrowIfStackIsEmpty(state);
 
                         var val = state.Stack[state.StackHead - 1];
-                        var idx = (uint)code[state.CurrentInstructionIndex + 1];
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        var type = _typeDefinitions[obj.EmitTypeIndex];
+                        var prop = type.GetPropertyByGlobalIndex(idx);
 
                         state.CurrentInstructionIndex += 2;
-                        state.Properties[idx] = val;
+                        prop.Setter(obj, val);
 
                         break;
                     }
@@ -398,6 +418,26 @@ namespace ProjectHekate.Scripting
             else if (state.StackHead == 0) {
                 throw new InvalidOperationException("There must be at least " + minimumNumberOfValues + " values on the stack in order to execute this instruction.");
             }
+        }
+
+        public int AddType(string typeName)
+        {
+            if (_typeNameToIndex.ContainsKey(typeName))
+                throw new ArgumentException("A type with the name \"" + typeName + "\" already exists in this machine.", "typeName");
+
+            var typeDefinition = new TypeDefinition(typeName, _typeDefinitions.Count);
+            _typeDefinitions.Add(typeDefinition);
+            _typeNameToIndex[typeName] = typeDefinition.Index;
+
+            return typeDefinition.Index;
+        }
+
+        public TypeDefinition GetType(string typeName)
+        {
+            if (!_typeNameToIndex.ContainsKey(typeName))
+                throw new ArgumentException("A type with the name \"" + typeName + "\" could not be found.", typeName);
+
+            return _typeDefinitions[_typeNameToIndex[typeName]];
         }
     }
 }

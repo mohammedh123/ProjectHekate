@@ -9,5 +9,7 @@ namespace ProjectHekate.Scripting
     public class AbstractScriptObject
     {
         public ScriptState ScriptState { get; set; }
+
+        public int EmitTypeIndex { get; set; }
     }
 }

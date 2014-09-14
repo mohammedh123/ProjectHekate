@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using ProjectHekate.Core;
 using ProjectHekate.GUI.DrawingHelpers;
 using ProjectHekate.GUI.Interfaces;
@@ -50,8 +46,9 @@ namespace ProjectHekate.GUI.Screens
 
             var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
 
+            _engine.VirtualMachine.AddType("bullet");
+            _engine.VirtualMachine.AddProperty("bullet", "X", aso => (aso as Bullet).X);
             _engine.VirtualMachine.LoadCode(scriptBody);
-            _engine.VirtualMachine.AddProperty("X");
 
             _player.Controller = _engine
                 .CreateController(_player.X, _player.Y, 0, true)

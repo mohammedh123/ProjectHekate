@@ -32,7 +32,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(expectedValue);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has something on it
                     State.StackHead.Should().Be(1);
@@ -55,7 +55,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
@@ -72,7 +72,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(Instruction.Pop);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has nothing on it
                     State.StackHead.Should().Be(0);
@@ -89,7 +89,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
@@ -108,7 +108,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(Instruction.Negate);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has negated dummy value on it
                     State.StackHead.Should().Be(1);
@@ -126,7 +126,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
@@ -145,7 +145,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(Instruction.OpNot);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has negated dummy value on it
                     State.StackHead.Should().Be(1);
@@ -164,7 +164,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(Instruction.OpNot);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has negated dummy value on it
                     State.StackHead.Should().Be(1);
@@ -183,7 +183,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(Instruction.OpNot);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has negated dummy value on it
                     State.StackHead.Should().Be(1);
@@ -201,7 +201,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<InvalidOperationException>();
                 }
             }
@@ -222,7 +222,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(binOp);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has the right value on it
                     State.StackHead.Should().Be(1);
@@ -268,7 +268,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<InvalidOperationException>();
                 }
 
@@ -343,7 +343,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(100);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: instruction index changes to beginning
                     State.CurrentInstructionIndex.Should().Be(6);
@@ -361,7 +361,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<IndexOutOfRangeException>();
 
                     code = new CodeBlock();
@@ -370,7 +370,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<IndexOutOfRangeException>();
                 }
             }
@@ -393,7 +393,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(100);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: instruction index changes to beginning
                     State.CurrentInstructionIndex.Should().Be(6);
@@ -416,7 +416,7 @@ namespace ProjectHekate.Scripting.Tests
                     code.Add(100);
 
                     // Act: call method
-                    Subject.InterpretCode(code, State, false);
+                    Subject.InterpretCode(code, State, null, false);
 
                     // Verify: stack has all 3 values on it
                     State.CurrentInstructionIndex.Should().Be(6);
@@ -436,7 +436,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<IndexOutOfRangeException>();
 
                     code = new CodeBlock();
@@ -447,8 +447,49 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Act+Verify
                     Subject
-                        .Invoking(vm => vm.InterpretCode(code, State, false))
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
                         .ShouldThrow<IndexOutOfRangeException>();
+                }
+            }
+
+            [TestClass]
+            public class GetProperty : TVirtualMachine
+            {
+                private class TestBullet : AbstractScriptObject
+                {
+                    public float X { get; set; }    
+                }
+
+                private class TestBullet2 : AbstractScriptObject
+                {
+                    public float X { get; set; }
+                }
+
+                [TestMethod]
+                public void ShouldInterpetGetPropertyWithMultipleTypes()
+                {
+                    // Setup: set up state + setup mappings
+                    Subject.AddType("bullet");
+                    Subject.AddType("bullet2");
+                    Subject.AddProperty("bullet", "X", aso => (aso as TestBullet).X);
+                    Subject.AddProperty("bullet2", "X", aso => (aso as TestBullet2).X);
+                    Subject.UpdatePropertyMappings();
+
+                    var dummyBullet = new TestBullet();
+                    dummyBullet.EmitTypeIndex = 0;
+
+                    var code = new CodeBlock();
+                    State.StackHead = 0;
+                    code.Add(Instruction.GetProperty);
+                    code.Add((byte)0);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, new TestBullet(), false);
+
+                    // Verify: instruction index changes to beginning
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
                 }
             }
         }
