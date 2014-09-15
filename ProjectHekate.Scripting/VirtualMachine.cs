@@ -313,16 +313,6 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
-                    case Instruction.Return:
-                    {
-
-
-                        break;   
-                    }
-                    case Instruction.FunctionCall:
-                        break;
-                    case Instruction.GetUpdater:
-                        break;
                     case Instruction.GetProperty:
                     {
                         var idx = (int)code[state.CurrentInstructionIndex + 1];
@@ -352,12 +342,6 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
-                    case Instruction.GetVariable:
-                        break;
-                    case Instruction.SetVariable:
-                        break;
-                    case Instruction.Fire:
-                        break;
                     case Instruction.WaitFrames:
                     {
                         ThrowIfStackIsEmpty(state);
