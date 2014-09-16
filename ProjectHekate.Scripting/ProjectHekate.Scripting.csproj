@@ -110,6 +110,7 @@
     <Compile Include="Interfaces\IScopeManager.cs" />
     <Compile Include="Interfaces\ISymbol.cs" />
     <Compile Include="Interfaces\ISymbolContext.cs" />
+    <Compile Include="Interfaces\ITypeDefinition.cs" />
     <Compile Include="Interfaces\ITypeManager.cs" />
     <Compile Include="Interfaces\IVirtualMachine.cs" />
     <Compile Include="NumericalSymbol.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="ScriptState.cs" />
     <Compile Include="StackScopeManager.cs" />
     <Compile Include="SymbolType.cs" />
+    <Compile Include="TypeDefinition.cs" />
     <Compile Include="VirtualMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
