@@ -195,6 +195,11 @@ namespace ProjectHekate.Scripting
 
         #region Miscellaneous statements (usually ones that wrap around expressions)
 
+        public override AbstractBytecodeEmitter VisitEmptyStatement(HekateParser.EmptyStatementContext context)
+        {
+            return new EmptyEmitter();
+        }
+
         public override AbstractBytecodeEmitter VisitVariableDeclarationStatement(HekateParser.VariableDeclarationStatementContext context)
         {
             var varDeclarationGen = Visit(context.variableDeclaration());

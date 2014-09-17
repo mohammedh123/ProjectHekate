@@ -28,6 +28,7 @@ namespace ProjectHekate.Scripting
         Jump,
         JumpIfZero,
         Return,
+        ExternalFunctionCall,
         FunctionCall,
         GetUpdater,
         GetProperty,

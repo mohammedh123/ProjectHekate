@@ -17,12 +17,12 @@ namespace ProjectHekate.Scripting
         public int CurrentInstructionIndex { get; set; }
         public int CodeBlockIndex { get; set; }
         public int SuspendTime { get; set; }
+        public IList<float> Stack { get; set; }
+        public int StackHead { get; set; }
 
         internal float[] NumericalVariables;
         internal object[] EmitterVariables; // TODO: change this to SOMETHING else
 
-        internal IList<float> Stack;
-        internal int StackHead;
 
         public ScriptState()
         {

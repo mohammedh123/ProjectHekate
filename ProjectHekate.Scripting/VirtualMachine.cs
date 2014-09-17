@@ -8,6 +8,15 @@ using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
 {
+    public class FunctionDefinition
+    {
+        public string Name { get; set; }
+        
+        public int Index { get; set; }
+
+        public Func<ScriptState, ScriptStatus> Function { get; set; } 
+    }
+
     public class VirtualMachine : IVirtualMachine, IBytecodeInterpreter
     {
         private const float TrueValue = 1.0f;
@@ -32,6 +41,9 @@ namespace ProjectHekate.Scripting
 
         private readonly List<string> _globalPropertyList;
 
+        private readonly List<FunctionDefinition> _externalFunctions;
+        private readonly Dictionary<string, int> _externalFunctionNameToIndex;
+
         public VirtualMachine()
         {
             _functionCodeScopes = new List<FunctionCodeScope>();
@@ -49,6 +61,9 @@ namespace ProjectHekate.Scripting
             _globalSymbolsNameToValue = new Dictionary<string, float>();
 
             _globalPropertyList = new List<string>();
+
+            _externalFunctions = new List<FunctionDefinition>();
+            _externalFunctionNameToIndex = new Dictionary<string, int>();
         }
 
         public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)
@@ -131,6 +146,56 @@ namespace ProjectHekate.Scripting
             else {
                 so.ScriptState.SuspendTime--;
             }
+        }
+
+        public void AddExternalFunction(string functionName, Func<ScriptState, ScriptStatus> function)
+        {
+            if (_externalFunctionNameToIndex.ContainsKey(functionName))
+                throw new ArgumentException("An external function with the name \"" + functionName+ "\" has already been registered.", "functionName");
+
+            var functionDef = new FunctionDefinition()
+            {
+                Function = function,
+                Name = functionName,
+                Index = _externalFunctions.Count
+            };
+
+            _externalFunctions.Add(functionDef);
+            _externalFunctionNameToIndex[functionName] = functionDef.Index;
+        }
+
+        public FunctionDefinition GetExternalFunction(string functionName)
+        {
+            if (_externalFunctionNameToIndex.ContainsKey(functionName)) {
+                return _externalFunctions[_externalFunctionNameToIndex[functionName]];
+            }
+
+            return null;
+        }
+
+        public FunctionDefinition GetExternalFunctionByIndex(int idx)
+        {
+            return _externalFunctions[idx];
+        }
+
+        public int AddType<TScriptObjectType>(string typeName) where TScriptObjectType : AbstractScriptObject
+        {
+            if (_typeNameToIndex.ContainsKey(typeName))
+                throw new ArgumentException("A type with the name \"" + typeName + "\" already exists in this machine.", "typeName");
+
+            var typeDefinition = new TypeDefinition(typeName, _typeDefinitions.Count);
+            _typeDefinitions.Add(typeDefinition);
+            _typeNameToIndex[typeName] = typeDefinition.Index;
+
+            return typeDefinition.Index;
+        }
+
+        public ITypeDefinition GetType(string typeName)
+        {
+            if (!_typeNameToIndex.ContainsKey(typeName))
+                throw new ArgumentException("A type with the name \"" + typeName + "\" could not be found.", typeName);
+
+            return _typeDefinitions[_typeNameToIndex[typeName]];
         }
 
         private int AddSpecializedCodeScope<TCodeScopeType>(string name, ICollection<TCodeScopeType> codeScopeList, IDictionary<string,int> codeScopeNameToIndexMap, TCodeScopeType codeScope) where TCodeScopeType : CodeScope
@@ -359,6 +424,25 @@ namespace ProjectHekate.Scripting
 
                         return ScriptStatus.Suspended;
                     }
+                    case Instruction.ExternalFunctionCall:
+                    {
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        var externalFunction = GetExternalFunctionByIndex(idx);
+
+                        var returnStatus = externalFunction.Function(state);
+                        state.CurrentInstructionIndex += 2;
+
+                        if (returnStatus == ScriptStatus.Suspended)
+                        { // need to do the check here because we're returning early
+                            if (state.CurrentInstructionIndex >= code.Size && looping) {
+                                state.CurrentInstructionIndex = 0;
+                            }
+
+                            return returnStatus;
+                        }
+
+                        break;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException(String.Format("One of the instruction types, {0}, was not implemented!", inst), (Exception)null);
                 }
@@ -407,26 +491,6 @@ namespace ProjectHekate.Scripting
             else if (state.StackHead == 0) {
                 throw new InvalidOperationException("There must be at least " + minimumNumberOfValues + " values on the stack in order to execute this instruction.");
             }
-        }
-
-        public int AddType<TScriptObjectType>(string typeName) where TScriptObjectType : AbstractScriptObject
-        {
-            if (_typeNameToIndex.ContainsKey(typeName))
-                throw new ArgumentException("A type with the name \"" + typeName + "\" already exists in this machine.", "typeName");
-
-            var typeDefinition = new TypeDefinition(typeName, _typeDefinitions.Count);
-            _typeDefinitions.Add(typeDefinition);
-            _typeNameToIndex[typeName] = typeDefinition.Index;
-
-            return typeDefinition.Index;
-        }
-
-        public ITypeDefinition GetType(string typeName)
-        {
-            if (!_typeNameToIndex.ContainsKey(typeName))
-                throw new ArgumentException("A type with the name \"" + typeName + "\" could not be found.", typeName);
-
-            return _typeDefinitions[_typeNameToIndex[typeName]];
         }
     }
 }

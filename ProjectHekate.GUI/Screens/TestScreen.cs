@@ -5,6 +5,7 @@ using System.Linq;
 using ProjectHekate.Core;
 using ProjectHekate.GUI.DrawingHelpers;
 using ProjectHekate.GUI.Interfaces;
+using ProjectHekate.Scripting;
 using SFML.Graphics;
 using SFML.Window;
 using Math = ProjectHekate.Core.Helpers.Math;
@@ -33,6 +34,7 @@ namespace ProjectHekate.GUI.Screens
 
     class TestScreen : GameScreen
     {
+        private Random _random;
         private IEngine _engine;
         private Player _player = new Player();
         private Sprite _playerSprite;
@@ -44,10 +46,13 @@ namespace ProjectHekate.GUI.Screens
         {
             _engine = new Engine();
 
+            _random = new Random();
+
             var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
 
             _engine.VirtualMachine.AddType<Bullet>("bullet");
             _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y);
+            _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
             _engine.VirtualMachine.LoadCode(scriptBody);
 
             _player.Controller = _engine
@@ -57,6 +62,17 @@ namespace ProjectHekate.GUI.Screens
 
             //_engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
             //    .Build();
+        }
+
+        private ScriptStatus GetRandomInt(ScriptState state)
+        {
+            var lowBound = (int)state.Stack[state.StackHead - 2];
+            var highBound = (int)state.Stack[state.StackHead - 1];
+
+            state.Stack[--state.StackHead - 1] = _random.Next(lowBound, highBound);
+            state.SuspendTime = 60;
+
+            return ScriptStatus.Suspended;
         }
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)

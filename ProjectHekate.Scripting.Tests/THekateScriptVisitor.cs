@@ -1242,6 +1242,28 @@ else {
             {
                 TestFunctionCallGenerationWithParameters(3);
             }
+
+            private ScriptStatus DummyFunc(ScriptState state) {  return ScriptStatus.Ok; }
+            [TestMethod]
+            public void ShouldGenerateCodeForExternalFunctionCall()
+            {
+                // Setup: create function
+                const string functionName = "SomeFunctionName";
+                var expression = String.Format("{0}()", functionName);
+
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(ivm => ivm.GetExternalFunction(functionName))
+                    .Returns(new FunctionDefinition());
+
+                // Act
+                var result = Subject.VisitFunctionCallExpression(GetFirstContext<HekateParser.FunctionCallExpressionContext>(expression))
+                    .Generate(MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Count.Should().Be(2);
+                result.Code[0].Should().Be((byte)Instruction.ExternalFunctionCall);
+                result.Code[1].Should().Be(0);
+            }
         }
 
         [TestClass]

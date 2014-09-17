@@ -1,9 +1,8 @@
 action UpdateBullet()
 {
-    $X += 3;
-    wait(0);    
-    $Y -= 2.1;
-    wait(60);
-    $X += 1.5;
-    wait(30);
+    var angle = GetRandomInt(0,5)*0.0174532925;
+    
+    $Angle += angle;
+
+    wait(0);
 }

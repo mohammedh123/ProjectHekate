@@ -648,6 +648,38 @@ namespace ProjectHekate.Scripting.Tests
                     dummyBullet.Speed.Should().Be(35.0f);
                 }
             }
+
+            [TestClass]
+            public class ExternalFunctionCall : TVirtualMachine
+            {
+                private ScriptStatus DummyFunc(ScriptState state)
+                {
+                    // no arguments, returns value
+                    state.Stack[state.StackHead - 1] = 3.5f;
+                    state.StackHead++;
+
+                    return ScriptStatus.Ok;
+                }
+
+                [TestMethod]
+                public void ShouldInterpetExternalFunctionCall()
+                {
+                    // Setup: set up state
+                    const float dummyValue = 3.5f;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.ExternalFunctionCall);
+                    code.Add((byte)0);
+                    Subject.AddExternalFunction("blah", DummyFunc);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: stack has negated dummy value on it
+                    State.StackHead.Should().Be(1);
+                    State.CurrentInstructionIndex.Should().Be(2);
+                    State.Stack[0].Should().Be(3.5f);
+                }
+            }
         }
     }
 }

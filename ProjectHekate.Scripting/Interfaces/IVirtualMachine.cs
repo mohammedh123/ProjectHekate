@@ -75,8 +75,40 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>The global property index of the property with the given name if it has been registered; <b>-1></b> otherwise.</returns>
         int GetPropertyIndex(string propertyName);
 
+        /// <summary>
+        /// Loads code into the virtual machine.
+        /// </summary>
+        /// <param name="text">The code to be loaded.</param>
         void LoadCode(string text);
 
-        void Update<TScriptObjectType>(TScriptObjectType so, float delta) where TScriptObjectType : AbstractScriptObject;
+        /// <summary>
+        /// Updates a script object.
+        /// </summary>
+        /// <typeparam name="TScriptObjectType">The type of script object being updated</typeparam>
+        /// <param name="so">The script object being updated</param>
+        void Update<TScriptObjectType>(TScriptObjectType so) where TScriptObjectType : AbstractScriptObject;
+
+        /// <summary>
+        /// Adds an external function to the virtual machine. External functions can be referenced in the script code and must be a function that takes in a single parameter of type <see cref="ScriptState"/> and returns a <seealso cref="ScriptStatus"/>.
+        /// </summary>
+        /// <param name="functionName">The name to use to refer to this function in the script</param>
+        /// <param name="function">The function to add to the virtual machine</param>
+        /// <exception cref="ArgumentException">Thrown when an external function with the name <paramref name="functionName"/> already exists.</exception>
+        void AddExternalFunction(string functionName, Func<ScriptState, ScriptStatus> function);
+
+        /// <summary>
+        /// Gets an external function definition by its name.
+        /// </summary>
+        /// <param name="functionName">The name of the function</param>
+        /// <returns>Returns the appropriate <see cref="FunctionDefinition"/> if a function with the name <paramref name="functionName"/> exists; <b>null</b> otherwise</returns>
+        FunctionDefinition GetExternalFunction(string functionName);
+
+        /// <summary>
+        /// Gets an external function definition by its index.
+        /// </summary>
+        /// <param name="idx">The index of the function</param>
+        /// <returns>Returns the appropriate <see cref="FunctionDefinition"/> if a function with the index <paramref name="idx"/> exists.</returns>
+        /// <exception cref="IndexOutOfRangeException">Thrown when the index is greater or equal to the number of external functions registered or is less than 0.</exception>
+        FunctionDefinition GetExternalFunctionByIndex(int idx);
     }
 }
