@@ -647,6 +647,76 @@ namespace ProjectHekate.Scripting.Tests
                     State.StackHead.Should().Be(1);
                     dummyBullet.Speed.Should().Be(35.0f);
                 }
+
+                [TestMethod]
+                public void ShouldThrowIfStackIsEmpty()
+                {
+                    var code = new CodeBlock();
+                    code.Add(Instruction.SetProperty);
+                    code.Add((byte)0);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<InvalidOperationException>();
+                }
+            }
+
+            [TestClass]
+            public class GetVariable : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetGetVariable()
+                {
+                    State.NumericalVariables[0] = 5f;
+
+                    var code = new CodeBlock();
+                    code.Add(Instruction.GetVariable);
+                    code.Add((byte)0);
+                    
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: stack has nothing on it
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(5f);
+                    State.CurrentInstructionIndex.Should().Be(2);
+                }
+            }
+
+            [TestClass]
+            public class SetVariable : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetSetPropertyWithMultipleTypes()
+                {
+                    State.StackHead = 1;
+                    State.Stack[0] = 35.5f;
+                    var code = new CodeBlock();
+                    code.Add(Instruction.SetVariable);
+                    code.Add((byte)0);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: stack has nothing on it
+                    State.StackHead.Should().Be(1);
+                    State.NumericalVariables[0].Should().Be(35.5f);
+                    State.CurrentInstructionIndex.Should().Be(2);
+                }
+
+                [TestMethod]
+                public void ShouldThrowIfStackIsEmpty()
+                {
+                    var code = new CodeBlock();
+                    code.Add(Instruction.SetVariable);
+                    code.Add((byte)0);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<InvalidOperationException>();
+                }
             }
 
             [TestClass]
@@ -655,7 +725,7 @@ namespace ProjectHekate.Scripting.Tests
                 private ScriptStatus DummyFunc(ScriptState state)
                 {
                     // no arguments, returns value
-                    state.Stack[state.StackHead - 1] = 3.5f;
+                    state.Stack[state.StackHead] = 3.5f;
                     state.StackHead++;
 
                     return ScriptStatus.Ok;

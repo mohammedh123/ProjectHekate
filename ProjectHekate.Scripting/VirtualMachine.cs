@@ -407,6 +407,31 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
+                    case Instruction.GetVariable:
+                    {
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        var val = state.NumericalVariables[idx];
+
+                        state.Stack[state.StackHead] = val;
+                        state.StackHead++;
+                        state.CurrentInstructionIndex += 2;
+
+                        ThrowIfStackLimitIsReached(state);
+
+                        break;
+                    }
+                    case Instruction.SetVariable:
+                    {
+                        ThrowIfStackIsEmpty(state);
+
+                        var val = state.Stack[state.StackHead - 1];
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        state.NumericalVariables[idx] = val;
+
+                        state.CurrentInstructionIndex += 2;
+
+                        break;
+                    }
                     case Instruction.WaitFrames:
                     {
                         ThrowIfStackIsEmpty(state);
