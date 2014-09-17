@@ -15,7 +15,7 @@ namespace ProjectHekate.Core
     {
         IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
-        IBullet FireScriptedBullet(float x, float y, float angle, int spriteIndex, ActionCodeScope actionBlock);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame,  int spriteIndex, ActionCodeScope actionBlock);
 
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
@@ -121,9 +121,9 @@ namespace ProjectHekate.Core
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
         }
 
-        public IBullet FireScriptedBullet(float x, float y, float angle, int spriteIndex, ActionCodeScope actionBlock)
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ActionCodeScope actionBlock)
         {
-            var bullet = InternalFireBullet(x, y, angle, 0, spriteIndex, null);
+            var bullet = InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
 
             bullet.ScriptState = new ScriptState()
                                  {

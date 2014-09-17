@@ -44,14 +44,23 @@ namespace ProjectHekate.GUI.Screens
 
         public TestScreen()
         {
-            _engine = new Engine();
-
             _random = new Random();
 
+            ReloadScript();
+
+
+            //_engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
+            //    .Build();
+        }
+
+        private void ReloadScript()
+        {
             var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
 
+            _engine = new Engine();
+
             _engine.VirtualMachine.AddType<Bullet>("bullet");
-            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y);
+            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y, b => b.Angle, b => b.Speed);
             _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
             _engine.VirtualMachine.LoadCode(scriptBody);
 
@@ -59,9 +68,6 @@ namespace ProjectHekate.GUI.Screens
                 .CreateController(_player.X, _player.Y, 0, true)
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
-
-            //_engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
-            //    .Build();
         }
 
         private ScriptStatus GetRandomInt(ScriptState state)
@@ -70,9 +76,8 @@ namespace ProjectHekate.GUI.Screens
             var highBound = (int)state.Stack[state.StackHead - 1];
 
             state.Stack[--state.StackHead - 1] = _random.Next(lowBound, highBound);
-            state.SuspendTime = 60;
 
-            return ScriptStatus.Suspended;
+            return ScriptStatus.Ok;
         }
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
@@ -108,7 +113,7 @@ namespace ProjectHekate.GUI.Screens
         {
             var testAction = engine.VirtualMachine.GetActionCodeScope("UpdateBullet");
 
-            engine.BulletSystem.FireScriptedBullet(e.X - 5, e.Y, Math.ToRadians(-90), 0, testAction);
+            var b = engine.BulletSystem.FireScriptedBullet(e.X - 5, e.Y, Math.ToRadians(-90), 3, 1, testAction);
 
             //engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
             //engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
@@ -195,6 +200,9 @@ namespace ProjectHekate.GUI.Screens
             if (input.Keyboard.IsKeyDown(Keyboard.Key.Down))
             {
                 dy += speed;
+            }
+            if (input.Keyboard.IsKeyPressed(Keyboard.Key.Back)) {
+                ReloadScript();
             }
             
             dx *= (float)gameTime.TotalSeconds;
