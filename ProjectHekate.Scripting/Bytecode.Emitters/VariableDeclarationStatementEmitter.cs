@@ -22,6 +22,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             // {evaluate expression, should place value on stack}
             // Instruction.SetVariable
             // {index of the variable}
+            // Pop (for the value of the expression)
 
             var code = new CodeBlock();
 
@@ -35,6 +36,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             code.Add(_valueExpression.Generate(vm, scopeManager));
             code.Add(Instruction.SetVariable);
             code.Add(index);
+            code.Add(Instruction.Pop);
 
             return code;
         }

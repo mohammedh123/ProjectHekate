@@ -24,8 +24,8 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
         {
             // For statement code
             // Generate code for the initialization (if there is one)
-            // Generate code for the test expression (if there is one)
-            // Generate code for the increment expressions (if there are any)
+            // Generate code for the test expression (if there is one) and a jump-if-zero if it exists, followed by a pop
+            // Generate code for the increment expressions (if there are any), followed by a pop
             // Generate code for the body statement
             // Instruction.Jump
             // jump index
@@ -33,8 +33,21 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             if(_forInit != null) codeBlock.Add(_forInit.Generate(vm, scopeManager));
 
             var loopBeginIdx = codeBlock.Size;
-            if(_forConditional != null) codeBlock.Add(_forConditional.Generate(vm, scopeManager));
-            if(_forUpdate != null) codeBlock.Add(_forUpdate.Generate(vm, scopeManager));
+            if (_forConditional != null) {
+                codeBlock.Add(_forConditional.Generate(vm, scopeManager));
+                codeBlock.Add(Instruction.JumpIfZero);
+                codeBlock.Add((byte)0); // going to reuse break location code here
+
+                _breakList.Add(codeBlock.Size-1);
+
+                codeBlock.Add(Instruction.Pop);
+            }
+
+            if (_forUpdate != null) {
+                codeBlock.Add(_forUpdate.Generate(vm, scopeManager));
+                codeBlock.Add(Instruction.Pop);
+            }
+
             _bodyStatement.EmitTo(codeBlock, vm, scopeManager);
             
             codeBlock.Add(Instruction.Jump);
@@ -53,6 +66,11 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
                 codeBlock[idx] = loopBeginIdx;
             }
             _continueList.Clear();
+
+            // dont forget to pop; conditional/increment needs to be popped off the stack
+            if (_forConditional != null) {
+                codeBlock.Add(Instruction.Pop);
+            }
         }
     }
 }
