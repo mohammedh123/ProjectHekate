@@ -72,7 +72,8 @@ namespace ProjectHekate.Scripting.Interfaces
         /// Retrieves the global property index of the property with the given name.
         /// </summary>
         /// <param name="propertyName">The name of the property</param>
-        /// <returns>The global property index of the property with the given name if it has been registered; <b>-1></b> otherwise.</returns>
+        /// <returns>The global property index of the property with the given name if it has been registered.</returns>
+        /// <exception cref="ArgumentException">Thrown when a property with a name of <paramref name="propertyName"/> has not been registered yet.</exception>
         int GetPropertyIndex(string propertyName);
 
         /// <summary>

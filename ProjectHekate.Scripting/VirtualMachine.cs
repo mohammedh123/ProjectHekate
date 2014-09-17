@@ -110,7 +110,10 @@ namespace ProjectHekate.Scripting
 
         public int GetPropertyIndex(string propertyName)
         {
-            return _globalPropertyList.IndexOf(propertyName);
+            var idx = _globalPropertyList.IndexOf(propertyName);
+            if(idx == -1) throw new ArgumentException(String.Format("A property with the name {0} has not been registered.", propertyName), propertyName);
+
+            return idx;
         }
 
         public void LoadCode(string text)
