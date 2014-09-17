@@ -401,7 +401,7 @@ namespace ProjectHekate.Core
                 }
 
                 if (b.ScriptState != null) {
-                    _vm.Update(b, 1.0f/60.0f);
+                    _vm.Update(b);
                 }
                 else {
                     // if the bullet does not have a special update function, skip the wait logic

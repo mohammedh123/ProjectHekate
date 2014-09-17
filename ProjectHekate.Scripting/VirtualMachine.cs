@@ -123,7 +123,7 @@ namespace ProjectHekate.Scripting
             }
         }
 
-        public void Update<TScriptObjectType>(TScriptObjectType so, float delta) where TScriptObjectType : AbstractScriptObject
+        public void Update<TScriptObjectType>(TScriptObjectType so) where TScriptObjectType : AbstractScriptObject
         {
             if (so.ScriptState.SuspendTime <= 0) {
                 InterpretCode(_actionCodeScopes[so.ScriptState.CodeBlockIndex], so.ScriptState, so, true);
