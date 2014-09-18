@@ -1,0 +1,8 @@
+action UpdateBullet()
+{
+    var angle = GetRandomInt(1,50)*PI_180;
+    
+    $Angle += angle;
+
+    wait(0);
+}

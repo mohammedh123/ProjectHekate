@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectHekate.Core.Interfaces;
+using ProjectHekate.Scripting;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -21,6 +24,7 @@ namespace ProjectHekate.Core
     {
         IBulletSystem BulletSystem { get; }
         IInterpolationSystem InterpolationSystem { get; }
+        IVirtualMachine VirtualMachine { get; } // TEMPORARY! just for testing out each new milestone
 
         /// <summary>
         /// Creates a controller that (should be) controlled by an external entity. The controller returned
@@ -47,8 +51,9 @@ namespace ProjectHekate.Core
     {
         private readonly BulletSystem _bulletSystem;
         private readonly InterpolationSystem _interpolationSystem;
-        private readonly List<Controller> _controllers;
+        private readonly IVirtualMachine _vm;
 
+        private readonly List<Controller> _controllers;
         private readonly List<Emitter> _emitters;
 
         public IBulletSystem BulletSystem
@@ -61,9 +66,14 @@ namespace ProjectHekate.Core
             get { return _interpolationSystem; }
         }
 
+        public IVirtualMachine VirtualMachine{
+            get { return _vm; }
+        }
+
         public Engine()
         {
-            _bulletSystem = new BulletSystem();
+            _vm = new VirtualMachine();
+            _bulletSystem = new BulletSystem(_vm);
             _interpolationSystem = new InterpolationSystem();
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();

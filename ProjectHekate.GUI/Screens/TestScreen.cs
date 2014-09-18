@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using ProjectHekate.Core;
 using ProjectHekate.GUI.DrawingHelpers;
 using ProjectHekate.GUI.Interfaces;
+using ProjectHekate.Scripting;
 using SFML.Graphics;
 using SFML.Window;
 using Math = ProjectHekate.Core.Helpers.Math;
@@ -36,6 +35,7 @@ namespace ProjectHekate.GUI.Screens
 
     class TestScreen : GameScreen
     {
+        private Random _random;
         private IEngine _engine;
         private Player _player = new Player();
         private Sprite _playerSprite;
@@ -45,15 +45,42 @@ namespace ProjectHekate.GUI.Screens
 
         public TestScreen()
         {
+            _random = new Random();
+
+            ReloadScript();
+
+
+            //_engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
+            //    .Build();
+        }
+
+        private void ReloadScript()
+        {
+            var scriptBody = File.ReadAllText(@"Resources\Scripts\sample_bullet.txt");
+
             _engine = new Engine();
+
+            _engine.VirtualMachine.AddType<Bullet>("bullet");
+            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y, b => b.Angle, b => b.Speed);
+            _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
+            _engine.VirtualMachine.AddGlobalSymbol("PI", Math.Pi);
+            _engine.VirtualMachine.AddGlobalSymbol("PI_180", Math.Pi/180.0f);
+            _engine.VirtualMachine.LoadCode(scriptBody);
 
             _player.Controller = _engine
                 .CreateController(_player.X, _player.Y, 0, true)
                 .WithEmitter(0, 0, 0, true, EmitterTestFunc)
                 .Build();
+        }
 
-            _engine.CreateScriptedController(512, 120, Math.PiOver2, true, ScriptedController1)
-                .Build();
+        private ScriptStatus GetRandomInt(ScriptState state)
+        {
+            var lowBound = (int)state.Stack[state.StackHead - 2];
+            var highBound = (int)state.Stack[state.StackHead - 1];
+
+            state.Stack[--state.StackHead - 1] = _random.Next(lowBound, highBound);
+
+            return ScriptStatus.Ok;
         }
 
         private IEnumerator<WaitInFrames> ScriptedController1(IController controller, IEngine engine)
@@ -87,8 +114,14 @@ namespace ProjectHekate.GUI.Screens
 
         public IEnumerator<WaitInFrames> EmitterTestFunc(Emitter e, IEngine engine)
         {
-            engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
-            engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+            var testAction = engine.VirtualMachine.GetActionCodeScope("UpdateBullet");
+
+            var b = engine.BulletSystem.FireScriptedBullet(e.X - 5, e.Y, Math.ToRadians(-90), 3, 1, testAction);
+
+            //engine.BulletSystem.FireBasicBullet(e.X - 5, e.Y, Math.ToRadians(-90), 5, 0);
+            //engine.BulletSystem.FireBasicBullet(e.X + 5, e.Y, Math.ToRadians(-90), 5, 0);
+
+           
             yield return new WaitInFrames(5);
         }
         
@@ -170,6 +203,9 @@ namespace ProjectHekate.GUI.Screens
             if (input.Keyboard.IsKeyDown(Keyboard.Key.Down))
             {
                 dy += speed;
+            }
+            if (input.Keyboard.IsKeyPressed(Keyboard.Key.Back)) {
+                ReloadScript();
             }
             
             dx *= (float)gameTime.TotalSeconds;

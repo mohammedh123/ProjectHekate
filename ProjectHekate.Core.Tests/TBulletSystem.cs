@@ -2,6 +2,8 @@
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Core.Tests
 {
@@ -13,7 +15,7 @@ namespace ProjectHekate.Core.Tests
         [TestInitialize]
         public void Initialize()
         {
-            System = new BulletSystem();
+            System = new BulletSystem(new Mock<IVirtualMachine>().Object);
         }
 
         [TestClass]

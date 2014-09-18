@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectHekate.Core.MathExtras;
+using ProjectHekate.Scripting;
+using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Core
 {
@@ -13,6 +15,8 @@ namespace ProjectHekate.Core
     {
         IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
+        IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame,  int spriteIndex, ActionCodeScope actionBlock);
+
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
         IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex,
@@ -83,18 +87,21 @@ namespace ProjectHekate.Core
         private ProjectileData<CurvedLaser> _curvedLaserData;
         private ProjectileData<Beam> _beamData;
         private ProjectileData<Laser> _laserData;
+
+        private readonly IVirtualMachine _vm;
         
         public IReadOnlyList<IBullet> Bullets { get; private set; }
         public IReadOnlyList<ICurvedLaser> CurvedLasers { get; private set; }
         public IReadOnlyList<IBeam> Beams { get; private set; }
         public IReadOnlyList<ILaser> Lasers { get; private set; }
 
-        public BulletSystem()
+        public BulletSystem(IVirtualMachine vm)
         {
             _bulletData = new ProjectileData<Bullet>(MaxBullets);
             _curvedLaserData = new ProjectileData<CurvedLaser>(MaxCurvedLasers);
             _beamData = new ProjectileData<Beam>(MaxBeams);
             _laserData = new ProjectileData<Laser>(MaxLasers);
+            _vm = vm;
 
             Bullets = Array.AsReadOnly(_bulletData.Projectiles);
             CurvedLasers = Array.AsReadOnly(_curvedLaserData.Projectiles);
@@ -112,6 +119,19 @@ namespace ProjectHekate.Core
         public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc)
         {
             return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, bulletFunc);
+        }
+
+        public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ActionCodeScope actionBlock)
+        {
+            var bullet = InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
+
+            bullet.ScriptState = new ScriptState()
+                                 {
+                                     CodeBlockIndex = actionBlock.Index,
+                                     CurrentInstructionIndex = 0
+                                 };
+
+            return bullet;
         }
 
         public ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<CurvedLaser> laserFunc)
@@ -380,47 +400,46 @@ namespace ProjectHekate.Core
                     UpdatePositionLinearly(b);
                 }
 
-                // if the bullet does not have a special update function, skip the wait logic
-                if (b.UpdateFunc == null)
-                {
-                    b.FramesAlive++;
-                    continue;
+                if (b.ScriptState != null) {
+                    _vm.Update(b);
                 }
+                else {
+                    // if the bullet does not have a special update function, skip the wait logic
+                    if (b.UpdateFunc == null) {
+                        b.FramesAlive++;
+                        continue;
+                    }
 
-                // if the bullet's "update state" is ready
-                if (_bulletData.ProjectileWaitTimers[i] <= 0)
-                {
-                    var loopAgain = true;
+                    // if the bullet's "update state" is ready
+                    if (_bulletData.ProjectileWaitTimers[i] <= 0) {
+                        var loopAgain = true;
 
-                    // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
-                    // this means that if there isn't a yield return, the function will loop infinitely
-                    // TODO: somehow prevent that
-                    while (loopAgain)
-                    {
-                        _bulletData.ProjectileEnumerators[i] = _bulletData.ProjectileEnumerators[i] ?? b.Update(ins);
+                        // this loopAgain variable basically means: start from the beginning of the Update function if the function reaches completion
+                        // this means that if there isn't a yield return, the function will loop infinitely
+                        // TODO: somehow prevent that
+                        while (loopAgain) {
+                            _bulletData.ProjectileEnumerators[i] = _bulletData.ProjectileEnumerators[i] ?? b.Update(ins);
 
-                        // this steps through the bullet's update function until it hits a yield return
-                        if (_bulletData.ProjectileEnumerators[i].MoveNext())
-                        {
-                            // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
-                            // starting next frame, this bullet is 'waiting'
-                            _bulletData.ProjectileWaitTimers[i] = _bulletData.ProjectileEnumerators[i].Current.Delay;
+                            // this steps through the bullet's update function until it hits a yield return
+                            if (_bulletData.ProjectileEnumerators[i].MoveNext()) {
+                                // TODO: check the type of _bulletEnumerators[i].Current to make sure it isn't null?
+                                // starting next frame, this bullet is 'waiting'
+                                _bulletData.ProjectileWaitTimers[i] = _bulletData.ProjectileEnumerators[i].Current.Delay;
 
-                            loopAgain = false;
-                        }
-                        else
-                        {
-                            // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
-                            _bulletData.ProjectileEnumerators[i] = b.Update(ins);
+                                loopAgain = false;
+                            }
+                            else {
+                                // if it returns false, then it has hit the end of the function -- so loop again, from the beginning
+                                _bulletData.ProjectileEnumerators[i] = b.Update(ins);
 
-                            loopAgain = true;
+                                loopAgain = true;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    // the bullet is "waiting"
-                    _bulletData.ProjectileWaitTimers[i]--;
+                    else {
+                        // the bullet is "waiting"
+                        _bulletData.ProjectileWaitTimers[i]--;
+                    }
                 }
 
                 b.FramesAlive++;
