@@ -422,7 +422,7 @@ else {
                 result.Code[19].Should().Be(0);
                 result.Code[20].Should().Be((byte)Instruction.Pop);
                 result.Code[21].Should().Be((byte)Instruction.Jump);
-                result.Code[22].Should().Be(25);
+                result.Code[22].Should().Be(26);
                 result.Code[23].Should().Be((byte)Instruction.Jump);
                 result.Code[24].Should().Be(5);
                 result.Code[25].Should().Be((byte)Instruction.Pop);
@@ -535,13 +535,15 @@ else {
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
-                result.Code.Should().HaveCount(6);
+                result.Code.Should().HaveCount(8);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
-                result.Code[3].Should().Be(6);
-                result.Code[4].Should().Be((byte) Instruction.Jump);
-                result.Code[5].Should().Be(0);
+                result.Code[3].Should().Be(7);
+                result.Code[4].Should().Be((byte)Instruction.Pop);
+                result.Code[5].Should().Be((byte) Instruction.Jump);
+                result.Code[6].Should().Be(0);
+                result.Code[7].Should().Be((byte)Instruction.Pop);
             }
 
             [TestMethod]
@@ -559,16 +561,18 @@ else {
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
-                result.Code.Should().HaveCount(9);
+                result.Code.Should().HaveCount(11);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
-                result.Code[3].Should().Be(9);
-                result.Code[4].Should().Be((byte) Instruction.Push);
-                result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte) Instruction.Pop);
-                result.Code[7].Should().Be((byte) Instruction.Jump);
-                result.Code[8].Should().Be(0);
+                result.Code[3].Should().Be(10);
+                result.Code[4].Should().Be((byte)Instruction.Pop);
+                result.Code[5].Should().Be((byte) Instruction.Push);
+                result.Code[6].Should().Be(3);
+                result.Code[7].Should().Be((byte) Instruction.Pop);
+                result.Code[8].Should().Be((byte) Instruction.Jump);
+                result.Code[9].Should().Be(0);
+                result.Code[10].Should().Be((byte)Instruction.Pop);
             }
 
             [TestMethod]
@@ -587,18 +591,20 @@ else {
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
-                result.Code.Should().HaveCount(11);
+                result.Code.Should().HaveCount(13);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[3].Should().Be(11);
-                result.Code[4].Should().Be((byte)Instruction.Push);
-                result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte)Instruction.Pop);
-                result.Code[7].Should().Be((byte)Instruction.Jump);
-                result.Code[8].Should().Be(11);
-                result.Code[9].Should().Be((byte)Instruction.Jump);
-                result.Code[10].Should().Be(0);
+                result.Code[3].Should().Be(12);
+                result.Code[4].Should().Be((byte)Instruction.Pop);
+                result.Code[5].Should().Be((byte)Instruction.Push);
+                result.Code[6].Should().Be(3);
+                result.Code[7].Should().Be((byte)Instruction.Pop);
+                result.Code[8].Should().Be((byte)Instruction.Jump);
+                result.Code[9].Should().Be(13);
+                result.Code[10].Should().Be((byte)Instruction.Jump);
+                result.Code[11].Should().Be(0);
+                result.Code[12].Should().Be((byte)Instruction.Pop);
             }
 
             [TestMethod]
@@ -617,18 +623,20 @@ else {
                     .EmitTo(result, MockVirtualMachine, MockScopeManager);
 
                 // Verify
-                result.Code.Should().HaveCount(11);
+                result.Code.Should().HaveCount(13);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
                 result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
-                result.Code[3].Should().Be(11);
-                result.Code[4].Should().Be((byte)Instruction.Push);
-                result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte)Instruction.Pop);
-                result.Code[7].Should().Be((byte)Instruction.Jump);
-                result.Code[8].Should().Be(0);
-                result.Code[9].Should().Be((byte)Instruction.Jump);
-                result.Code[10].Should().Be(0);
+                result.Code[3].Should().Be(12);
+                result.Code[4].Should().Be((byte)Instruction.Pop);
+                result.Code[5].Should().Be((byte)Instruction.Push);
+                result.Code[6].Should().Be(3);
+                result.Code[7].Should().Be((byte)Instruction.Pop);
+                result.Code[8].Should().Be((byte)Instruction.Jump);
+                result.Code[9].Should().Be(0);
+                result.Code[10].Should().Be((byte)Instruction.Jump);
+                result.Code[11].Should().Be(0);
+                result.Code[12].Should().Be((byte)Instruction.Pop);
             }
         }
 

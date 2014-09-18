@@ -22,11 +22,12 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
         {
             // While statement code
             // Generate code for _conditionExpression
-            // Instruction.Jump
+            // Instruction.Jump + Pop
             // jump location
             // Generate expression code for bodyStatement
             // Instruction.Jump
             // jump location (should be index of conditional)
+            // Pop (for early jumps)
 
             var loopBeginIdx = codeBlock.Size;
             codeBlock.Add(_conditionExpression.Generate(vm, scopeManager));
@@ -34,13 +35,16 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
 
             var whileJumpIdx = codeBlock.Size;
             codeBlock.Add(0.0f); // dummy value
+            codeBlock.Add(Instruction.Pop);
 
             _bodyStatement.EmitTo(codeBlock, vm, scopeManager);
 
             codeBlock.Add(Instruction.Jump);
             codeBlock.Add(loopBeginIdx);
+            
+            codeBlock[whileJumpIdx] = codeBlock.Size; // this must be before the Pop so that the while jump pops after exiting the loop
 
-            codeBlock[whileJumpIdx] = codeBlock.Size;
+            codeBlock.Add(Instruction.Pop);
 
             // loop through all break locations and update them
             foreach (var idx in _breakList) {
