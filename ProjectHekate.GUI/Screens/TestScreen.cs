@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using ProjectHekate.Core;
 using ProjectHekate.GUI.DrawingHelpers;
 using ProjectHekate.GUI.Interfaces;
@@ -62,6 +63,8 @@ namespace ProjectHekate.GUI.Screens
             _engine.VirtualMachine.AddType<Bullet>("bullet");
             _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y, b => b.Angle, b => b.Speed);
             _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
+            _engine.VirtualMachine.AddGlobalSymbol("PI", Math.Pi);
+            _engine.VirtualMachine.AddGlobalSymbol("PI_180", Math.Pi/180.0f);
             _engine.VirtualMachine.LoadCode(scriptBody);
 
             _player.Controller = _engine

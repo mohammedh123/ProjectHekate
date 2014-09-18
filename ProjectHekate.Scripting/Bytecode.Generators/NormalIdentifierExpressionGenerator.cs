@@ -15,9 +15,19 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
 
         public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
         {
+            // if the identifier belongs to a global value, then just push that value
+            // else
             // Normal identifier expression code:
-            // Instructions.Push
+            // Instructions.GetVariable
             // {index of variable if it exists}
+
+            if (vm.HasGlobalSymbolDefined(_identifierName)) {
+                var codeBlock = new CodeBlock();
+                codeBlock.Add(Instruction.Push);
+                codeBlock.Add(vm.GetGlobalSymbolValue(_identifierName));
+
+                return codeBlock;
+            }
 
             return CodeGenHelper.GenerateCodeForValueOfVariable(scopeManager, _identifierName);
         }

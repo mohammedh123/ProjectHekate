@@ -1,6 +1,6 @@
 action UpdateBullet()
 {
-    var angle = GetRandomInt(0,5)*0.0174532925;
+    var angle = GetRandomInt(1,50)*PI_180;
     
     $Angle += angle;
 
