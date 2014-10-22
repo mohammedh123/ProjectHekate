@@ -190,6 +190,10 @@ namespace ProjectHekate.Scripting
             _typeDefinitions.Add(typeDefinition);
             _typeNameToIndex[typeName] = typeDefinition.Index;
 
+            typeDefinition.AddProperty<TScriptObjectType>(t => t.X);
+            typeDefinition.AddProperty<TScriptObjectType>(t => t.Y);
+            typeDefinition.AddProperty<TScriptObjectType>(t => t.Angle);
+
             return typeDefinition.Index;
         }
 

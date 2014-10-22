@@ -11,5 +11,9 @@ namespace ProjectHekate.Scripting
         public ScriptState ScriptState { get; set; }
 
         public int EmitTypeIndex { get; set; }
+
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Angle { get; set; }
     }
 }

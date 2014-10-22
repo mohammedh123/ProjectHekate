@@ -61,7 +61,7 @@ namespace ProjectHekate.GUI.Screens
             _engine = new Engine();
 
             _engine.VirtualMachine.AddType<Bullet>("bullet");
-            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.X, b => b.Y, b => b.Angle, b => b.Speed);
+            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.Speed);
             _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
             _engine.VirtualMachine.AddGlobalSymbol("PI", Math.Pi);
             _engine.VirtualMachine.AddGlobalSymbol("PI_180", Math.Pi/180.0f);
@@ -137,7 +137,7 @@ namespace ProjectHekate.GUI.Screens
                     engine.BulletSystem.FireOrbitingScriptedBullet(e, 32, angleDiff * i, 0, 3, 6, OrbitDistanceIncreaseToMax);
                 }
                 engine.BulletSystem.FireOrbitingBasicBullet(e, 0, 0, 0, 0, 5);
-            }
+            }           
 
             e.X += (float)System.Math.Cos(e.Angle) * 2.0f;
             e.Y += (float)System.Math.Sin(e.Angle) * 2.0f;

@@ -1,8 +1,13 @@
 action UpdateBullet()
 {
-    var angle = GetRandomInt(1,50)*PI_180;
+    var angle = 0;
+    for(var i = 0; i < 50; i++) {
+        angle = GetRandomInt(1,50)*PI_180;
     
-    $Angle += angle;
+        $Angle += angle;
 
-    wait(0);
+        fire bullet($X, $Y, $Angle + PI_180, $Speed, $Sprite);
+
+        wait(i);
+    }
 }

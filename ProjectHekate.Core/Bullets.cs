@@ -72,9 +72,6 @@ namespace ProjectHekate.Core
     public abstract class AbstractProjectile : AbstractScriptObject
     {
         public uint Id { get; internal set; }
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Angle { get; set; }
         public float Speed { get; set; }
         public int SpriteIndex { get; set; }
         public uint FramesAlive { get; set; }

@@ -153,7 +153,7 @@ namespace ProjectHekate.Scripting
             var bodyStatementGen = Visit(context.statement());
 
             return new ForStatementEmitter(forInitGen, forCondGen, forUpdateGen, bodyStatementGen, breakList, continueList);
-        }
+        }    
 
         public override AbstractBytecodeEmitter VisitWhileStatement(HekateParser.WhileStatementContext context)
         {

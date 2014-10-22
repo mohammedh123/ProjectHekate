@@ -457,15 +457,11 @@ namespace ProjectHekate.Scripting.Tests
             {
                 private class TestBullet : AbstractScriptObject
                 {
-                    public float X { get; set; }
-                    public float Y { get; set; }
-                    public float Angle { get; set; }
                     public float Speed { get; set; }    
                 }
 
                 private class TestBullet2 : AbstractScriptObject
                 {
-                    public float X { get; set; }
                 }
 
                 [TestMethod]
@@ -554,15 +550,11 @@ namespace ProjectHekate.Scripting.Tests
             {
                 private class TestBullet : AbstractScriptObject
                 {
-                    public float X { get; set; }
-                    public float Y { get; set; }
-                    public float Angle { get; set; }
                     public float Speed { get; set; }
                 }
 
                 private class TestBullet2 : AbstractScriptObject
                 {
-                    public float X { get; set; }
                 }
 
                 [TestMethod]
