@@ -30,12 +30,19 @@ namespace ProjectHekate.Scripting
         public int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression) where TScriptObjectType : AbstractScriptObject
         {
             var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
-            var propertyName = pi.Name;
+
+            return AddProperty(propertyExpression, pi.Name);
+        }
+
+        public int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject
+        {
+            var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
+            var propertyName = name;
 
             int index;
             var worked = _propertyDefinitionsNameToIndex.TryGetValue(propertyName, out index);
 
-            if(worked) throw new ArgumentException("A property with the name " + propertyName + " already exists.");
+            if (worked) throw new ArgumentException("A property with the name " + propertyName + " already exists.");
 
             var addedProperty = new PropertyRecord<TScriptObjectType>();
 

@@ -131,6 +131,16 @@ namespace ProjectHekate.Scripting
             }
         }
 
+        public void AddProperty<TScriptObjectType>(string typeName, Expression<Func<TScriptObjectType, float>> propertyExpression,
+            string name) where TScriptObjectType : AbstractScriptObject
+        {
+            var type = GetType(typeName);
+            type.AddProperty(propertyExpression, name);
+
+            var exists = _globalPropertyList.Contains(name);
+            if (!exists) _globalPropertyList.Add(name);
+        }
+
         public int GetPropertyIndex(string propertyName)
         {
             var idx = _globalPropertyList.IndexOf(propertyName);

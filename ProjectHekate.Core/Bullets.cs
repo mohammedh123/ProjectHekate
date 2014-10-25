@@ -73,6 +73,7 @@ namespace ProjectHekate.Core
     {
         public uint Id { get; internal set; }
         public float Speed { get; set; }
+        public float SpriteIndexAsFloat { get { return SpriteIndex; } set { SpriteIndex = (int)value; } }
         public int SpriteIndex { get; set; }
         public uint FramesAlive { get; set; }
         public float Radius { get; set; }

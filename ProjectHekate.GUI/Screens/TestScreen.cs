@@ -62,11 +62,12 @@ namespace ProjectHekate.GUI.Screens
 
             _engine.VirtualMachine.AddType<Bullet>("bullet");
             _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.Speed);
-            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.SpriteIndex);
+            _engine.VirtualMachine.AddProperty<Bullet>("bullet", b => b.SpriteIndexAsFloat, "SpriteIndex");
             _engine.VirtualMachine.AddFiringFunction("bullet", "fire", _engine.BulletSystem, bs => bs.FireBasicBullet(0,0,0,0,0));
             _engine.VirtualMachine.AddExternalFunction("GetRandomInt", GetRandomInt);
             _engine.VirtualMachine.AddGlobalSymbol("PI", Math.Pi);
-            _engine.VirtualMachine.AddGlobalSymbol("PI_180", Math.Pi/180.0f);
+            _engine.VirtualMachine.AddGlobalSymbol("PI_180", Math.Pi / 180.0f);
+            _engine.VirtualMachine.AddGlobalSymbol("PI_90", Math.Pi / 90.0f);
             _engine.VirtualMachine.LoadCode(scriptBody);
 
             _player.Controller = _engine
