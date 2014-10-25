@@ -98,6 +98,32 @@ namespace ProjectHekate.Scripting.Interfaces
         void AddExternalFunction(string functionName, Func<ScriptState, ScriptStatus> function);
 
         /// <summary>
+        /// Adds a firing function to the virtual machine. Firing functions are used in code to fire bullets.
+        /// </summary>
+        /// <typeparam name="TFiringClass">The type of the object doing the firing (usually something like a bullet manager/system)</typeparam>
+        /// <typeparam name="TBulletType">The type of the bullet being fired</typeparam>
+        /// <param name="typeName">The name of the type this function fires (for use in the script)</param>
+        /// <param name="functionName">The name of the firing function (for use in the script)</param>
+        /// <param name="instance">An instance of <typeparamref name="TFiringClass"/> that will be used for firing bullets</param>
+        /// <param name="methodSelector">A call to the firing method to add; use 0s, nulls, and default values to call the correct method</param>
+        void AddFiringFunction<TFiringClass, TBulletType>(string typeName, string functionName, TFiringClass instance, Expression<Func<TFiringClass, TBulletType>> methodSelector);
+
+        /// <summary>
+        /// Gets a firing function associated with a type by its function name.
+        /// </summary>
+        /// <param name="typeName">The name of the type this function fires</param>
+        /// <param name="functionName">The name of the firing function</param>
+        /// <returns>Returns the appropriate <see cref="FiringFunctionDefinition"/> if a firing function for the given <paramref name="typeName"/> and with the given <paramref name="functionName"/> exists; <b>null</b> otherwise</returns>
+        FiringFunctionDefinition GetFiringFunction(string typeName, string functionName);
+
+        /// <summary>
+        /// Gets a firing function by index.
+        /// </summary>
+        /// <param name="idx">The index into the list</param>
+        /// <returns>Returns the appropriate <see cref="FiringFunctionDefinition"/> if a firing function at the given <paramref name="idx"/> exists; <b>null</b> otherwise</returns>
+        FiringFunctionDefinition GetFiringFunctionByIndex(int idx);
+
+        /// <summary>
         /// Gets an external function definition by its name.
         /// </summary>
         /// <param name="functionName">The name of the function</param>

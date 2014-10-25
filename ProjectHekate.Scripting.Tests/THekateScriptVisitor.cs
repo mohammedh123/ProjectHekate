@@ -1342,5 +1342,38 @@ else {
                 vmachine.GetActionCodeScope("SomeAction").Index.Should().Be(0);
             }
         }
+
+        [TestClass]
+        public class VisitFireStatement : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateFiringFunctionCode()
+            {
+                // Setup: dummy data
+                const string expression = "fire bullet(3,5);";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fire"))
+                    .Returns(new FiringFunctionDefinition()
+                             {
+                                 Index = 0,
+                                 Name = "fire",
+                                 OwningType = new TypeDefinition("bullet", 0)
+                             });
+
+                // Act
+                var result = new CodeBlock();
+                Subject.VisitFireStatement(GetFirstContext<HekateParser.FireStatementContext>(expression))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(6);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(3);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(5);
+                result.Code[4].Should().Be((byte)Instruction.Fire);
+                result.Code[5].Should().Be(0);
+            }            
+        }
     }
 }

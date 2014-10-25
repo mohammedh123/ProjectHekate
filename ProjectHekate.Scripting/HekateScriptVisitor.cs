@@ -190,6 +190,12 @@ namespace ProjectHekate.Scripting
             return new WaitStatementEmitter(expressionEmitter);
         }
 
+        public override AbstractBytecodeEmitter VisitFireStatement(HekateParser.FireStatementContext context)
+        {
+            var parameterBytecodeGenerator = Visit(context.parExpressionList());
+            return new FireStatementEmitter(context.TypeName.Text, context.FiringFunctionName.Text, parameterBytecodeGenerator);
+        }
+
         #endregion
 
 

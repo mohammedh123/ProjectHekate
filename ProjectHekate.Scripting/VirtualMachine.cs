@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Antlr4.Runtime;
+using Fasterflect;
+using MiscUtil.Linq;
 using ProjectHekate.Grammar;
 using ProjectHekate.Scripting.Interfaces;
 
@@ -15,6 +17,21 @@ namespace ProjectHekate.Scripting
         public int Index { get; set; }
 
         public Func<ScriptState, ScriptStatus> Function { get; set; } 
+    }
+
+    public class FiringFunctionDefinition
+    {
+        public string Name { get; set; }
+
+        public ITypeDefinition OwningType { get; set; }
+        
+        public int Index { get; set; }
+
+        public MethodInvoker Function { get; set; }
+
+        public object FiringObject { get; set; }
+
+        public int NumParams { get; set; }
     }
 
     public class VirtualMachine : IVirtualMachine, IBytecodeInterpreter
@@ -44,6 +61,9 @@ namespace ProjectHekate.Scripting
         private readonly List<FunctionDefinition> _externalFunctions;
         private readonly Dictionary<string, int> _externalFunctionNameToIndex;
 
+        private readonly List<FiringFunctionDefinition> _firingFunctions;
+        private readonly EditableLookup<string, int> _firingFunctionNameToIndex; 
+
         public VirtualMachine()
         {
             _functionCodeScopes = new List<FunctionCodeScope>();
@@ -64,6 +84,9 @@ namespace ProjectHekate.Scripting
 
             _externalFunctions = new List<FunctionDefinition>();
             _externalFunctionNameToIndex = new Dictionary<string, int>();
+
+            _firingFunctions = new List<FiringFunctionDefinition>();
+            _firingFunctionNameToIndex = new EditableLookup<string, int>();
         }
 
         public int AddFunctionCodeScope(string name, FunctionCodeScope codeScope)
@@ -181,6 +204,62 @@ namespace ProjectHekate.Scripting
             return _externalFunctions[idx];
         }
 
+        public void AddFiringFunction<TFiringClass, TBulletType>(string typeName, string functionName, TFiringClass instance, Expression<Func<TFiringClass, TBulletType>> methodSelector)
+        {
+            var owningType = GetType(typeName);
+            if(owningType == null) throw new ArgumentException("No type can be found with the given name.", "typeName");
+
+            var body = methodSelector.Body as MethodCallExpression;
+            if (body == null) throw new ArgumentException("The expression is not a simple method call.", "methodSelector");
+            var methodInfo = body.Method;
+
+            // grab some information we'll need to grab the delegate
+            var firingClassType = instance.GetType();
+            var methodName = methodInfo.Name;
+            var methodArgumentsType = methodInfo.Parameters().Select(pi => pi.ParameterType).ToArray();
+            var numArguments = methodArgumentsType.Length;
+
+            var firingFuncDelegate = firingClassType.DelegateForCallMethod(methodName, methodArgumentsType);
+
+            // do some validation to make sure this is unique
+
+            var firingFuncDef = new FiringFunctionDefinition()
+                                {
+                                    Function = firingFuncDelegate,
+                                    Index = _firingFunctions.Count,
+                                    OwningType = owningType,
+                                    NumParams = numArguments,
+                                    FiringObject = instance,
+                                    Name = functionName
+                                };
+
+            _firingFunctions.Add(firingFuncDef);
+            _firingFunctionNameToIndex.Add(functionName, firingFuncDef.Index);
+        }
+
+        public FiringFunctionDefinition GetFiringFunction(string typeName, string functionName)
+        {
+            if (!_firingFunctionNameToIndex.Contains(functionName))
+                throw new ArgumentException("A firing function with the name \"" + functionName + "\" could not be found.", functionName);
+
+            var group = _firingFunctionNameToIndex[functionName];
+
+            foreach (var idx in group) {
+                if(_firingFunctions[idx].OwningType.Name == typeName) {
+                    return _firingFunctions[idx];
+                }
+            }
+
+            return null;
+        }
+
+        public FiringFunctionDefinition GetFiringFunctionByIndex(int idx)
+        {
+            if (idx < 0 || idx > _firingFunctions.Count) return null;
+
+            return _firingFunctions[idx];
+        }
+
         public int AddType<TScriptObjectType>(string typeName) where TScriptObjectType : AbstractScriptObject
         {
             if (_typeNameToIndex.ContainsKey(typeName))
@@ -190,9 +269,9 @@ namespace ProjectHekate.Scripting
             _typeDefinitions.Add(typeDefinition);
             _typeNameToIndex[typeName] = typeDefinition.Index;
 
-            typeDefinition.AddProperty<TScriptObjectType>(t => t.X);
-            typeDefinition.AddProperty<TScriptObjectType>(t => t.Y);
-            typeDefinition.AddProperty<TScriptObjectType>(t => t.Angle);
+            AddProperty<TScriptObjectType>(typeName, t => t.X);
+            AddProperty<TScriptObjectType>(typeName, t => t.Y);
+            AddProperty<TScriptObjectType>(typeName, t => t.Angle);
 
             return typeDefinition.Index;
         }
@@ -472,6 +551,21 @@ namespace ProjectHekate.Scripting
 
                             return returnStatus;
                         }
+
+                        break;
+                    }
+                    case Instruction.Fire:
+                    {
+                        var idx = (int)code[state.CurrentInstructionIndex + 1];
+                        var firingFunction = GetFiringFunctionByIndex(idx);
+                        ThrowIfStackDoesNotContainEnoughValues(state, firingFunction.NumParams);
+
+                        var args = new object[firingFunction.NumParams];
+                        Array.Copy(state.Stack, state.StackHead - firingFunction.NumParams, args, 0, firingFunction.NumParams);
+                        firingFunction.Function(firingFunction.FiringObject, args);
+
+                        state.StackHead -= firingFunction.NumParams;
+                        state.CurrentInstructionIndex += 2;
 
                         break;
                     }

@@ -83,8 +83,6 @@ namespace ProjectHekate.Scripting
         private PropertyInfo GetPropertyInfoAndThrowIfExpressionIsntProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression)
             where TScriptObjectType : AbstractScriptObject
         {
-            var type = typeof (TScriptObjectType);
-
             var member = propertyExpression.Body as MemberExpression;
             if (member == null)
                 throw new ArgumentException(String.Format("Expression '{0}' refers to a method, not a property.", propertyExpression));

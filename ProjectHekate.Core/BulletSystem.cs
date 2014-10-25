@@ -13,7 +13,7 @@ namespace ProjectHekate.Core
 {
     public interface IBulletSystem
     {
-        IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex);
+        IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, float spriteIndex);
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc);
         IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame,  int spriteIndex, ActionCodeScope actionBlock);
 
@@ -111,9 +111,9 @@ namespace ProjectHekate.Core
 
         #region Firing functions
 
-        public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex)
+        public IBullet FireBasicBullet(float x, float y, float angle, float speedPerFrame, float spriteIndex)
         {
-            return InternalFireBullet(x, y, angle, speedPerFrame, spriteIndex, null);
+            return InternalFireBullet(x, y, angle, speedPerFrame, (int)spriteIndex, null);
         }
 
         public IBullet FireScriptedBullet(float x, float y, float angle, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Bullet> bulletFunc)
