@@ -2,6 +2,8 @@
 using AutoMoq.Helpers;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using ProjectHekate.Core;
 
 namespace ProjectHekate.Scripting.Tests
 {
@@ -470,34 +472,6 @@ namespace ProjectHekate.Scripting.Tests
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
                     Subject.AddType<TestBullet2>("bullet2");
-                    Subject.AddProperty<TestBullet>("bullet", b  => b.X);
-                    Subject.AddProperty<TestBullet2>("bullet2", b => b.X);
-                    Subject.UpdatePropertyMappings();
-
-                    var dummyBullet = new TestBullet();
-                    dummyBullet.X = 100;
-                    dummyBullet.EmitTypeIndex = 0;
-
-                    var code = new CodeBlock();
-                    State.StackHead = 0;
-                    code.Add(Instruction.GetProperty);
-                    code.Add((byte)0);
-
-                    // Act: call method
-                    Subject.InterpretCode(code, State, dummyBullet, false);
-
-                    // Verify: instruction index changes to end, stack has value of property
-                    State.CurrentInstructionIndex.Should().Be(2);
-                    State.StackHead.Should().Be(1);
-                    State.Stack[0].Should().Be(100);
-                }
-
-                [TestMethod]
-                public void ShouldInterpetGetPropertyWithSingleType()
-                {
-                    // Setup: set up state + setup mappings
-                    Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -523,7 +497,7 @@ namespace ProjectHekate.Scripting.Tests
                 {
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.X, b => b.Y, b => b.Speed, b => b.Angle);
+                    Subject.AddProperty<TestBullet>("bullet", t => t.Speed);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -533,7 +507,7 @@ namespace ProjectHekate.Scripting.Tests
                     var code = new CodeBlock();
                     State.StackHead = 0;
                     code.Add(Instruction.GetProperty);
-                    code.Add(2); // 2 should be speed
+                    code.Add(3); // 3 should be speed
 
                     // Act: call method
                     Subject.InterpretCode(code, State, dummyBullet, false);
@@ -563,8 +537,6 @@ namespace ProjectHekate.Scripting.Tests
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
                     Subject.AddType<TestBullet2>("bullet2");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
-                    Subject.AddProperty<TestBullet2>("bullet2", b => b.X);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -591,7 +563,6 @@ namespace ProjectHekate.Scripting.Tests
                 {
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.X);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -618,7 +589,7 @@ namespace ProjectHekate.Scripting.Tests
                 {
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.X, b => b.Y, b => b.Speed, b => b.Angle);
+                    Subject.AddProperty<TestBullet>("bullet", b => b.Speed);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -629,7 +600,7 @@ namespace ProjectHekate.Scripting.Tests
                     State.StackHead = 1;
                     State.Stack[0] = 35.0f;
                     code.Add(Instruction.SetProperty);
-                    code.Add(2); // 2 should be speed
+                    code.Add(3); // 3 should be speed
 
                     // Act: call method
                     Subject.InterpretCode(code, State, dummyBullet, false);
@@ -740,6 +711,78 @@ namespace ProjectHekate.Scripting.Tests
                     State.StackHead.Should().Be(1);
                     State.CurrentInstructionIndex.Should().Be(2);
                     State.Stack[0].Should().Be(3.5f);
+                }
+            }
+
+            [TestClass]
+            public class Fire : TVirtualMachine
+            {
+                private class TestBullet : AbstractScriptObject
+                {
+                }
+
+                [TestMethod]
+                public void ShouldThrowExceptionWhenNotPassingInEnoughArguments()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.Push);
+                    code.Add(1);
+                    code.Add(Instruction.Push);
+                    code.Add(2);
+                    code.Add(Instruction.Push);
+                    code.Add(3);
+                    code.Add(Instruction.Push);
+                    code.Add(4);
+                    code.Add(Instruction.Fire);
+                    code.Add((byte)0);
+
+                    var bus = new BulletSystem(Subject);
+
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddFiringFunction("bullet", "fire", bus, bs => bs.FireBasicBullet(0, 0, 0, 0, 0));
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(s => s.InterpretCode(code, State, null, false))
+                        .ShouldThrow<ArgumentException>();
+                }
+                
+                [TestMethod]
+                public void ShouldInterpetFire()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.Push);
+                    code.Add(1);
+                    code.Add(Instruction.Push);
+                    code.Add(2);
+                    code.Add(Instruction.Push);
+                    code.Add(3);
+                    code.Add(Instruction.Push);
+                    code.Add(4);
+                    code.Add(Instruction.Push);
+                    code.Add(5);
+                    code.Add(Instruction.Fire);
+                    code.Add((byte)0);
+
+                    var bus = new BulletSystem(Subject);
+                    
+                    Subject.AddType<TestBullet>("bullet");
+                    Subject.AddFiringFunction("bullet", "fire", bus, bs => bs.FireBasicBullet(0, 0, 0, 0, 0));
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: stack has negated dummy value on it
+                    State.StackHead.Should().Be(0);
+                    State.CurrentInstructionIndex.Should().Be(12);
+                    bus.Bullets[0].IsActive.Should().BeTrue();
+                    bus.Bullets[0].X.Should().Be(1);
+                    bus.Bullets[0].Y.Should().Be(2);
+                    bus.Bullets[0].Angle.Should().Be(3);
+                    bus.Bullets[0].Speed.Should().Be(4);
+                    bus.Bullets[0].SpriteIndex.Should().Be(5);
                 }
             }
         }

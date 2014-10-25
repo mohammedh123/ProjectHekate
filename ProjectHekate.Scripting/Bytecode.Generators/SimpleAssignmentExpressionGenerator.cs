@@ -1,5 +1,6 @@
 ﻿using System;
 using ProjectHekate.Scripting.Bytecode.Emitters;
+using ProjectHekate.Scripting.Helpers;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting.Bytecode.Generators
@@ -32,24 +33,13 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             switch (_identifierType) {
                 case IdentifierType.Property:
                 {
-                    var index = vm.GetPropertyIndex(_identifierName);
-
-                    code.Add(Instruction.SetProperty);
-                    code.Add(index);
+                    code.Add(CodeGenHelper.GenerateCodeForSettingValueOfProperty(vm, _identifierName));
 
                     break;
                 }
                 case IdentifierType.Variable:
                 {
-                    var scope = scopeManager.GetCurrentScope();
-                    var symbol = scope.GetSymbol(_identifierName);
-
-                    if (symbol.Type != SymbolType.Numerical) {
-                        throw new InvalidOperationException("Cannot use assignment expression with non-numerical symbols.");
-                    }
-
-                    code.Add(Instruction.SetVariable);
-                    code.Add(symbol.Index);
+                    code.Add(CodeGenHelper.GenerateCodeForSettingValueOfVariable(scopeManager, _identifierName));
 
                     break;
                 }

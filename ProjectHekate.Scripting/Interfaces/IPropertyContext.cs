@@ -6,13 +6,24 @@ namespace ProjectHekate.Scripting.Interfaces
     public interface IPropertyContext
     {
         /// <summary>
-        /// Adds a property to the type. A property is a float-type variable.
+        /// Adds a property to the type. The name is the property's name. A property is a float-type variable.
         /// </summary>
         /// <param name="propertyExpression">The CLR property mapped to the type property</param>
         /// <returns>Returns the index of the property</returns>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
         int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression)
+            where TScriptObjectType : AbstractScriptObject;
+
+        /// <summary>
+        /// Adds a property to the type with a name. A property is a float-type variable.
+        /// </summary>
+        /// <param name="propertyExpression">The CLR property mapped to the type property</param>
+        /// <param name="name">The name of the property</param>
+        /// <returns>Returns the index of the property</returns>
+        /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
+        int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression, string name)
             where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>

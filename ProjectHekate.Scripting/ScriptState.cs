@@ -17,7 +17,7 @@ namespace ProjectHekate.Scripting
         public int CurrentInstructionIndex { get; set; }
         public int CodeBlockIndex { get; set; }
         public int SuspendTime { get; set; }
-        public IList<float> Stack { get; set; }
+        public float[] Stack { get; set; }
         public int StackHead { get; set; }
 
         internal float[] NumericalVariables;

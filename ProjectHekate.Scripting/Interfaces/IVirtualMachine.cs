@@ -60,13 +60,23 @@ namespace ProjectHekate.Scripting.Interfaces
         EmitterUpdaterCodeScope GetEmitterUpdaterCodeScope(string name);
 
         /// <summary>
-        /// Adds a property to the virtual machine. A property is a float-type variable that belongs to all emitters.
+        /// Adds properties to the virtual machine. The names will match the property name. A property is a float-type variable that belongs to all emitters.
         /// </summary>
         /// <param name="typeName">The name of the type this property belongs to</param>
         /// <param name="propertyExpressions">The CLR properties mapped to the type's properties</param>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when any of the expressions in  <paramref name="propertyExpressions"/> do not map to a CLR property.</exception>
         void AddProperty<TScriptObjectType>(string typeName, params Expression<Func<TScriptObjectType, float>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject;
+
+        /// <summary>
+        /// Adds a property to the virtual machine, optionally with a different name. A property is a float-type variable that belongs to all emitters.
+        /// </summary>
+        /// <param name="typeName">The name of the type this property belongs to</param>
+        /// <param name="propertyExpression">The CLR property mapped to the type's property</param>
+        /// <param name="name">The name of the property</param>
+        /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the expression in  <paramref name="propertyExpression"/> do not map to a CLR property.</exception>
+        void AddProperty<TScriptObjectType>(string typeName, Expression<Func<TScriptObjectType, float>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>
         /// Retrieves the global property index of the property with the given name.
@@ -96,6 +106,32 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="function">The function to add to the virtual machine</param>
         /// <exception cref="ArgumentException">Thrown when an external function with the name <paramref name="functionName"/> already exists.</exception>
         void AddExternalFunction(string functionName, Func<ScriptState, ScriptStatus> function);
+
+        /// <summary>
+        /// Adds a firing function to the virtual machine. Firing functions are used in code to fire bullets.
+        /// </summary>
+        /// <typeparam name="TFiringClass">The type of the object doing the firing (usually something like a bullet manager/system)</typeparam>
+        /// <typeparam name="TBulletType">The type of the bullet being fired</typeparam>
+        /// <param name="typeName">The name of the type this function fires (for use in the script)</param>
+        /// <param name="functionName">The name of the firing function (for use in the script)</param>
+        /// <param name="instance">An instance of <typeparamref name="TFiringClass"/> that will be used for firing bullets</param>
+        /// <param name="methodSelector">A call to the firing method to add; use 0s, nulls, and default values to call the correct method</param>
+        void AddFiringFunction<TFiringClass, TBulletType>(string typeName, string functionName, TFiringClass instance, Expression<Func<TFiringClass, TBulletType>> methodSelector);
+
+        /// <summary>
+        /// Gets a firing function associated with a type by its function name.
+        /// </summary>
+        /// <param name="typeName">The name of the type this function fires</param>
+        /// <param name="functionName">The name of the firing function</param>
+        /// <returns>Returns the appropriate <see cref="FiringFunctionDefinition"/> if a firing function for the given <paramref name="typeName"/> and with the given <paramref name="functionName"/> exists; <b>null</b> otherwise</returns>
+        FiringFunctionDefinition GetFiringFunction(string typeName, string functionName);
+
+        /// <summary>
+        /// Gets a firing function by index.
+        /// </summary>
+        /// <param name="idx">The index into the list</param>
+        /// <returns>Returns the appropriate <see cref="FiringFunctionDefinition"/> if a firing function at the given <paramref name="idx"/> exists; <b>null</b> otherwise</returns>
+        FiringFunctionDefinition GetFiringFunctionByIndex(int idx);
 
         /// <summary>
         /// Gets an external function definition by its name.

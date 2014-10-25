@@ -190,6 +190,12 @@ namespace ProjectHekate.Scripting
             return new WaitStatementEmitter(expressionEmitter);
         }
 
+        public override AbstractBytecodeEmitter VisitFireStatement(HekateParser.FireStatementContext context)
+        {
+            var parameterBytecodeGenerator = Visit(context.parExpressionList());
+            return new FireStatementEmitter(context.TypeName.Text, context.FiringFunctionName.Text, parameterBytecodeGenerator);
+        }
+
         #endregion
 
 
@@ -281,6 +287,7 @@ namespace ProjectHekate.Scripting
         public override AbstractBytecodeEmitter VisitNormalIdentifierExpression(HekateParser.NormalIdentifierExpressionContext context)
         {
             var identifierName = context.NormalIdentifier().GetText();
+            identifierName = CoaxIdentifierToProperName(IdentifierType.Variable, identifierName);
 
             return new NormalIdentifierExpressionGenerator(identifierName);
         }
@@ -288,6 +295,7 @@ namespace ProjectHekate.Scripting
         public override AbstractBytecodeEmitter VisitPropertyIdentifierExpression(HekateParser.PropertyIdentifierExpressionContext context)
         {
             var identifierName = context.PropertyIdentifier().GetText();
+            identifierName = CoaxIdentifierToProperName(IdentifierType.Property, identifierName);
 
             return new PropertyIdentifierExpressionGenerator(identifierName);
         }
@@ -313,6 +321,8 @@ namespace ProjectHekate.Scripting
                 throw new InvalidOperationException(
                     "You forgot to add a case for another identifier type! Check the code for VisitPostIncDecExpression.");
             }
+
+            identifierName = CoaxIdentifierToProperName(identifierType, identifierName);
 
             var op = GetIncOrDecOperatorFromContext(context);
             return new PostIncDecExpressionGenerator(identifierType, identifierName, op);
@@ -340,6 +350,8 @@ namespace ProjectHekate.Scripting
             {
                 throw new InvalidOperationException("You forgot to add a case for another identifier type! Check the code for VisitAssignmentExpression.");
             }
+
+            identifierName = CoaxIdentifierToProperName(identifierType, identifierName);
 
             var exprGen = Visit(context.expression());
             if (context.Operator.Type == HekateParser.ASSIGN) {
@@ -427,6 +439,19 @@ namespace ProjectHekate.Scripting
             }
         }
 
+        public string CoaxIdentifierToProperName(IdentifierType identifierType, string identifierName)
+        {
+            switch (identifierType)
+            {
+                case IdentifierType.Property:
+                    return identifierName.FirstOrDefault() == '$' ? identifierName.Substring(1) : identifierName; // get rid of the first character ($)
+                case IdentifierType.Variable:
+                    // dont need to coax variable identifierName to anything
+                    return identifierName;
+                default:
+                    throw new ArgumentOutOfRangeException("identifierType");
+            }
+        }
         #endregion
     }
 }

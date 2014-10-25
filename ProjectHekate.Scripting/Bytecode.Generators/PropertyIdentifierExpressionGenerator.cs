@@ -19,7 +19,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // Instructions.Push
             // {index of property if it exists}
 
-            return CodeGenHelper.GenerateCodeForValueOfProperty(vm, _propertyIdentifier);
+            return CodeGenHelper.GenerateCodeForGettingValueOfProperty(vm, _propertyIdentifier);
         }
     }
 }
