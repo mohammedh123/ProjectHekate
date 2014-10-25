@@ -36,8 +36,6 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             _identifierType = identifierType;
             _identifierName = identifierName;
             _op = op;
-
-            CodeGenHelper.CoaxIdentifierToProperName(_identifierType, ref _identifierName);
         }
 
         public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
@@ -72,24 +70,13 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             switch (_identifierType) {
                 case IdentifierType.Property:
                 {
-                    var index = vm.GetPropertyIndex(_identifierName);
-                    code.Add(Instruction.SetProperty);
-                    code.Add(index);
+                    code.Add(CodeGenHelper.GenerateCodeForSettingValueOfProperty(vm, _identifierName));
 
                     break;
                 }
                 case IdentifierType.Variable:
                 {
-                    var scope = scopeManager.GetCurrentScope();
-                    var symbol = scope.GetSymbol(_identifierName);
-
-                    if (symbol.Type != SymbolType.Numerical)
-                    {
-                        throw new InvalidOperationException("Cannot use assignment expression with non-numerical symbols.");
-                    }
-
-                    code.Add(Instruction.SetVariable);
-                    code.Add(symbol.Index);
+                    code.Add(CodeGenHelper.GenerateCodeForSettingValueOfVariable(scopeManager, _identifierName));
 
                     break;
                 }

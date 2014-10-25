@@ -11,8 +11,6 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
         public PropertyIdentifierExpressionGenerator(string propertyIdentifier)
         {
             _propertyIdentifier = propertyIdentifier;
-
-            CodeGenHelper.CoaxIdentifierToProperName(IdentifierType.Property, ref _propertyIdentifier);
         }
 
         public override ICodeBlock Generate(IVirtualMachine vm, IScopeManager scopeManager)
@@ -21,7 +19,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
             // Instructions.Push
             // {index of property if it exists}
 
-            return CodeGenHelper.GenerateCodeForValueOfProperty(vm, _propertyIdentifier);
+            return CodeGenHelper.GenerateCodeForGettingValueOfProperty(vm, _propertyIdentifier);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace ProjectHekate.Scripting.Bytecode.Generators
                 return codeBlock;
             }
 
-            return CodeGenHelper.GenerateCodeForValueOfVariable(scopeManager, _identifierName);
+            return CodeGenHelper.GenerateCodeForGettingValueOfVariable(scopeManager, _identifierName);
         }
     }
 }
