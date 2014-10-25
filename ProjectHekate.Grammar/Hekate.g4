@@ -65,8 +65,8 @@ statement
 	|	VAR NormalIdentifier ASSIGN buildEmitterExpression SEMI	# BuildEmitterVariableStatement
 	|	variableDeclaration SEMI							# VariableDeclarationStatement
 	|	expression SEMI			# ExpressionStatement
+	|	FiringFunctionName=NormalIdentifier TypeName=NormalIdentifier parExpressionList SEMI	# FireStatement
 	|	NormalIdentifier ATTACH NormalIdentifier parExpressionList withUpdaterOption? SEMI		# AttachEmitterStatement
-	|	FIRE NormalIdentifier parExpressionList fromEmitterOption SEMI	# FireStatement
 	|	WAIT expression FRAMES SEMI		# WaitStatement
 	;
 
@@ -180,7 +180,6 @@ ACTION		: 'action';
 EUPDATER	: 'emitterUpdater';
 ATTACH		: 'attach';
 BUILD		: 'build';
-FIRE		: 'fire';
 FROM		: 'from';
 WAIT		: 'wait';
 FRAMES		: 'frames';

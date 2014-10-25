@@ -6,7 +6,7 @@ action UpdateBullet()
     
         $Angle += angle;
 
-        fire bullet($X, $Y, $Angle + PI_180, $Speed, $Sprite);
+        fire bullet($X, $Y, $Angle + PI_180, $Speed, $SpriteIndex);
 
         wait(i);
     }
