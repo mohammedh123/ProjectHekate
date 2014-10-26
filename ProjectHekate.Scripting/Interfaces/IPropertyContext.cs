@@ -12,7 +12,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the index of the property</returns>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
-        int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression)
+        int AddProperty<TScriptObjectType, TType>(Expression<Func<TScriptObjectType, TType>> propertyExpression)
             where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <returns>Returns the index of the property</returns>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when <paramref name="propertyExpression"/> does not map to a CLR property.</exception>
-        int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression, string name)
+        int AddProperty<TScriptObjectType, TType>(Expression<Func<TScriptObjectType, TType>> propertyExpression, string name)
             where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>

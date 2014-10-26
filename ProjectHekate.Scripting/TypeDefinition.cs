@@ -27,14 +27,14 @@ namespace ProjectHekate.Scripting
             _globalPropertyIndexMappings = new List<int>();
         }
 
-        public int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression) where TScriptObjectType : AbstractScriptObject
+        public int AddProperty<TScriptObjectType, TPropertyType>(Expression<Func<TScriptObjectType, TPropertyType>> propertyExpression) where TScriptObjectType : AbstractScriptObject
         {
             var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
 
             return AddProperty(propertyExpression, pi.Name);
         }
 
-        public int AddProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject
+        public int AddProperty<TScriptObjectType, TPropertyType>(Expression<Func<TScriptObjectType, TPropertyType>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject
         {
             var pi = GetPropertyInfoAndThrowIfExpressionIsntProperty(propertyExpression);
             var propertyName = name;
@@ -51,9 +51,10 @@ namespace ProjectHekate.Scripting
 
             var target = Expression.Parameter(typeof(TScriptObjectType));
             var value = Expression.Parameter(typeof(float));
-            var setBody = Expression.Call(target, setMethod, Expression.Convert(value, pi.PropertyType));
+            var setBody = Expression.Call(target, setMethod, Expression.Convert(value, typeof(TPropertyType)));
             var setMethodAction = Expression.Lambda<Action<TScriptObjectType, float>>(setBody, target, value).Compile();
-            var getBody = Expression.Call(target, getMethod);
+            var callBody = Expression.Call(target, getMethod);
+            var getBody = Expression.Convert(callBody, typeof(float));
             var getMethodAction = Expression.Lambda<Func<TScriptObjectType, float>>(getBody, target).Compile();
 
             addedProperty.Name = propertyName;
@@ -87,7 +88,7 @@ namespace ProjectHekate.Scripting
             return _propertyDefinitions[idx];
         }
 
-        private PropertyInfo GetPropertyInfoAndThrowIfExpressionIsntProperty<TScriptObjectType>(Expression<Func<TScriptObjectType, float>> propertyExpression)
+        private PropertyInfo GetPropertyInfoAndThrowIfExpressionIsntProperty<TScriptObjectType, TType>(Expression<Func<TScriptObjectType, TType>> propertyExpression)
             where TScriptObjectType : AbstractScriptObject
         {
             var member = propertyExpression.Body as MemberExpression;

@@ -119,7 +119,7 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeScope(name, "emitter updater", _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex);
         }
 
-        public void AddProperty<TScriptObjectType>(string typeName, params Expression<Func<TScriptObjectType, float>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject
+        public void AddProperty<TScriptObjectType, TType>(string typeName, params Expression<Func<TScriptObjectType, TType>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject
         {
             foreach (var expression in propertyExpressions) {
                 var type = GetType(typeName);
@@ -131,7 +131,7 @@ namespace ProjectHekate.Scripting
             }
         }
 
-        public void AddProperty<TScriptObjectType>(string typeName, Expression<Func<TScriptObjectType, float>> propertyExpression,
+        public void AddProperty<TScriptObjectType, TType>(string typeName, Expression<Func<TScriptObjectType, TType>> propertyExpression,
             string name) where TScriptObjectType : AbstractScriptObject
         {
             var type = GetType(typeName);
@@ -279,9 +279,9 @@ namespace ProjectHekate.Scripting
             _typeDefinitions.Add(typeDefinition);
             _typeNameToIndex[typeName] = typeDefinition.Index;
 
-            AddProperty<TScriptObjectType>(typeName, t => t.X);
-            AddProperty<TScriptObjectType>(typeName, t => t.Y);
-            AddProperty<TScriptObjectType>(typeName, t => t.Angle);
+            AddProperty<TScriptObjectType, float>(typeName, t => t.X);
+            AddProperty<TScriptObjectType, float>(typeName, t => t.Y);
+            AddProperty<TScriptObjectType, float>(typeName, t => t.Angle);
 
             return typeDefinition.Index;
         }

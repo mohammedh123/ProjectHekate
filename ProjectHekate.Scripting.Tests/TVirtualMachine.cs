@@ -497,7 +497,7 @@ namespace ProjectHekate.Scripting.Tests
                 {
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", t => t.Speed);
+                    Subject.AddProperty<TestBullet, float>("bullet", t => t.Speed);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();
@@ -589,7 +589,7 @@ namespace ProjectHekate.Scripting.Tests
                 {
                     // Setup: set up state + setup mappings
                     Subject.AddType<TestBullet>("bullet");
-                    Subject.AddProperty<TestBullet>("bullet", b => b.Speed);
+                    Subject.AddProperty<TestBullet, float>("bullet", b => b.Speed);
                     Subject.UpdatePropertyMappings();
 
                     var dummyBullet = new TestBullet();

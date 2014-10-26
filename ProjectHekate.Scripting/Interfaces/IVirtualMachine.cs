@@ -66,8 +66,8 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="propertyExpressions">The CLR properties mapped to the type's properties</param>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when any of the expressions in  <paramref name="propertyExpressions"/> do not map to a CLR property.</exception>
-        void AddProperty<TScriptObjectType>(string typeName, params Expression<Func<TScriptObjectType, float>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject;
-
+        void AddProperty<TScriptObjectType, TType>(string typeName, params Expression<Func<TScriptObjectType, TType>>[] propertyExpressions) where TScriptObjectType : AbstractScriptObject;
+                                                                    
         /// <summary>
         /// Adds a property to the virtual machine, optionally with a different name. A property is a float-type variable that belongs to all emitters.
         /// </summary>
@@ -76,7 +76,7 @@ namespace ProjectHekate.Scripting.Interfaces
         /// <param name="name">The name of the property</param>
         /// <exception cref="System.ArgumentException">Thrown when a property with that name already exists</exception>
         /// <exception cref="System.ArgumentException">Thrown when the expression in  <paramref name="propertyExpression"/> do not map to a CLR property.</exception>
-        void AddProperty<TScriptObjectType>(string typeName, Expression<Func<TScriptObjectType, float>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject;
+        void AddProperty<TScriptObjectType, TType>(string typeName, Expression<Func<TScriptObjectType, TType>> propertyExpression, string name) where TScriptObjectType : AbstractScriptObject;
 
         /// <summary>
         /// Retrieves the global property index of the property with the given name.
