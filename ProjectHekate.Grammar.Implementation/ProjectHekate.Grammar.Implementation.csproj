@@ -64,22 +64,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateBaseListener.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateBaseListener.cs">
       <Link>Links to Generated Files\HekateBaseListener.cs</Link>
     </Compile>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateBaseVisitor.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateBaseVisitor.cs">
       <Link>Links to Generated Files\HekateBaseVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateLexer.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateLexer.cs">
       <Link>Links to Generated Files\HekateLexer.cs</Link>
     </Compile>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateListener.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateListener.cs">
       <Link>Links to Generated Files\HekateListener.cs</Link>
     </Compile>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateParser.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateParser.cs">
       <Link>Links to Generated Files\HekateParser.cs</Link>
     </Compile>
-    <Compile Include="..\ProjectHekate.Grammar\obj\x64\Debug\HekateVisitor.cs">
+    <Compile Include="..\ProjectHekate.Grammar\$(IntermediateOutputPath)\HekateVisitor.cs">
       <Link>Links to Generated Files\HekateVisitor.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
