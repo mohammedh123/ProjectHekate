@@ -77,14 +77,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-audio-2">
-      <HintPath>C:\C# Libraries\SFML.Net-2.1\lib\sfmlnet-audio-2.dll</HintPath>
+    <Reference Include="sfmlnet-audio-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\sfmlnet-audio-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-graphics-2">
-      <HintPath>C:\C# Libraries\SFML.Net-2.1\lib\sfmlnet-graphics-2.dll</HintPath>
+    <Reference Include="sfmlnet-graphics-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
-    <Reference Include="sfmlnet-window-2">
-      <HintPath>C:\C# Libraries\SFML.Net-2.1\lib\sfmlnet-window-2.dll</HintPath>
+    <Reference Include="sfmlnet-window-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
