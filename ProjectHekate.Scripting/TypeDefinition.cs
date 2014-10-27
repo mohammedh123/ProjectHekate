@@ -51,8 +51,24 @@ namespace ProjectHekate.Scripting
 
             var target = Expression.Parameter(typeof(TScriptObjectType));
             var value = Expression.Parameter(typeof(float));
-            var setBody = Expression.Call(target, setMethod, Expression.Convert(value, typeof(TPropertyType)));
-            var setMethodAction = Expression.Lambda<Action<TScriptObjectType, float>>(setBody, target, value).Compile();
+            MethodCallExpression setBody;
+            Action<TScriptObjectType, float> setMethodAction;
+            if (typeof (TPropertyType) == typeof (bool)) {
+                var equalityValue = Expression.Equal(value, Expression.Constant(1.0f));
+
+                // if its a bool, it should be
+                // void SetProperty(float value)
+                //      this.Property = value == 1.0f;
+                setBody = Expression.Call(target, setMethod, equalityValue);
+                setMethodAction = Expression.Lambda<Action<TScriptObjectType, float>>(setBody, target, value).Compile();
+            }
+            else {
+                setBody = Expression.Call(target, setMethod, Expression.Convert(value, typeof (TPropertyType)));
+                // void SetProperty(float value)
+                //      this.Property = (TPropertyType)value;
+                setMethodAction = Expression.Lambda<Action<TScriptObjectType, float>>(setBody, target, value).Compile();
+            }
+
             var callBody = Expression.Call(target, getMethod);
             var getBody = Expression.Convert(callBody, typeof(float));
             var getMethodAction = Expression.Lambda<Func<TScriptObjectType, float>>(getBody, target).Compile();
