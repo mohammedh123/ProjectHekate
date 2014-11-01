@@ -28,7 +28,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             scopeManager.Remove();
 
             // done, now add to the pool of action records
-            vm.AddActionCodeScope(_name, bUpdaterCodeBlock);
+            vm.SetActionCodeScopesCode(_name, bUpdaterCodeBlock);
         }
     }
 }

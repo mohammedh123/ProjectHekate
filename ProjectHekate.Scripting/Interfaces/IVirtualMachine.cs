@@ -34,6 +34,14 @@ namespace ProjectHekate.Scripting.Interfaces
         int AddActionCodeScope(string name, ActionCodeScope codeScope);
 
         /// <summary>
+        /// Updates an action code scope in the virtual machine with given code.
+        /// </summary>
+        /// <param name="name">The name of the action</param>
+        /// <param name="newCode">The new code to replace the code scope's code with</param>
+        /// <exception cref="System.ArgumentException"></exception>
+        void SetActionCodeScopesCode(string name, CodeBlock newCode);
+
+        /// <summary>
         /// Gets an action code scope by name if it exists.
         /// </summary>
         /// <param name="name">The name of the action code scope</param>

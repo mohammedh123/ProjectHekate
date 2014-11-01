@@ -46,6 +46,11 @@ namespace ProjectHekate.Scripting
             return _symbols[index];
         }
 
+        public IEnumerable<ISymbol> GetSymbols()
+        {
+            return _symbols;
+        } 
+
         public bool HasSymbolDefined(string name)
         {
             return _symbolsNameToIndex.ContainsKey(name);

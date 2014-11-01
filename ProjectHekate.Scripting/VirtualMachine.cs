@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Fasterflect;
 using MiscUtil.Linq;
 using ProjectHekate.Grammar;
@@ -104,6 +105,14 @@ namespace ProjectHekate.Scripting
             return AddSpecializedCodeScope(name, _actionCodeScopes, _actionCodeScopeNameToIndex, codeScope);
         }
 
+        public void SetActionCodeScopesCode(string name, CodeBlock newCode)
+        {
+            if(!_actionCodeScopeNameToIndex.ContainsKey(name)) throw new ArgumentException("No action code scope exists with the name \"" + name + "\".", name);
+
+            var existingCodeScope = _actionCodeScopes[_actionCodeScopeNameToIndex[name]];
+            _actionCodeScopes[_actionCodeScopeNameToIndex[name]] = new ActionCodeScope(existingCodeScope, newCode);
+        }
+
         public ActionCodeScope GetActionCodeScope(string name)
         {
             return GetSpecializedCodeScope(name, "action", _actionCodeScopes, _actionCodeScopeNameToIndex);
@@ -154,12 +163,16 @@ namespace ProjectHekate.Scripting
             var lexer = new HekateLexer(new AntlrInputStream(text));
             var tokens = new CommonTokenStream(lexer);
             var parser = new HekateParser(tokens);
-
             var scriptContext = parser.script();
 
+            // preprocess the script
+            var parseTreeWalker = new ParseTreeWalker();
+            var preprocessor = new HekateScriptPreprocessor(this);
+            parseTreeWalker.Walk(preprocessor, scriptContext);
+
+            // now fill in the codeblocks
             var visitor = new HekateScriptVisitor();
             var emitter = visitor.Visit(scriptContext);
-
             emitter.EmitTo(null, this, new StackScopeManager());
 
             UpdatePropertyMappings();

@@ -87,6 +87,7 @@
     <Compile Include="EmitterUpdaterCodeScope.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FunctionCodeScope.cs" />
+    <Compile Include="HekateScriptPreprocessor.cs" />
     <Compile Include="HekateScriptVisitor.cs" />
     <Compile Include="Helpers\CodeGenHelper.cs" />
     <Compile Include="IdentifierRecord.cs" />

@@ -11,5 +11,16 @@ namespace ProjectHekate.Scripting
                 AddSymbol(paramName, SymbolType.Numerical); // bullet updaters can only have numerical params
             }
         }
+
+        public ActionCodeScope(ActionCodeScope existingCodeScope, CodeBlock newCode)
+        {
+            foreach (var symbol in existingCodeScope.GetSymbols()) {
+                AddSymbol(symbol.Name, symbol.Type);
+            }
+
+            Index = existingCodeScope.Index;
+
+            Add(newCode);
+        }
     }
 }
