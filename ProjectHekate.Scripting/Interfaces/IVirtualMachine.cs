@@ -50,6 +50,13 @@ namespace ProjectHekate.Scripting.Interfaces
         ActionCodeScope GetActionCodeScope(string name);
 
         /// <summary>
+        /// Gets an action code scope by its index if it exists.
+        /// </summary>
+        /// <param name="idx">The index of the action code scope</param>
+        /// <returns>The action code scope with the given index; <b>null</b> otherwise</returns>
+        ActionCodeScope GetActionCodeScopeByIndex(int idx);
+
+        /// <summary>
         /// Adds an emitter updater code scope to the program code scope.
         /// </summary>
         /// <param name="name">The name of the emitter updater</param>

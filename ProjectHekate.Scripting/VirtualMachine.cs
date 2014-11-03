@@ -118,6 +118,10 @@ namespace ProjectHekate.Scripting
             return GetSpecializedCodeScope(name, "action", _actionCodeScopes, _actionCodeScopeNameToIndex);
         }
 
+        public ActionCodeScope GetActionCodeScopeByIndex(int idx)
+        {
+            return _actionCodeScopes[idx];
+        }
         public int AddEmitterUpdaterCodeScope(string name, EmitterUpdaterCodeScope codeScope)
         {
             return AddSpecializedCodeScope(name, _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex, codeScope);
