@@ -192,8 +192,26 @@ namespace ProjectHekate.Scripting
 
         public override AbstractBytecodeEmitter VisitFireStatement(HekateParser.FireStatementContext context)
         {
+            var updater = context.withUpdaterOption();
+            AbstractBytecodeEmitter updaterCallBytecodeGenerator = null;
+            var expressionList = context.parExpressionList().expressionList();
+            var numParams = expressionList == null ? 0 : expressionList.expression().Count;
+            var numParamsOnUpdater = 0;
+            var updaterName = "";
+
+            if (updater != null) {
+                updaterCallBytecodeGenerator = Visit(updater.updaterCallExpression());
+
+                var updaterExpressionList = updater.updaterCallExpression().parExpressionList().expressionList();
+                numParamsOnUpdater = updaterExpressionList == null ? 0 : updaterExpressionList.expression().Count;
+                updaterName = updater.updaterCallExpression().NormalIdentifier().GetText();
+            }
+
+            // regular fire statement = [push parameters on stack], Fire, index
+            // fire with updater stmt = [push parameters on stack], [push updater parameters on stack], FireWithUpdater, index, func index
+
             var parameterBytecodeGenerator = Visit(context.parExpressionList());
-            return new FireStatementEmitter(context.TypeName.Text, context.FiringFunctionName.Text, parameterBytecodeGenerator);
+            return new FireStatementEmitter(context.TypeName.Text, context.FiringFunctionName.Text, numParams, parameterBytecodeGenerator, updaterCallBytecodeGenerator, numParamsOnUpdater, updaterName);
         }
 
         #endregion
@@ -269,6 +287,18 @@ namespace ProjectHekate.Scripting
         public override AbstractBytecodeEmitter VisitUpdaterBody(HekateParser.UpdaterBodyContext context)
         {
             return Visit(context.block());
+        }
+
+        public override AbstractBytecodeEmitter VisitWithUpdaterOption(HekateParser.WithUpdaterOptionContext context)
+        {
+            return Visit(context.updaterCallExpression());
+        }
+
+        public override AbstractBytecodeEmitter VisitUpdaterCallExpression(HekateParser.UpdaterCallExpressionContext context)
+        {
+            var parameterExpressionGenerator = Visit(context.parExpressionList());
+
+            return parameterExpressionGenerator;
         }
 
         #endregion

@@ -32,9 +32,27 @@ namespace ProjectHekate.Scripting.Tests
             return GetNthContext<TContextType>(expression, 0, wrappedInFunctionString);
         }
 
-        protected virtual TContextType GetNthContext<TContextType>(string expression, int n, bool wrappedInFunctionString = true) where TContextType : class, IParseTree
+        protected virtual TContextType GetNthContext<TContextType>(string expression, int n, bool wrappedInFunctionString) where TContextType : class, IParseTree
         {
-            var lexer = new HekateLexer(new AntlrInputStream(wrappedInFunctionString ? String.Format(WrappedProgramStringUnfmted, expression) : expression));
+            return GetNthContext<TContextType>(expression, n, wrappedInFunctionString, WrappedProgramStringUnfmted);
+        }
+
+        protected virtual TContextType GetNthContext<TContextType>(string expression, int n, bool wrappedFormatString, string formatString) where TContextType : class, IParseTree
+        {
+            var lexer = new HekateLexer(new AntlrInputStream(wrappedFormatString ? String.Format(formatString, expression) : expression));
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new HekateParser(tokens);
+
+            var tree = parser.script();
+
+            return tree.GetDescendantsOfType<TContextType>()
+                .Skip(n)
+                .FirstOrDefault();
+        }
+
+        protected virtual TContextType GetNthContext<TContextType>(string entireScript, int n) where TContextType : class, IParseTree
+        {
+            var lexer = new HekateLexer(new AntlrInputStream(entireScript));
             var tokens = new CommonTokenStream(lexer);
             var parser = new HekateParser(tokens);
 
@@ -839,8 +857,8 @@ else {
             public void ShouldThrowArgumentExceptionForNonMatchingVariable()
             {
                 // Setup: create code scope, mock vm out
-                const string identifier = "$SomeIdentifier";
-                var expression = String.Format("{0}", identifier);
+                const string identifier = "SomeIdentifier";
+                var expression = String.Format("${0}", identifier);
                 Mocker.GetMock<IVirtualMachine>()
                     .Setup(ivm => ivm.GetPropertyIndex(identifier))
                     .Throws<ArgumentException>();
@@ -1111,8 +1129,8 @@ else {
             public void ShouldThrowExceptionForAssigningToNonexistentProperty()
             {
                 // Setup: none
-                const string propertyName = "$SomeProperty";
-                var expression = String.Format("{0} = 3.5", propertyName);
+                const string propertyName = "SomeProperty";
+                var expression = String.Format("${0} = 3.5", propertyName);
                 Mocker.GetMock<IVirtualMachine>()
                     .Setup(ivm => ivm.GetPropertyIndex(propertyName))
                     .Throws<ArgumentException>();
@@ -1304,45 +1322,7 @@ else {
                 result.Code[1].Should().Be(0);
             }
         }
-
-        [TestClass]
-        public class VisitActionDeclarationExpression : THekateScriptVisitor
-        {
-            [TestMethod]
-            public void ShouldGenerateAnActionCodeScopeWithNoParameters()
-            {
-                // Setup: dummy data
-                const string expression = "action SomeAction(){}";
-                var vmachine = new VirtualMachine();
-
-                SetUpGetCurrentScope(new CodeScope());
-
-                // Act
-                Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
-                    .EmitTo(null, vmachine, MockScopeManager);
-
-                // Verify
-                vmachine.GetActionCodeScope("SomeAction").Index.Should().Be(0);
-            }
-            
-            [TestMethod]
-            public void ShouldGenerateAnActionCodeScopeWithSomeParameters()
-            {
-                // Setup: dummy data
-                const string expression = "action SomeAction(someParam){}";
-                var vmachine = new VirtualMachine();
-
-                SetUpGetCurrentScope(new CodeScope());
-
-                // Act
-                Subject.VisitActionDeclaration(GetFirstContext<HekateParser.ActionDeclarationContext>(expression, false))
-                    .EmitTo(null, vmachine, MockScopeManager);
-
-                // Verify
-                vmachine.GetActionCodeScope("SomeAction").Index.Should().Be(0);
-            }
-        }
-
+        
         [TestClass]
         public class VisitFireStatement : THekateScriptVisitor
         {
@@ -1357,7 +1337,8 @@ else {
                              {
                                  Index = 0,
                                  Name = "fire",
-                                 OwningType = new TypeDefinition("bullet", 0)
+                                 OwningType = new TypeDefinition("bullet", 0),
+                                 NumParams = 2
                              });
 
                 // Act
@@ -1373,7 +1354,171 @@ else {
                 result.Code[3].Should().Be(5);
                 result.Code[4].Should().Be((byte)Instruction.Fire);
                 result.Code[5].Should().Be(0);
-            }            
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionWhenNotPassingInEnoughArguments()
+            {
+                // Setup: dummy data
+                const string expression = "fire bullet(3,5);";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fire"))
+                    .Returns(new FiringFunctionDefinition()
+                             {
+                                 Index = 0,
+                                 Name = "fire",
+                                 OwningType = new TypeDefinition("bullet", 0),
+                                 NumParams = 3
+                             });
+
+                // Act+Verify
+                Subject
+                    .Invoking(
+                        hsv =>
+                            hsv.VisitFireStatement(GetFirstContext<HekateParser.FireStatementContext>(expression))
+                                .EmitTo(It.IsAny<CodeBlock>(), MockVirtualMachine, MockScopeManager))
+                    .ShouldThrow<ArgumentException>();
+            }
+            
+            [TestMethod]
+            public void ShouldThrowExceptionWhenNoMatchingFiringFunctionCanBeFound()
+            {
+                // Setup: dummy data
+                const string expression = "fire bullet(3,5);";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fireBLAH"))
+                    .Returns(new FiringFunctionDefinition()
+                    {
+                        Index = 0,
+                        Name = "fire",
+                        OwningType = new TypeDefinition("bullet", 0),
+                        NumParams = 3
+                    });
+
+                // Act+Verify
+                Subject
+                    .Invoking(
+                        hsv =>
+                            hsv.VisitFireStatement(GetFirstContext<HekateParser.FireStatementContext>(expression))
+                                .EmitTo(It.IsAny<CodeBlock>(), MockVirtualMachine, MockScopeManager))
+                    .ShouldThrow<ArgumentException>();
+            }
+            
+            [TestMethod]
+            public void ShouldGenerateFiringFunctionCodeWithUpdater()
+            {
+                // Setup: dummy data
+                const string script = @"
+action someAction(blah)
+{
+}
+
+function main()
+{
+    fire bullet(3,5) with updater someAction(3);
+}
+";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fire"))
+                    .Returns(new FiringFunctionDefinition()
+                             {
+                                 Index = 0,
+                                 Name = "fire",
+                                 OwningType = new TypeDefinition("bullet", 0),
+                                 NumParams = 2
+                             });
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetActionCodeScope("someAction"))
+                    .Returns(new ActionCodeScope(new[] { "blah" })
+                    {
+                        Index = 0
+                    });
+
+                // Act
+                var result = new CodeBlock();
+                Subject.VisitFireStatement(GetNthContext<HekateParser.FireStatementContext>(script, 0))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(9);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(3);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(5);
+                result.Code[4].Should().Be((byte)Instruction.Push);
+                result.Code[5].Should().Be(3);
+                result.Code[6].Should().Be((byte)Instruction.Fire);
+                result.Code[7].Should().Be(0);
+                result.Code[8].Should().Be(0);
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionWhenFiringFunctionCodeWithUpdaterWithWrongArgumentCount()
+            {
+                // Setup: dummy data
+                const string script = @"
+action someAction(blah)
+{
+}
+
+function main()
+{
+    fire bullet(3,5) with updater someAction();
+}
+";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fire"))
+                    .Returns(new FiringFunctionDefinition()
+                    {
+                        Index = 0,
+                        Name = "fire",
+                        OwningType = new TypeDefinition("bullet", 0),
+                        NumParams = 2
+                    });
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetActionCodeScope("someAction"))
+                    .Returns(new ActionCodeScope(new[]{"blah"})
+                    {
+                        Index = 0
+                    });
+
+                // Act+Verify
+                var result = new CodeBlock();
+                Subject
+                    .Invoking(hsv => hsv.VisitFireStatement(GetNthContext<HekateParser.FireStatementContext>(script, 0))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager)).ShouldThrow<ArgumentException>();
+            }
+
+            [TestMethod]
+            public void ShouldThrowExceptionWhenFiringFunctionCodeWithUpdaterWithWrongName()
+            {
+                // Setup: dummy data
+                const string script = @"
+action someAction(blah)
+{
+}
+
+function main()
+{
+    fire bullet(3,5) with updater someAcsdftion();
+}
+";
+                Mocker.GetMock<IVirtualMachine>()
+                    .Setup(vm => vm.GetFiringFunction("bullet", "fire"))
+                    .Returns(new FiringFunctionDefinition()
+                    {
+                        Index = 0,
+                        Name = "fire",
+                        OwningType = new TypeDefinition("bullet", 0),
+                        NumParams = 2
+                    });
+
+                // Act+Verify
+                var result = new CodeBlock();
+                Subject
+                    .Invoking(hsv => hsv.VisitFireStatement(GetNthContext<HekateParser.FireStatementContext>(script, 0))
+                    .EmitTo(result, MockVirtualMachine, MockScopeManager)).ShouldThrow<ArgumentException>();
+            }
         }
     }
 }

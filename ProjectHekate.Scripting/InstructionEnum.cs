@@ -36,6 +36,7 @@ namespace ProjectHekate.Scripting
         GetVariable,
         SetVariable,
         Fire,
+        FireWithUpdater,
         WaitFrames
     }
 }

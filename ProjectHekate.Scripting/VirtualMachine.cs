@@ -122,6 +122,7 @@ namespace ProjectHekate.Scripting
         {
             return _actionCodeScopes[idx];
         }
+
         public int AddEmitterUpdaterCodeScope(string name, EmitterUpdaterCodeScope codeScope)
         {
             return AddSpecializedCodeScope(name, _emitterUpdaterCodeScopes, _emitterUpdaterCodeScopeNameToIndex, codeScope);
@@ -249,7 +250,7 @@ namespace ProjectHekate.Scripting
             var firingFuncDelegate = firingClassType.DelegateForCallMethod(methodName, methodArgumentsType);
 
             // do some validation to make sure this is unique
-
+                
             var firingFuncDef = new FiringFunctionDefinition()
                                 {
                                     Function = firingFuncDelegate,
@@ -593,6 +594,38 @@ namespace ProjectHekate.Scripting
 
                         state.StackHead -= firingFunction.NumParams;
                         state.CurrentInstructionIndex += 2;
+
+                        break;
+                    }
+                    case Instruction.FireWithUpdater:
+                    {
+                        var firingFunctionIdx = (int)code[state.CurrentInstructionIndex + 1];
+                        var firingFunction = GetFiringFunctionByIndex(firingFunctionIdx);
+                        var updaterActionIdx = (int)code[state.CurrentInstructionIndex + 2];
+                        var updaterAction = GetActionCodeScopeByIndex(firingFunctionIdx);
+
+                        ThrowIfStackDoesNotContainEnoughValues(state, firingFunction.NumParams + updaterAction.NumParams);
+
+                        var firingFunctionArgs = new object[firingFunction.NumParams];
+                        Array.Copy(state.Stack, state.StackHead - updaterAction.NumParams - firingFunction.NumParams, firingFunctionArgs, 0, firingFunction.NumParams);
+
+                        var updaterActionArgs = new object[updaterAction.NumParams];
+                        Array.Copy(state.Stack, state.StackHead - updaterAction.NumParams, updaterActionArgs, 0, updaterAction.NumParams);
+
+                        var bullet = firingFunction.Function(firingFunction.FiringObject, firingFunctionArgs) as AbstractScriptObject;
+                        if (bullet == null) throw new InvalidOperationException(String.Format("This firing function ({0}) does not return an AbstractScriptObject.", firingFunction.Name));
+
+                        bullet.ScriptState = new ScriptState()
+                                             {
+                                                 CodeBlockIndex = updaterActionIdx,
+                                                 CurrentInstructionIndex = 0
+                                             };
+                        for (var i = 0; i < updaterAction.NumParams; i++) {
+                            bullet.ScriptState.NumericalVariables[i] = (float)updaterActionArgs[i];
+                        }
+
+                        state.StackHead -= firingFunction.NumParams + updaterAction.NumParams;
+                        state.CurrentInstructionIndex += 3;
 
                         break;
                     }
