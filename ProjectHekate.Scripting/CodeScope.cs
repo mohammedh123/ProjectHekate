@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ProjectHekate.Scripting.Interfaces;
 
 namespace ProjectHekate.Scripting
@@ -54,6 +55,22 @@ namespace ProjectHekate.Scripting
         public bool HasSymbolDefined(string name)
         {
             return _symbolsNameToIndex.ContainsKey(name);
+        }
+    }
+
+    public class ParameterizedCodeScope : CodeScope
+    {
+        public int NumParams { get; private set; }
+
+        public ParameterizedCodeScope(IEnumerable<string> paramNames)
+        {
+            var paramz = paramNames.ToList();
+            // the parameters are added as local variables
+            foreach (var paramName in paramz) {
+                AddSymbol(paramName, SymbolType.Numerical); // functions can only have numerical params
+            }
+
+            NumParams = paramz.Count();
         }
     }
 }
