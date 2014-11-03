@@ -81,8 +81,8 @@ function Main()
 
         for (var i = 0; i < numShots; i++)
         {
-            fire OrbitingCurvedLaser(200, diffAngle * i, 8, 50, 0, 0, 3) from finalEmitter;
-            fire OrbitingCurvedLaser(100, diffAngle * i, 8, 50, 0, 0, 2) from finalEmitter;
+            fire OrbitingCurvedLaser(200, diffAngle * i, 8, 50, 0, 0, 3);
+            fire OrbitingCurvedLaser(100, diffAngle * i, 8, 50, 0, 0, 2);
         }
     }
 
