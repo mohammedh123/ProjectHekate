@@ -368,7 +368,7 @@ namespace ProjectHekate.Scripting.Tests
 
                     code = new CodeBlock();
                     code.Add(Instruction.Jump);
-                    code.Add(2); // out of range
+                    code.Add(3); // out of range
 
                     // Act+Verify
                     Subject
@@ -445,7 +445,7 @@ namespace ProjectHekate.Scripting.Tests
                     State.StackHead = 1;
                     State.Stack[0] = 0;
                     code.Add(Instruction.Jump);
-                    code.Add(2); // out of range
+                    code.Add(3); // out of range
 
                     // Act+Verify
                     Subject
