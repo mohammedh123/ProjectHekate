@@ -479,7 +479,8 @@ namespace ProjectHekate.Scripting
                     }
                     case Instruction.IfZeroBranch:
                     {
-                        var address = (int) code[state.CurrentInstructionIndex + 1];
+                        // pop value, branch if zero
+                        var address = (int)code[state.CurrentInstructionIndex + 1];
 
                         if (address < 0 || address > code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump: {0}, size: {1}).", address, code.Size));
 
@@ -489,6 +490,8 @@ namespace ProjectHekate.Scripting
                         else {
                             state.CurrentInstructionIndex += 2;
                         }
+
+                        state.StackHead--;
 
                         break;
                     }

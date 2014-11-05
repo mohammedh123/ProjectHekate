@@ -40,8 +40,6 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
                 codeBlock.Add((byte)0); // going to reuse break location code here, but it needs to be reduced by 1 because it should hit the final Pop statement, not past it
                 conditionalJumpIdx = codeBlock.Size - 1;
                 _breakList.Add(conditionalJumpIdx);
-
-                codeBlock.Add(Instruction.Pop);
             }
 
             if (_forUpdate != null) {
@@ -54,12 +52,6 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             codeBlock.Add(Instruction.Jump);
             codeBlock.Add(loopBeginIdx);
             
-            // dont forget to pop; conditional/increment needs to be popped off the stack
-            if (_forConditional != null)
-            {
-                codeBlock.Add(Instruction.Pop);
-            }
-
             // loop through all break locations and update them
             foreach (var idx in _breakList)
             {
@@ -73,9 +65,6 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
                 codeBlock[idx] = loopBeginIdx;
             }
             _continueList.Clear();
-
-            // remember to decrement the conditional jump idx to account for the Pop at the end
-            if (conditionalJumpIdx != -1) codeBlock[conditionalJumpIdx]--;
         }
     }
 }

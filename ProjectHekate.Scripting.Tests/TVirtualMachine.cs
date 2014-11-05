@@ -399,8 +399,8 @@ namespace ProjectHekate.Scripting.Tests
 
                     // Verify: instruction index changes to end
                     State.CurrentInstructionIndex.Should().Be(6);
-                    State.StackHead.Should().Be(2);
-                    State.Stack[1].Should().Be(100);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
                 }
 
                 [TestMethod]
@@ -420,10 +420,10 @@ namespace ProjectHekate.Scripting.Tests
                     // Act: call method
                     Subject.InterpretCode(code, State, null, false);
 
-                    // Verify: stack has all 3 values on it
+                    // Verify: stack has both push values on it
                     State.CurrentInstructionIndex.Should().Be(6);
-                    State.StackHead.Should().Be(3);
-                    State.Stack[2].Should().Be(100);
+                    State.StackHead.Should().Be(2);
+                    State.Stack[1].Should().Be(100);
                 }
 
                 [TestMethod]
