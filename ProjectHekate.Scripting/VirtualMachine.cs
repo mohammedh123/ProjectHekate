@@ -477,7 +477,7 @@ namespace ProjectHekate.Scripting
 
                         break;
                     }
-                    case Instruction.JumpIfZero:
+                    case Instruction.IfZeroBranch:
                     {
                         var address = (int) code[state.CurrentInstructionIndex + 1];
 

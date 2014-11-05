@@ -31,7 +31,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
 
             var loopBeginIdx = codeBlock.Size;
             codeBlock.Add(_conditionExpression.Generate(vm, scopeManager));
-            codeBlock.Add(Instruction.JumpIfZero);
+            codeBlock.Add(Instruction.IfZeroBranch);
 
             var whileJumpIdx = codeBlock.Size;
             codeBlock.Add(0.0f); // dummy value

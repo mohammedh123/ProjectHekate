@@ -378,16 +378,16 @@ namespace ProjectHekate.Scripting.Tests
             }
 
             [TestClass]
-            public class JumpIfZero : TVirtualMachine
+            public class IfZeroBranch : TVirtualMachine
             {
                 [TestMethod]
-                public void ShouldInterpetJumpIfZeroCodeForZero()
+                public void ShouldInterpetIfZeroBranchCodeForZero()
                 {
                     // Setup: set up state
                     var code = new CodeBlock();
                     State.StackHead = 1;
                     State.Stack[0] = 0;
-                    code.Add(Instruction.JumpIfZero);
+                    code.Add(Instruction.IfZeroBranch);
                     code.Add(4);
                     code.Add(Instruction.Push); // just some dummy code
                     code.Add(1);
@@ -397,20 +397,20 @@ namespace ProjectHekate.Scripting.Tests
                     // Act: call method
                     Subject.InterpretCode(code, State, null, false);
 
-                    // Verify: instruction index changes to beginning
+                    // Verify: instruction index changes to end
                     State.CurrentInstructionIndex.Should().Be(6);
                     State.StackHead.Should().Be(2);
                     State.Stack[1].Should().Be(100);
                 }
 
                 [TestMethod]
-                public void ShouldNotJumpForNonZero()
+                public void ShouldNotBranchForNonZero()
                 {
                     // Setup: set up state
                     var code = new CodeBlock();
                     State.StackHead = 1;
                     State.Stack[0] = 5;
-                    code.Add(Instruction.JumpIfZero);
+                    code.Add(Instruction.IfZeroBranch);
                     code.Add(4);
                     code.Add(Instruction.Push); // just some dummy code
                     code.Add(1);
@@ -433,7 +433,7 @@ namespace ProjectHekate.Scripting.Tests
                     var code = new CodeBlock();
                     State.StackHead = 1;
                     State.Stack[0] = 0;
-                    code.Add(Instruction.JumpIfZero);
+                    code.Add(Instruction.IfZeroBranch);
                     code.Add(-10);
 
                     // Act+Verify

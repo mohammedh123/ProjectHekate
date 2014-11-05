@@ -27,7 +27,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             // Generate code for statement (if it exists)
 
             codeBlock.Add(_ifConditionExpression.Generate(vm, scopeManager));
-            codeBlock.Add(Instruction.JumpIfZero);
+            codeBlock.Add(Instruction.IfZeroBranch);
 
             var conditionalIdx = codeBlock.Size;
             codeBlock.Add(0.0f); // dummy value, will be changed later

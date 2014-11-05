@@ -26,7 +26,7 @@ namespace ProjectHekate.Scripting
         OpOr,
         OpNot,
         Jump,
-        JumpIfZero,
+        IfZeroBranch,
         Return,
         ExternalFunctionCall,
         FunctionCall,

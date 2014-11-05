@@ -36,7 +36,7 @@ namespace ProjectHekate.Scripting.Bytecode.Emitters
             var conditionalJumpIdx = -1;
             if (_forConditional != null) {
                 codeBlock.Add(_forConditional.Generate(vm, scopeManager));
-                codeBlock.Add(Instruction.JumpIfZero);
+                codeBlock.Add(Instruction.IfZeroBranch);
                 codeBlock.Add((byte)0); // going to reuse break location code here, but it needs to be reduced by 1 because it should hit the final Pop statement, not past it
                 conditionalJumpIdx = codeBlock.Size - 1;
                 _breakList.Add(conditionalJumpIdx);

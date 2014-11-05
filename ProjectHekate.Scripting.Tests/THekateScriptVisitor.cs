@@ -176,7 +176,7 @@ namespace ProjectHekate.Scripting.Tests
                 result.Code.Should().HaveCount(4);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
                 result.Code[3].Should().Be(4);
             }
 
@@ -198,7 +198,7 @@ namespace ProjectHekate.Scripting.Tests
                 result.Code.Should().HaveCount(7);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
                 result.Code[3].Should().Be(7);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
@@ -226,7 +226,7 @@ else {
                 result.Code.Should().HaveCount(12);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
                 result.Code[3].Should().Be(9);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
@@ -262,7 +262,7 @@ else {
                 result.Code.Should().HaveCount(21);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
                 result.Code[3].Should().Be(9);
                 result.Code[4].Should().Be((byte) Instruction.Push);
                 result.Code[5].Should().Be(3);
@@ -271,7 +271,7 @@ else {
                 result.Code[8].Should().Be(21);
                 result.Code[9].Should().Be((byte) Instruction.Push);
                 result.Code[10].Should().Be(2);
-                result.Code[11].Should().Be((byte) Instruction.JumpIfZero);
+                result.Code[11].Should().Be((byte) Instruction.IfZeroBranch);
                 result.Code[12].Should().Be(18);
                 result.Code[13].Should().Be((byte) Instruction.Push);
                 result.Code[14].Should().Be(4);
@@ -354,12 +354,12 @@ else {
                 result.Code[7].Should().Be((byte) Instruction.Push);
                 result.Code[8].Should().Be(10);
                 result.Code[9].Should().Be((byte)Instruction.OpLessThan);
-                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[11].Should().Be(15);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
                 result.Code[13].Should().Be((byte) Instruction.Jump);
                 result.Code[14].Should().Be(5);
                 result.Code[15].Should().Be((byte)Instruction.Pop);
+                result.Code[10].Should().Be((byte)Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -386,7 +386,6 @@ else {
                 result.Code[7].Should().Be((byte) Instruction.Push);
                 result.Code[8].Should().Be(10);
                 result.Code[9].Should().Be((byte)Instruction.OpLessThan);
-                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[11].Should().Be(23);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
                 result.Code[13].Should().Be((byte) Instruction.GetVariable);
@@ -400,6 +399,7 @@ else {
                 result.Code[21].Should().Be((byte) Instruction.Jump);
                 result.Code[22].Should().Be(5);
                 result.Code[23].Should().Be((byte)Instruction.Pop);
+                result.Code[10].Should().Be((byte)Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -428,7 +428,6 @@ else {
                 result.Code[7].Should().Be((byte)Instruction.Push);
                 result.Code[8].Should().Be(10);
                 result.Code[9].Should().Be((byte)Instruction.OpLessThan);
-                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[11].Should().Be(25);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
                 result.Code[13].Should().Be((byte)Instruction.GetVariable);
@@ -444,6 +443,7 @@ else {
                 result.Code[23].Should().Be((byte)Instruction.Jump);
                 result.Code[24].Should().Be(5);
                 result.Code[25].Should().Be((byte)Instruction.Pop);
+                result.Code[10].Should().Be((byte)Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -472,7 +472,6 @@ else {
                 result.Code[7].Should().Be((byte)Instruction.Push);
                 result.Code[8].Should().Be(10);
                 result.Code[9].Should().Be((byte)Instruction.OpLessThan);
-                result.Code[10].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[11].Should().Be(25);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
                 result.Code[13].Should().Be((byte)Instruction.GetVariable);
@@ -488,6 +487,7 @@ else {
                 result.Code[23].Should().Be((byte)Instruction.Jump);
                 result.Code[24].Should().Be(5);
                 result.Code[25].Should().Be((byte)Instruction.Pop);
+                result.Code[10].Should().Be((byte)Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -517,7 +517,6 @@ else {
                 result.Code[7].Should().Be((byte) Instruction.Push);
                 result.Code[8].Should().Be(10);
                 result.Code[9].Should().Be((byte) Instruction.OpLessThan);
-                result.Code[10].Should().Be((byte) Instruction.JumpIfZero);
                 result.Code[11].Should().Be(26); // to 'end'
                 result.Code[12].Should().Be((byte)Instruction.Pop);
                 result.Code[13].Should().Be((byte) Instruction.GetVariable);
@@ -534,6 +533,7 @@ else {
                 result.Code[24].Should().Be((byte) Instruction.Jump);
                 result.Code[25].Should().Be(5);
                 result.Code[26].Should().Be((byte)Instruction.Pop);
+                result.Code[10].Should().Be((byte) Instruction.IfZeroBranch);
             }
         }
 
@@ -556,12 +556,12 @@ else {
                 result.Code.Should().HaveCount(8);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
                 result.Code[3].Should().Be(7);
                 result.Code[4].Should().Be((byte)Instruction.Pop);
                 result.Code[5].Should().Be((byte) Instruction.Jump);
                 result.Code[6].Should().Be(0);
                 result.Code[7].Should().Be((byte)Instruction.Pop);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -582,7 +582,6 @@ else {
                 result.Code.Should().HaveCount(11);
                 result.Code[0].Should().Be((byte) Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte) Instruction.JumpIfZero);
                 result.Code[3].Should().Be(10);
                 result.Code[4].Should().Be((byte)Instruction.Pop);
                 result.Code[5].Should().Be((byte) Instruction.Push);
@@ -591,6 +590,7 @@ else {
                 result.Code[8].Should().Be((byte) Instruction.Jump);
                 result.Code[9].Should().Be(0);
                 result.Code[10].Should().Be((byte)Instruction.Pop);
+                result.Code[2].Should().Be((byte) Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -612,7 +612,6 @@ else {
                 result.Code.Should().HaveCount(13);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[3].Should().Be(12);
                 result.Code[4].Should().Be((byte)Instruction.Pop);
                 result.Code[5].Should().Be((byte)Instruction.Push);
@@ -623,6 +622,7 @@ else {
                 result.Code[10].Should().Be((byte)Instruction.Jump);
                 result.Code[11].Should().Be(0);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
+                result.Code[2].Should().Be((byte)Instruction.IfZeroBranch);
             }
 
             [TestMethod]
@@ -644,7 +644,6 @@ else {
                 result.Code.Should().HaveCount(13);
                 result.Code[0].Should().Be((byte)Instruction.Push);
                 result.Code[1].Should().Be(1);
-                result.Code[2].Should().Be((byte)Instruction.JumpIfZero);
                 result.Code[3].Should().Be(12);
                 result.Code[4].Should().Be((byte)Instruction.Pop);
                 result.Code[5].Should().Be((byte)Instruction.Push);
@@ -655,6 +654,7 @@ else {
                 result.Code[10].Should().Be((byte)Instruction.Jump);
                 result.Code[11].Should().Be(0);
                 result.Code[12].Should().Be((byte)Instruction.Pop);
+                result.Code[2].Should().Be((byte)Instruction.IfZeroBranch);
             }
         }
 
