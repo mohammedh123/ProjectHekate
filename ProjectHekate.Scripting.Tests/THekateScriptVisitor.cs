@@ -1468,7 +1468,7 @@ function main()
                 result.Code[3].Should().Be(5);
                 result.Code[4].Should().Be((byte)Instruction.Push);
                 result.Code[5].Should().Be(3);
-                result.Code[6].Should().Be((byte)Instruction.Fire);
+                result.Code[6].Should().Be((byte)Instruction.FireWithUpdater);
                 result.Code[7].Should().Be(0);
                 result.Code[8].Should().Be(0);
             }
