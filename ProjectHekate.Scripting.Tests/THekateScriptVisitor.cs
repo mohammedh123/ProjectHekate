@@ -1029,6 +1029,90 @@ else {
         }
 
         [TestClass]
+        public class VisitTernaryOpExpression : THekateScriptVisitor
+        {
+            [TestMethod]
+            public void ShouldGenerateCodeForTernaryOpExpression()
+            {
+                // Setup: dummy data
+                const int ifTrueVal = 1;
+                const float ifFalseVal = 2;
+                var expression = String.Format("1 % 2 == 0 ? {0} : {1}", ifTrueVal, ifFalseVal);
+
+                // Act
+                var result = Subject.VisitTernaryOpExpression(GetFirstContext<HekateParser.TernaryOpExpressionContext>(expression))
+                    .Generate(MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(16);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(2);
+                result.Code[4].Should().Be((byte)Instruction.OpMod);
+                result.Code[5].Should().Be((byte)Instruction.Push);
+                result.Code[6].Should().Be(0);
+                result.Code[7].Should().Be((byte)Instruction.OpEqual); 
+                result.Code[8].Should().Be((byte)Instruction.IfZeroBranchOffset);
+                result.Code[9].Should().Be(4);
+                result.Code[10].Should().Be((byte)Instruction.Push);
+                result.Code[11].Should().Be(ifTrueVal);
+                result.Code[12].Should().Be((byte)Instruction.JumpOffset);
+                result.Code[13].Should().Be(2);
+                result.Code[14].Should().Be((byte)Instruction.Push);
+                result.Code[15].Should().Be(ifFalseVal);
+            }
+            
+            [TestMethod]
+            public void ShouldGenerateCodeForChainedTernaryOpExpression()
+            {                
+                // Setup: dummy data
+                var expression = String.Format("1 % 2 == 0 ? 3 : 4 % 5 == 0 ? 6 : 7");
+
+                // Act
+                var result = Subject.VisitTernaryOpExpression(GetFirstContext<HekateParser.TernaryOpExpressionContext>(expression))
+                    .Generate(MockVirtualMachine, MockScopeManager);
+
+                // Verify
+                result.Code.Should().HaveCount(30);
+                result.Code[0].Should().Be((byte)Instruction.Push);
+                result.Code[1].Should().Be(1);
+                result.Code[2].Should().Be((byte)Instruction.Push);
+                result.Code[3].Should().Be(2);
+                result.Code[4].Should().Be((byte)Instruction.OpMod);
+                result.Code[5].Should().Be((byte)Instruction.Push);
+                result.Code[6].Should().Be(0);
+                result.Code[7].Should().Be((byte)Instruction.OpEqual);
+                result.Code[8].Should().Be((byte)Instruction.IfZeroBranchOffset);
+                result.Code[9].Should().Be(4);
+                // true
+                    result.Code[10].Should().Be((byte)Instruction.Push);
+                    result.Code[11].Should().Be(3);
+                    result.Code[12].Should().Be((byte)Instruction.JumpOffset);
+                    result.Code[13].Should().Be(16);
+                // false
+                    result.Code[14].Should().Be((byte)Instruction.Push);
+                    result.Code[15].Should().Be(4);
+                    result.Code[16].Should().Be((byte)Instruction.Push);
+                    result.Code[17].Should().Be(5);
+                    result.Code[18].Should().Be((byte)Instruction.OpMod);
+                    result.Code[19].Should().Be((byte)Instruction.Push);
+                    result.Code[20].Should().Be(0);
+                    result.Code[21].Should().Be((byte)Instruction.OpEqual);
+                    result.Code[22].Should().Be((byte)Instruction.IfZeroBranchOffset);
+                    result.Code[23].Should().Be(4);
+                    // true
+                        result.Code[24].Should().Be((byte)Instruction.Push);
+                        result.Code[25].Should().Be(6);
+                        result.Code[26].Should().Be((byte)Instruction.JumpOffset);
+                        result.Code[27].Should().Be(2);
+                    // false
+                        result.Code[28].Should().Be((byte)Instruction.Push);
+                        result.Code[29].Should().Be(7);
+            }
+        }
+
+        [TestClass]
         public class VisitPostIncDecExpression : THekateScriptVisitor
         {
             private void TestIncDecWithExistingVariableOrProperty(bool isIncrementing, IdentifierType type)
