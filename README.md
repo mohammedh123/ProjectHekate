@@ -51,13 +51,7 @@ action UpdateBullet()
     var angle = 0;
     for(var i = 0; i < 30; i++) {
         angle = i*2*PI/180;
-        var sprite = 0;
-        if(i % 2 == 0) {
-            sprite = 2;
-        }
-        else {
-            sprite = 3;
-        }
+        var sprite = i % 2 == 0 ? 2 : 3;
 
         fire bullet($X, $Y, $Angle + angle, $Speed, sprite) with updater SomeRandomShit(i);
         wait(0);
