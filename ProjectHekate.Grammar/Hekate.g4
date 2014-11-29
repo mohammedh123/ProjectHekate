@@ -121,6 +121,7 @@ expression
 	|	Literal						# LiteralExpression
 	|	NormalIdentifier			        # NormalIdentifierExpression
 	|	PropertyIdentifier					# PropertyIdentifierExpression
+	|	NormalIdentifier parExpressionList		# FunctionCallExpression
 	|	(NormalIdentifier|PropertyIdentifier) Operator=(INC|DEC)		# PostIncDecExpression
 	|	Operator=(
 			SUB
@@ -144,7 +145,8 @@ expression
 		|	OR
 		)
 		expression	# BinaryExpression
-	|	(NormalIdentifier | PropertyIdentifier) 
+	|	<assoc=right> expression QUESTION expression COLON expression		# TernaryOpExpression
+	|	<assoc=right> (NormalIdentifier | PropertyIdentifier) 
 		Operator=(
 			ASSIGN
 		|	MUL_ASSIGN 
@@ -153,7 +155,6 @@ expression
 		|	SUB_ASSIGN
 		)
 		expression  # AssignmentExpression
-	|	NormalIdentifier parExpressionList		# FunctionCallExpression
 	;
 	
 /*
@@ -236,6 +237,8 @@ SUB			: '-';
 MUL			: '*';
 DIV			: '/';
 MOD         : '%';
+QUESTION	: '?';
+COLON		: ':';
 EQUAL		: '==';
 LE			: '<=';
 GE			: '>=';
