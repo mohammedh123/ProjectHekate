@@ -10,7 +10,7 @@ One of my favorite type of games is the shmup (also known as bullet hell/curtain
 
 Since learning how to program, it's always been a stretch goal of mine to create a fully-functioning shmup engine. From my first year of university (2009), I've made countless prototypes and have learned much from the myriad of iterations I've gone through. ProjectHekate is the culmination - or, at the very least, a half decent bullet scripting engine - of those years of research and prototyping.
 
-A couple years ago, I stumbled upon [BulletScript](https://code.google.com/p/bulletscript/) (no longer maintained, it seems) and used it in my C++ shmup iterations. It served me well. The creator had written a scripting language for use with the engine - I did my fair share of bughunting and helped some aberrant behavior here and there. I learned a lot recently (while writing my own language) from this codebase, hence the shoutout.
+A couple years ago, I stumbled upon [BulletScript](https://code.google.com/p/bulletscript/) (no longer maintained, it seems) and used it in my C++ shmup iterations. It served me well. The creator had written a scripting language for use with the engine - I did my fair share of bughunting and helped fix some aberrant behavior here and there. I learned a lot recently (while writing my own language) from this codebase, hence the shoutout.
 
 ## Technical Stuff
 
