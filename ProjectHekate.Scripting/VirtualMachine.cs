@@ -469,16 +469,29 @@ namespace ProjectHekate.Scripting
                     }
                     case Instruction.Jump:
                     {
-                        var address = (int) code[state.CurrentInstructionIndex + 1];
+                        var address = (int)code[state.CurrentInstructionIndex + 1];
 
-                        if(address < 0 || address > code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump: {0}, size: {1}).", address, code.Size));
+                        if (address < 0 || address > code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump: {0}, size: {1}).", address, code.Size));
 
                         state.CurrentInstructionIndex = address;
 
                         break;
                     }
+                    case Instruction.JumpOffset:
+                    {
+                        // pop value, branch if zero
+                        var numberOfInstructionsToSkip = (int)code[state.CurrentInstructionIndex + 1];
+                        var newLocation = state.CurrentInstructionIndex + 2 + numberOfInstructionsToSkip; // 2 because of the instruction + offset
+                        if (newLocation < 0 || newLocation > code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump offset: {0}, size: {1}).", numberOfInstructionsToSkip, code.Size));
+
+                        state.CurrentInstructionIndex = newLocation;
+
+                        break;
+                    }
                     case Instruction.IfZeroBranch:
                     {
+                        ThrowIfStackIsEmpty(state);
+
                         // pop value, branch if zero
                         var address = (int)code[state.CurrentInstructionIndex + 1];
 
@@ -488,6 +501,28 @@ namespace ProjectHekate.Scripting
                             state.CurrentInstructionIndex = address;
                         }
                         else {
+                            state.CurrentInstructionIndex += 2;
+                        }
+
+                        state.StackHead--;
+
+                        break;
+                    }
+                    case Instruction.IfZeroBranchOffset:
+                    {
+                        ThrowIfStackIsEmpty(state);
+
+                        // pop value, branch if zero
+                        var numberOfInstructionsToSkip = (int)code[state.CurrentInstructionIndex + 1];
+                        var newLocation = state.CurrentInstructionIndex + 2 + numberOfInstructionsToSkip; // 2 because of the instruction + offset
+                        if (newLocation < 0 || newLocation > code.Size) throw new IndexOutOfRangeException(String.Format("Jump address is out-of-range (jump offset: {0}, size: {1}).", numberOfInstructionsToSkip, code.Size));
+
+                        if (state.Stack[state.StackHead - 1] == 0)
+                        {
+                            state.CurrentInstructionIndex = newLocation;
+                        }
+                        else
+                        {
                             state.CurrentInstructionIndex += 2;
                         }
 

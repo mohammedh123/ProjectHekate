@@ -378,6 +378,54 @@ namespace ProjectHekate.Scripting.Tests
             }
 
             [TestClass]
+            public class JumpOffset : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetJumpCode()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.JumpOffset);
+                    code.Add(2);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: instruction index changes to beginning
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldThrowOutOfRangeExceptionForInvalidJumpAddress()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    code.Add(Instruction.JumpOffset);
+                    code.Add(-10);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+
+                    code = new CodeBlock();
+                    code.Add(Instruction.JumpOffset);
+                    code.Add(3); // out of range
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+                }
+            }
+
+            [TestClass]
             public class IfZeroBranch : TVirtualMachine
             {
                 [TestMethod]
@@ -446,6 +494,83 @@ namespace ProjectHekate.Scripting.Tests
                     State.Stack[0] = 0;
                     code.Add(Instruction.Jump);
                     code.Add(3); // out of range
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+                }
+            }
+
+            [TestClass]
+            public class IfZeroBranchOffset : TVirtualMachine
+            {
+                [TestMethod]
+                public void ShouldInterpetIfZeroBranchOffsetCodeForZero()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.IfZeroBranchOffset);
+                    code.Add(2);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: instruction index changes to end
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(1);
+                    State.Stack[0].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldNotBranchForNonZero()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 5;
+                    code.Add(Instruction.IfZeroBranchOffset);
+                    code.Add(2);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(1);
+                    code.Add(Instruction.Push); // just some dummy code
+                    code.Add(100);
+
+                    // Act: call method
+                    Subject.InterpretCode(code, State, null, false);
+
+                    // Verify: stack has both push values on it
+                    State.CurrentInstructionIndex.Should().Be(6);
+                    State.StackHead.Should().Be(2);
+                    State.Stack[1].Should().Be(100);
+                }
+
+                [TestMethod]
+                public void ShouldThrowOutOfRangeExceptionForInvalidJumpAddress()
+                {
+                    // Setup: set up state
+                    var code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.IfZeroBranch);
+                    code.Add(-10);
+
+                    // Act+Verify
+                    Subject
+                        .Invoking(vm => vm.InterpretCode(code, State, null, false))
+                        .ShouldThrow<IndexOutOfRangeException>();
+
+                    code = new CodeBlock();
+                    State.StackHead = 1;
+                    State.Stack[0] = 0;
+                    code.Add(Instruction.JumpOffset);
+                    code.Add(1); // out of range
 
                     // Act+Verify
                     Subject

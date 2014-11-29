@@ -416,6 +416,15 @@ namespace ProjectHekate.Scripting
             return new BinaryExpressionGenerator(leftExprGen, rightExprGen, op);
         }
 
+        public override AbstractBytecodeEmitter VisitTernaryOpExpression(HekateParser.TernaryOpExpressionContext context)
+        {
+            var testExprGen = Visit(context.expression(0));
+            var ifTrueExprGen = Visit(context.expression(1));
+            var ifFalseExprGen = Visit(context.expression(2));
+
+            return new TernaryOpExpressionGenerator(testExprGen, ifTrueExprGen, ifFalseExprGen);
+        }
+
         private Instruction GetIncOrDecOperatorFromContext(HekateParser.PostIncDecExpressionContext context)
         {
             switch (context.Operator.Type)
