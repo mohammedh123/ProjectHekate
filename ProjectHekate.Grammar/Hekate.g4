@@ -24,6 +24,21 @@ actionDeclaration
 	:	ACTION NormalIdentifier formalParameters updaterBody
 	;
 
+controllerDeclaration
+	:	CONTROLLER NormalIdentifier controllerBody
+
+emitterVarDeclaration
+	:	EMITTER NormalIdentifier SEMI
+	;
+
+controllerStateDeclaration
+	:	NormalIdentifier LPAREN RPAREN controllerStateBody
+	;
+
+controllerStateBody
+	: block
+	;
+
 functionBody
 	:	blockWithReturn
 	;
@@ -31,6 +46,10 @@ functionBody
 updaterBody
 	:	block
 	;
+
+controllerBody
+	:	emitterVarDeclaration
+	|
 
 block
 	:	LBRACE statement* RBRACE
@@ -175,6 +194,7 @@ RETURN		: 'return';
 
 CREATE		: 'create';
 EMITTER		: 'emitter';
+CONTROLLER	: 'controller';
 WITH		: 'with';
 UPDATER		: 'updater';
 ACTION		: 'action';
