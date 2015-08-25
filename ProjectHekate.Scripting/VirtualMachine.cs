@@ -640,7 +640,7 @@ namespace ProjectHekate.Scripting
                         var firingFunctionIdx = (int)code[state.CurrentInstructionIndex + 1];
                         var firingFunction = GetFiringFunctionByIndex(firingFunctionIdx);
                         var updaterActionIdx = (int)code[state.CurrentInstructionIndex + 2];
-                        var updaterAction = GetActionCodeScopeByIndex(firingFunctionIdx);
+                        var updaterAction = GetActionCodeScopeByIndex(updaterActionIdx);
 
                         ThrowIfStackDoesNotContainEnoughValues(state, firingFunction.NumParams + updaterAction.NumParams);
 
