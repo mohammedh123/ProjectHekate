@@ -286,7 +286,7 @@ namespace ProjectHekate.GUI.Screens
                 {
                     sprite = _bulletSprites[b.SpriteIndex];
                     sprite.Position = new Vector2f(b.X, b.Y);
-                    sprite.Rotation = Math.ToDegrees(b.Angle);
+                    sprite.Rotation = Math.ToDegrees(b.Angle + b.SpriteAngle);
 
                     Game.Window.Draw(sprite);
                 }

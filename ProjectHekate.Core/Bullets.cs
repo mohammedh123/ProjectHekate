@@ -20,6 +20,8 @@ namespace ProjectHekate.Core
         /// </summary>
         float Angle { get; }
 
+        float SpriteAngle { get; }
+
         /// <summary>
         /// The speed of the bullet (measured in pixels per frame). 
         /// </summary>
@@ -72,6 +74,7 @@ namespace ProjectHekate.Core
     public abstract class AbstractProjectile : AbstractScriptObject
     {
         public uint Id { get; internal set; }
+        public float SpriteAngle { get; set; }
         public float Speed { get; set; }
         public float SpriteIndexAsFloat { get { return SpriteIndex; } set { SpriteIndex = (int)value; } }
         public int SpriteIndex { get; set; }
