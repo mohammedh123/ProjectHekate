@@ -7,13 +7,10 @@ namespace ProjectHekate.Scripting
         private readonly string _name;
         private readonly int _index;
 
-        public string Name { get { return _name; } }
-        public int Index { get { return _index; } }
+        public string Name => _name;
+        public int Index => _index;
 
-        public SymbolType Type
-        {
-            get { return SymbolType.Numerical; }
-        }
+        public SymbolType Type => SymbolType.Numerical;
 
         public NumericalSymbol(string name, int index)
         {

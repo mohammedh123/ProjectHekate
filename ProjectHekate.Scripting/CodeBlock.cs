@@ -7,7 +7,7 @@ namespace ProjectHekate.Scripting
     public class CodeBlock : ICodeBlock
     {
         public int Index { get; set; }
-        public int Size { get { return _code.Count; } }
+        public int Size => _code.Count;
         public IReadOnlyList<float> Code { get; private set; }
         private readonly List<float> _code;
 

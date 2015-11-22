@@ -63,9 +63,9 @@ namespace ProjectHekate.GUI.Managers
         }
 
         public Vector2i PreviousMousePosition { get; set; }
-        public Vector2i MousePositionDelta { get { return CurrentMousePosition - PreviousMousePosition; } }
+        public Vector2i MousePositionDelta => CurrentMousePosition - PreviousMousePosition;
 
-        public bool MouseMoved { get { return MousePositionDelta.X == 0 && MousePositionDelta.Y == 0; } }
+        public bool MouseMoved => MousePositionDelta.X == 0 && MousePositionDelta.Y == 0;
 
         public void UpdateMousePosition(Window window)
         {

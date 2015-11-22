@@ -32,9 +32,7 @@ namespace ProjectHekate.Core
 
             public int CurrentFrame { get; set; }
 
-            public bool IsFinished {
-                get { return CurrentFrame == _frameCount+1; }
-            }
+            public bool IsFinished => CurrentFrame == _frameCount+1;
 
             public ProjectileAngleInterpolator(AbstractProjectile proj, float initialAngle, float finalAngle, int frameCount)
             {

@@ -16,15 +16,9 @@ namespace ProjectHekate.Scripting.Tests
     {
         protected const string WrappedProgramStringUnfmted = "function main(){{{0};}}";
 
-        protected IVirtualMachine MockVirtualMachine
-        {
-            get { return Mocker.GetMock<IVirtualMachine>().Object; }
-        }
+        protected IVirtualMachine MockVirtualMachine => Mocker.GetMock<IVirtualMachine>().Object;
 
-        protected IScopeManager MockScopeManager
-        {
-            get { return Mocker.GetMock<IScopeManager>().Object; }
-        }
+        protected IScopeManager MockScopeManager => Mocker.GetMock<IScopeManager>().Object;
 
 
         protected virtual TContextType GetFirstContext<TContextType>(string expression, bool wrappedInFunctionString = true) where TContextType : class, IParseTree

@@ -15,7 +15,7 @@ namespace ProjectHekate.Core
     {
         internal float WaitTimer { get; set; }
         internal IEnumerator<WaitInFrames> WaitEnumerator { get; set; }
-        public bool IsScripted { get { return UpdateFunc == null; } }
+        public bool IsScripted => UpdateFunc == null;
 
         internal TUpdateFunc UpdateFunc { get; set; }
     }
@@ -51,29 +51,20 @@ namespace ProjectHekate.Core
     {
         private readonly BulletSystem _bulletSystem;
         private readonly InterpolationSystem _interpolationSystem;
-        private readonly IVirtualMachine _vm;
 
         private readonly List<Controller> _controllers;
         private readonly List<Emitter> _emitters;
 
-        public IBulletSystem BulletSystem
-        {
-            get { return _bulletSystem; }
-        }
+        public IBulletSystem BulletSystem => _bulletSystem;
 
-        public IInterpolationSystem InterpolationSystem
-        {
-            get { return _interpolationSystem; }
-        }
+        public IInterpolationSystem InterpolationSystem => _interpolationSystem;
 
-        public IVirtualMachine VirtualMachine{
-            get { return _vm; }
-        }
+        public IVirtualMachine VirtualMachine { get; }
 
         public Engine()
         {
-            _vm = new VirtualMachine();
-            _bulletSystem = new BulletSystem(_vm);
+            VirtualMachine = new VirtualMachine();
+            _bulletSystem = new BulletSystem(VirtualMachine);
             _interpolationSystem = new InterpolationSystem();
             _controllers = new List<Controller>();
             _emitters = new List<Emitter>();

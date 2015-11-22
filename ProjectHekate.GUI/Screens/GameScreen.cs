@@ -68,10 +68,7 @@ namespace ProjectHekate.GUI.Screens
         /// from 1 (fully active, no transition) to 0 (transitioned
         /// fully off to nothing).
         /// </summary>
-        public float TransitionAlpha
-        {
-            get { return 1f - TransitionPosition; }
-        }
+        public float TransitionAlpha => 1f - TransitionPosition;
 
 
         /// <summary>
@@ -94,15 +91,9 @@ namespace ProjectHekate.GUI.Screens
         /// <summary>
         /// Checks whether this screen is active and can respond to user input.
         /// </summary>
-        public bool IsActive
-        {
-            get
-            {
-                return !_otherScreenHasFocus &&
-                       (ScreenState == ScreenState.TransitionOn ||
-                        ScreenState == ScreenState.Active);
-            }
-        }
+        public bool IsActive => !_otherScreenHasFocus &&
+                                (ScreenState == ScreenState.TransitionOn ||
+                                 ScreenState == ScreenState.Active);
 
         bool _otherScreenHasFocus;
 
