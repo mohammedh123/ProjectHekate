@@ -19,6 +19,7 @@ namespace ProjectHekate.Core
 
         ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex,
             ProjectileUpdateDelegate<CurvedLaser> laserFunc);
+        ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, float lifetime, float speedPerFrame, float spriteIndex);
         IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex,
             ProjectileUpdateDelegate<Beam> beamFunc = null);
         ILaser FireLaser(float x, float y, float angle, float radius, float length, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<Laser> laserFunc = null);
@@ -137,6 +138,12 @@ namespace ProjectHekate.Core
         public ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, uint lifetime, float speedPerFrame, int spriteIndex, ProjectileUpdateDelegate<CurvedLaser> laserFunc)
         {
             return InternalFireCurvedLaser(x, y, angle, radius, lifetime, speedPerFrame, spriteIndex, laserFunc);
+        }
+
+        public ICurvedLaser FireCurvedLaser(float x, float y, float angle, float radius, float lifetime, float speedPerFrame,
+            float spriteIndex)
+        {
+            return FireCurvedLaser(x, y, angle, radius, (uint)lifetime, speedPerFrame, (int)spriteIndex, null);
         }
 
         public IBeam FireBeam(float x, float y, float angle, float radius, float length, uint delayInFrames, uint lifetime, int spriteIndex, ProjectileUpdateDelegate<Beam> beamFunc = null)
