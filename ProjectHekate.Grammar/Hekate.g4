@@ -26,6 +26,7 @@ actionDeclaration
 
 controllerDeclaration
 	:	CONTROLLER NormalIdentifier controllerBody
+	;
 
 emitterVarDeclaration
 	:	EMITTER NormalIdentifier SEMI
@@ -49,7 +50,7 @@ updaterBody
 
 controllerBody
 	:	emitterVarDeclaration
-	|
+	;
 
 block
 	:	LBRACE statement* RBRACE
